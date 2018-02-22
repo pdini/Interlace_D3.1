@@ -10,3 +10,5 @@ main.pdf
 !.gitkeep
 *.synctex.gz
 *.out
+*.fls
+*.fdb_latexmk

@@ -6,4 +6,73 @@
 Eduard Hirsch and Paolo Dini
 \end{center}
 
+In this chapter an overview of the used technologies for running the INTERLACE
+Specification is given. At the beginning a quick start description is provided in
+order to jump right into the execution of the model.
+
+Further details which are enabling the Abstract State Interacting Machines (ASIM)
+specifications to be executed are discussed and elaborated about the environment in place for granting simple and stable execution.
+
+\section{Quick Start}
+
+There are two base environments available. One based one docker and one
+based on vagrant. Currently the focus lies on the vagrant environment which can be
+downloaded at github\footnote{https://github.com/InterlaceProject/ASIMVagrantEnvironment}.
+
+The vagrant definition provides a running environment for executing the INTERLACE ASIM definitions. During the provisioning process an ubuntu vagrant box is set up which installs the necessary components on that box. It is cloning and building the ICEF framework\footnote{https://github.com/biomics/icef} as well as the ASIM Specification
+\footnote{https://github.com/InterlaceProject/ASIMSpec} into the data directory
+where it is finally ready for usage.
+
+\subsection{Prerequisites}
+
+Download and install the following software products:
+
+\begin{itemize}
+	\item Virtual Box: https://www.virtualbox.org/
+	\item git: https://git-scm.com/downloads
+	\item vagrant: https://www.vagrantup.com/
+\end{itemize}
+
+\subsection{Prerequisites}
+
+To clone the ASIM vagrant environment from github into a directory git can be utilized:
+
+\begin{lstlisting}
+	git clone https://github.com/InterlaceProject/ASIMVagrantEnvironment.git
+\end{lstlisting}
+
+\subsection{Execution}
+
+Once software is installed and the vagrant definitions are cloned it is possible to call
+
+\begin{lstlisting}
+	execute.sh
+\end{lstlisting}
+
+from the main directory in order to let the INTERLACE specifications run. Note: when
+using Windows it is necessary to start that command within git-bash which needs to run in
+elevated admin mode (right click $\rightarrow$ start as administrator).
+
+What will happen:
+\begin{itemize}
+	\item On the very first execution the script is provisioning a 
+	virtual machine based on ubuntu by using vagrant up
+	\item If the virtual machine is not yet running it tries to start
+	the virtual machine.
+	\item If the VM is finally running the script data/execute.sh is called on the guest vm.
+\end{itemize}
+
+The actual execution is running inside of the Virtual Machine:
+
+The script data/execute.sh starts the icef manager as well as one brapper. Then it is submitting the specification (run.icef) located in data/ASIMSpec/ to the manager. When done the script is waiting for a stop command or may also be stopped using \textbf{ctrl + c}.
+
+\section{Environment}
+
+\section{coreASIM}
+
+\section{Interpreter}
+
+\section{ICEF}
+
 \todo{sections structure, text}
+
