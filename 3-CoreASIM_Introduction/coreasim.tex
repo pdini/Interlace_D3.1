@@ -33,7 +33,7 @@ Download and install the following software products:
 	\item vagrant: https://www.vagrantup.com/
 \end{itemize}
 
-\subsection{Prerequisites}
+\subsection{Clone Environment}
 
 To clone the ASIM vagrant environment from github into a directory git can be utilized:
 
@@ -55,6 +55,21 @@ Note: when using Windows it is necessary to start that command within
 git-bash which needs to run in elevated admin mode (right click $\rightarrow$
 start as administrator).
 
+On the very first execution the script is provisioning a virtual machine based on ubuntu by calling \texttt{vagrant up} which may take some time. Consecutive calls will be much faster. A detailed description explaining the precise process is covered in section \ref{sec:env-exec}.
+
+\section{INTERLACE Model Execution Environment}
+\label{sec:env-exec}
+
+
+
+\section{coreASIM}
+
+\section{Interpreter}
+
+\section{ICEF}
+
+\section{keep for later usage}
+\todo{section remove later}
 What will happen:
 \begin{itemize}
 	\item On the very first execution the script is provisioning a 
@@ -69,14 +84,6 @@ The actual execution is running inside of the Virtual Machine:
 The script data/execute.sh starts the icef manager as well as one brapper. Then it is submitting
 the specification (run.icef) located in data/ASIMSpec/ to the manager. When
 done the script is waiting for a stop command or may also be stopped using \textbf{ctrl + c}.
-
-\section{Environment}
-
-\section{coreASIM}
-
-\section{Interpreter}
-
-\section{ICEF}
 
 \todo{sections structure, text}
 
