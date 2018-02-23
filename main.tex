@@ -25,6 +25,12 @@
   \parbox[t]{0.9\textwidth}{\textcolor{red}{TODO: #1}}                                                                                     
 }}}
 \usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily,
+  columns=fullflexible,
+  breaklines=true,
+  postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+}
 \usepackage{graphicx}
 \usepackage{acronym}
 \usepackage{ifthen}
