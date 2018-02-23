@@ -43,15 +43,17 @@ To clone the ASIM vagrant environment from github into a directory git can be ut
 
 \subsection{Execution}
 
-Once all software components are installed and the vagrant definitions are cloned it is possible to call
+Once all software components are installed and the vagrant definitions are cloned it is
+possible to call
 
 \begin{lstlisting}
 	execute.sh
 \end{lstlisting}
 
-from the main directory in order to let the INTERLACE specifications run. Note: when
-using Windows it is necessary to start that command within git-bash which needs to run in
-elevated admin mode (right click $\rightarrow$ start as administrator).
+from the main directory in order to let the INTERLACE specifications run.
+Note: when using Windows it is necessary to start that command within
+git-bash which needs to run in elevated admin mode (right click $\rightarrow$
+start as administrator).
 
 What will happen:
 \begin{itemize}
@@ -64,7 +66,9 @@ What will happen:
 
 The actual execution is running inside of the Virtual Machine:
 
-The script data/execute.sh starts the icef manager as well as one brapper. Then it is submitting the specification (run.icef) located in data/ASIMSpec/ to the manager. When done the script is waiting for a stop command or may also be stopped using \textbf{ctrl + c}.
+The script data/execute.sh starts the icef manager as well as one brapper. Then it is submitting
+the specification (run.icef) located in data/ASIMSpec/ to the manager. When
+done the script is waiting for a stop command or may also be stopped using \textbf{ctrl + c}.
 
 \section{Environment}
 
