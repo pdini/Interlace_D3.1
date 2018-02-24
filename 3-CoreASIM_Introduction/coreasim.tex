@@ -8,7 +8,7 @@ Eduard Hirsch and Paolo Dini
 
 In this chapter an overview of the used technologies for running the INTERLACE Specification is given. At the beginning a quick start description is provided in order to jump right into the execution of the model.
 
-Further details which are enabling the Abstract State Interacting Machines (ASIM) specifications to be executed are discussed and elaborated about the environment in place for granting simple and stable execution.
+Further details which are enabling the Abstract State Interacting Machines (ASIM) specifications to be executed are discussed and why this possible in a simple and stable manner.
 
 \section{Quick Start}
 
@@ -54,16 +54,29 @@ Once the execution is started it will run until it is stopped by pressing \textb
 
 from any another console window.
 
-\section{INTERLACE Model Execution Environment}
-\label{sec:env-exec}
+\section{ICEF - The Interaction Computing Execution Framework}
+\label{sec:icef-intro}
 
+\todo{references}
 
+The interaction framework is wrapping the original coreASM framework in order to extend it and giving it the capabilities to execute concurrent and distributed. It has been developed in a project called BIOMICS and financed by the European Comission.
+
+This wrapping took place on three levels:
+
+First the interpreter coreASM had to be extended supporting additional languages primitives as well as communications features. Here BSL replaces ASM as a new language having a new interpreter coreASIM.
+
+Second a place has been created were the now so called Abstract State Interaction Machines (ASIMs) take over and are able to execute in parallel. This environment is called Brapper (short for BIOMICS Wrapper).
+
+Third a central server called manager takes care handling distributed Brapper instances dealing with message and scheduling issues.
+
+Technology wise coreASIM changes the coreASM implementation in Java. Brappers are written in Java as well but the managers are coordinating the Brappers using nodejs.
 
 \section{coreASIM}
 
 \section{Interpreter}
 
-\section{ICEF}
+\section{INTERLACE Model Execution Environment}
+\label{sec:env-exec}
 
 \section{keep for later usage}
 \todo{section remove later}
