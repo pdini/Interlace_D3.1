@@ -10,9 +10,10 @@ In this chapter an overview of the used technologies for running the INTERLACE S
 
 Further details which are enabling the Abstract State Interacting Machines (ASIM) specifications to be executed are discussed and why this possible in a simple and stable manner.
 
-\section{Quick Start}
+\section{Quick Start Vagrant}
+\label{sec:quick-start-vagrant}
 
-There are two base environments available. One based one docker and one based on vagrant. Currently the focus lies on the vagrant environment which can be downloaded at github\footnote{https://github.com/InterlaceProject/ASIMVagrantEnvironment}.
+There are two base environments available. One based one docker and one based on vagrant. The focus shifted from the vagrant environment which can be downloaded at github\footnote{https://github.com/InterlaceProject/ASIMVagrantEnvironment} to a docker based version which is explained in section \ref{sec:quick-start-docker}. Nevertheless, for developer preferring vagrant, the setup will be still explained.
 
 The vagrant definition provides a running environment for executing the INTERLACE ASIM definitions. During the provisioning process an ubuntu vagrant box is set up which installs the necessary components on that box. It is cloning and building the ICEF framework\footnote{https://github.com/biomics/icef} as well as the ASIM Specification\footnote{https://github.com/InterlaceProject/ASIMSpec} into the data directory where it is finally ready for usage.
 
@@ -52,7 +53,49 @@ Once the execution is started it will run until it is stopped by pressing \textb
 	stop.sh
 \end{lstlisting}
 
-from any another console window.
+from any other console window.
+
+\section{Quick Start Docker}
+\label{sec:quick-start-docker}
+
+The docker project at github\footnote{https://github.com/InterlaceProject/ASIMDockerEnvironment} is also based on virtualization like the vagrant environment but emphasizing \textit{Operating System} instead of \textit{Hardware virtualization}\footnote{https://www.docker.com/what-container\#comparing}.
+
+\subsection{Installation}
+
+\begin{itemize}
+	\item install docker
+	\item install git (including git bash for windows)
+\end{itemize}
+
+On Linux machines it is important to add the current user to the docker group in order to manage docker container and images. Otherwise all further explained commands need to be executed as root or with sudo.
+
+\subsection{Before First Execution}
+
+In order to configure the environment it is necessary to call the following script:
+
+\begin{lstlisting}
+	./configure
+\end{lstlisting}
+
+This will generate a docker container image called \textit{asim} where all the necessary frameworks are build and prepared for execution of the specifications. The ICEF framework as well as the ASIM model specifcations are cloned outside of the container to simplify development.
+
+\subsection{Execute Specification}
+
+The container image \textit{asim} created during the configuring step can be started by calling
+
+\begin{lstlisting}
+	./execute
+\end{lstlisting}
+
+A container started in this way is called \textit{active\_asim} and running all the necessary steps like starting an ICEF manager as well a ICEF brapper to run the ASIM specifications.
+
+Like the vagrant environment a running execution may be stopped by pressing \textbf{ctrl + c} or by calling
+
+\begin{lstlisting}
+	./stop
+\end{lstlisting}
+
+from any other console window.
 
 \section{ICEF - The Interaction Computing Execution Framework}
 \label{sec:icef-intro}
