@@ -94,6 +94,25 @@ Like the vagrant environment a running execution may be stopped by pressing \tex
 \section{Execution Environment Stack}
 \label{sec:exec-env-stack}
 
+Independent of the used virtualization techniques a consistent base system is used. So both docker as well as vagrant are provisioning a Linux based operating system using an Ubuntu 16.04 LTS (Long Term Support) distribution.
+That consistent, stable and reliable structure will be important later when considerations about provability as well testability come into place. That design provides always the same preconditions and everybody executing or testing against the specifications will receive the same results.
+
+\subsection{Software Stack}
+
+The Ubuntu 16.04 LTS distribution is enhanced and updated according to the needs of an ASIM executing machine as well as to the needs of developers working with that virtual system. To be more specific the following components are installed during the provisioning process:
+
+\begin{itemize}
+	\item curl $\rightarrow$ Tool for querying REST resources (used for downloading package resources)
+	\item nodejs $\rightarrow$ JavaScript engine including the package manager npm (running the Manager Component of ICEF)
+	\item build-essential $\rightarrow$ Packages needed to compile a debian based package (used for building the project sources)
+	\item maven $\rightarrow$ Java build and packaging tool (used for building the project sources)
+	\item vim $\rightarrow$ Well known U/Linux editor (for development purposes)
+	\item git $\rightarrow$ Distributed Version Control System (downloading source repositories from GitHub)
+	\item Java 8 $\rightarrow$ Programming Language used for coreASIM base system implementation (running ASIM instances)
+\end{itemize}
+
+
+
 \todo{Ubuntu, Manager, Brapper, Refs, Figures, Development}
 
 \section{ICEF - The Interaction Computing Execution Framework}
