@@ -60,7 +60,7 @@ from any other console window.
 
 The docker project at github\footnote{https://github.com/InterlaceProject/ASIMDockerEnvironment} is also based on virtualization like the vagrant environment but emphasizing \textit{Operating System} instead of \textit{Hardware virtualization}\footnote{https://www.docker.com/what-container\#comparing}.
 
-\subsection{Installation}
+\subsection{Prerequisites}
 
 \begin{itemize}
 	\item install docker
@@ -68,6 +68,8 @@ The docker project at github\footnote{https://github.com/InterlaceProject/ASIMDo
 \end{itemize}
 
 On Linux machines it is important to add the current user to the docker group in order to manage docker container and images. Otherwise all further explained commands need to be executed as root or with sudo.
+
+For Windows machines use \textit{git-bash} to execute the commands described in the following sections.
 
 \subsection{Before First Execution}
 
@@ -77,7 +79,7 @@ In order to configure the environment it is necessary to call the following scri
 	./configure
 \end{lstlisting}
 
-This will generate a docker container image called \textit{asim} where all the necessary frameworks are build and prepared for execution of the specifications. The ICEF framework as well as the ASIM model specifcations are cloned outside of the container to simplify development.
+This will generate a docker container image called \textit{asim} where all the necessary frameworks are build and prepared for execution of the specifications. The ICEF framework as well as the ASIM model specifications are cloned outside of the container to simplify development.
 
 \subsection{Execute Specification}
 
@@ -98,6 +100,7 @@ Independent of the used virtualization techniques a consistent base system is us
 That consistent, stable and reliable structure will be important later when considerations about provability as well testability come into place. That design provides always the same preconditions and everybody executing or testing against the specifications will receive the same results.
 
 \subsection{Software Stack}
+\label{sec:env-exec-stack-software-stack}
 
 The Ubuntu 16.04 LTS distribution is enhanced and updated according to the needs of an ASIM executing machine as well as to the needs of developers working with that virtual system. To be more specific the following components are installed during the provisioning process:
 
@@ -110,6 +113,38 @@ The Ubuntu 16.04 LTS distribution is enhanced and updated according to the needs
 	\item git $\rightarrow$ Distributed Version Control System (downloading source repositories from GitHub)
 	\item Java 8 $\rightarrow$ Programming Language used for coreASIM base system implementation (running ASIM instances)
 \end{itemize}
+
+\subsection{Provisioning Process}
+
+The provisioning process can be separated into 3 steps which are executed when \textit{.\/configure} for docker or \textit{vagrant up} for vagrant is called from the command line:
+
+\begin{enumerate}
+	\item Download ASIMSpec and ICEF from GitHub
+	\item Install of software packages mentioned in section \ref{sec:env-exec-stack-software-stack}
+	\item Build ICEF framework and prepare virtual machine for execution
+\end{enumerate}
+
+For development purposes the ASIMSpec as well as the ICEF framework are cloned into directories which are available from the host machine and the virtual guest machine. This is necessary because then it is possible to directly edit the source or debug from outside and execute the code from within the container. Consequently it is not necessary to copy the code into the container when changes where done.
+
+For \textbf{Vagrant} shared folder is configured over the vagrant file
+
+\begin{lstlisting}
+	config.vm.synced_folder "./data", "/vagrant-data"
+\end{lstlisting}
+
+saying that on the host system the folder \textit{data} is used and on the guest system a folder \textit{vagrant-data} is mounted which are shared and thus containing the same content. Additionally during provisioning a symbolic link in the home directory is created called project (/home/ubuntu/project) which is linking the mounted root folder /vagrant-data.
+
+When the virtual machine is stopped the data directory on the host is kept and can be still manipulated or executed (of course only if the framework dependencies are installed on the host as well).
+
+For \textbf{Docker} we need to first clone all GitHub sources to the host machine and can only then share the files into the guest container by using the command line option "-v"
+
+\begin{lstlisting}
+	docker run -v "$1/ASIMSpec:/home/ASIMSpec" \
+	           -v "$1/icef:/home/icef" \
+	           --name active_asim -it asim /$2
+\end{lstlisting}
+
+This line is part of the script \textit{scripts/runDocker.sh}. \$1 here stands for the home directory of the user and \$2 will be replace by script which should be executed inside of the docker container.
 
 \subsection{Executions Stack}
 
