@@ -126,13 +126,14 @@ The provisioning process can be separated into 3 steps which are executed when \
 
 For development purposes the ASIMSpec as well as the ICEF framework are cloned into directories which are available from the host machine and the virtual guest machine. This is necessary because then it is possible to directly edit the source or debug from outside and execute the code from within the container. Consequently it is not necessary to copy the code into the container when changes where done.
 
+\todo{move to exec stack?}
 For \textbf{Vagrant} shared folder is configured over the vagrant file
 
 \begin{lstlisting}
 	config.vm.synced_folder "./data", "/vagrant-data"
 \end{lstlisting}
 
-saying that on the host system the folder \textit{data} is used and on the guest system a folder \textit{vagrant-data} is mounted which are shared and thus containing the same content. Additionally during provisioning a symbolic link in the home directory is created called project (/home/ubuntu/project) which is linking the mounted root folder /vagrant-data.
+saying that on the host system the folder \textit{data} is used and on the guest system a folder \textit{vagrant-data} is mounted which are shared and thus containing the same content. Additionally during provisioning a symbolic link in the home directory is created called project (\textit{/home/ubuntu/project}) which is linking the mounted root folder /vagrant-data.
 
 When the virtual machine is stopped the data directory on the host is kept and can be still manipulated or executed (of course only if the framework dependencies are installed on the host as well).
 
@@ -144,25 +145,37 @@ For \textbf{Docker} we need to first clone all GitHub sources to the host machin
 	           --name active_asim -it asim /$2
 \end{lstlisting}
 
-This line is part of the script \textit{scripts/runDocker.sh}. \$1 here stands for the home directory of the user and \$2 will be replace by script which should be executed inside of the docker container.
+This line is part of the script \textit{scripts/runDocker.sh}. \$1 here stands for the local directory of the environment and \$2 will be explained later in section \ref{sec:env-exec-stack-exec-stack}. Important to note is that the \textit{ASIMSpec} folder of the host machine is shared into \textit{/home/ASIMSpec} of the docker container and the \textit{icef} directory is shared into \textit{/home/icef}.
 
-\subsection{Executions Stack}
+\subsection{Execution}
+\label{sec:env-exec-stack-exe}
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.9\textwidth, clip, trim=1mm 1mm 1mm 1mm]{Figures/environment_asim}
-  \caption{ASIM Execution Environment Overview}
-  \label{fig:exec-env-asim}
-\end{figure}
+The execution stack in figure \ref{fig:icef-intro-asim} shows where a ICEF specification is transmitted to for it to be executed. The details will be covered in section \ref{sec:icef-intro}. In this part of the document, however, we will take a look at how and which services are started.
 
-\todo{Ubuntu, Manager, Brapper, Refs, Figures, Development}
+Due to limitations of the ICEF framework it is currently not possible to cleanly shut down a running ICEF simulation with several running ASIM instances. Therefore both environments have to start and stop all services for every execution in order to grant a correct execution set-up.
+
+Both environments offer a script (\textit{execute(.sh)}) to be called from the host system and one from within the virtualized machine (\textit{executeASIMSpec.sh/executeOnGuest.sh}). Whereas the script on the virtualized system only differ in directory references the outside scripts are need to handle different things as one script is dealing with docker and the other with vagrant.
+
+In detail Docker can immediately start the servers and run the script inside the container whereas vagrant needs add an additional step if the virtual machine is not up and running yet. Thus vagrant
+
+\begin{enumerate}
+	\item is trying to start the server processes and submit the specifications
+	\item if the first step failed is checking for the virtual machine if it is running and if not it tries to restart the virtual machine
+	\item if the restart has been successful the first step will be retried.
+\end{enumerate}
+
+When now focusing on the first step which is basically the same on both environments it can be discussed in detail how the process is continued. So on the guest system we are first running a so called \textit{CASIMA} which is short hand for coreASIM-Manager \ref{TODO}. This manager takes care about ASIM states, scheduling and also deals as messaging backbone.
+
+\todo{Brapper, https://github.com/biomics/icef}
+
+\subsection{Development}
+
+\todo{do we need?}
 
 \section{ICEF - The Interaction Computing Execution Framework}
 \label{sec:icef-intro}
 
-\todo{references}
-
-The interaction framework is wrapping the original coreASM framework in order to extend it and giving it the capabilities to execute concurrent and distributed. It has been developed in a project called BIOMICS and financed by the European Comission.
+The interaction framework is wrapping the original coreASM framework in order to extend it and giving it the capabilities to execute concurrent and distributed. It has been developed in a project called BIOMICS and financed by the European Commission.
 
 This wrapping took place on three levels:
 
@@ -173,6 +186,16 @@ Second a place has been created were the now so called Abstract State Interactio
 Third a central server called manager takes care handling distributed Brapper instances dealing with message and scheduling issues.
 
 Technology wise coreASIM changes the coreASM implementation in Java. Brappers are written in Java as well but the managers are coordinating the Brappers using nodejs.
+
+\subsection{Framework Stack}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.9\textwidth, clip, trim=1mm 1mm 1mm 1mm]{Figures/environment_asim}
+  \caption{ASIM Execution Environment Overview}
+  \label{fig:icef-intro-asim}
+\end{figure}
+
 
 \section{coreASIM}
 
