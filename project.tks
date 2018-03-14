@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TexmakerSession quickmode="3">
-    <document bookmark1="0" bookmark2="0" bookmark3="0" master="true" file="main.tex" hasfocus="false" line="0"/>
-    <document bookmark1="0" bookmark2="0" bookmark3="0" master="false" file="3-CoreASIM_Introduction/coreasim.tex" hasfocus="true" line="0"/>
+    <document master="true" file="main.tex" line="19" hasfocus="false" bookmark1="0" bookmark2="0" bookmark3="0"/>
+    <document master="false" file="3-CoreASIM_Introduction/coreasim.tex" line="259" hasfocus="true" bookmark1="0" bookmark2="0" bookmark3="0"/>
+    <document master="false" file="2-Update_Business_Logic_Specification/businesslogic.tex" line="0" hasfocus="false" bookmark1="0" bookmark2="0" bookmark3="0"/>
+    <document master="false" file="Misc/json.tex" line="5" hasfocus="false" bookmark1="0" bookmark2="0" bookmark3="0"/>
 </TexmakerSession>

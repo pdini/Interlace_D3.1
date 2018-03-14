@@ -126,7 +126,6 @@ The provisioning process can be separated into 3 steps which are executed when \
 
 For development purposes the ASIMSpec as well as the ICEF framework are cloned into directories which are available from the host machine and the virtual guest machine. This is necessary because then it is possible to directly edit the source or debug from outside and execute the code from within the container. Consequently it is not necessary to copy the code into the container when changes where done.
 
-\todo{move to exec stack?}
 For \textbf{Vagrant} shared folder is configured over the vagrant file
 
 \begin{lstlisting}
@@ -154,7 +153,7 @@ The execution stack in figure \ref{fig:icef-intro-asim} shows where a ICEF speci
 
 Due to limitations of the ICEF framework it is currently not possible to cleanly shut down a running ICEF simulation with several running ASIM instances. Therefore both environments have to start and stop all services for every execution in order to grant a correct execution set-up.
 
-Both environments offer a script (\textit{execute(.sh)}) to be called from the host system and one from within the virtualized machine (\textit{executeASIMSpec.sh/executeOnGuest.sh}). Whereas the script on the virtualized system only differ in directory references the outside scripts are need to handle different things as one script is dealing with docker and the other with vagrant.
+\subsubsection{Start Services Processes}: Both environments offer a script (\textit{execute(.sh)}) to be called from the host system and one from within the virtualized machine (\textit{executeASIMSpec.sh/executeOnGuest.sh}). Whereas the script on the virtualized system only differ in directory references the outside scripts are need to handle different things as one script is dealing with docker and the other with vagrant.
 
 In detail Docker can immediately start the servers and run the script inside the container whereas vagrant needs add an additional step if the virtual machine is not up and running yet. Thus vagrant
 
@@ -164,30 +163,101 @@ In detail Docker can immediately start the servers and run the script inside the
 	\item if the restart has been successful the first step will be retried.
 \end{enumerate}
 
-When now focusing on the first step which is basically the same on both environments it can be discussed in detail how the process is continued. So on the guest system we are first running a so called \textit{CASIMA} which is short hand for coreASIM-Manager \ref{TODO}. This manager takes care about ASIM states, scheduling and also deals as messaging backbone.
+When now focusing on the first step which is basically the same on both environments it can be discussed in detail how the process is continued. So on the guest system we are first running a so called \textit{CASIMA} which is short hand for coreASIM-Manager \ref{sec:icef-intro}. This manager takes care about ASIM states, scheduling and also acts as messaging backbone.
 
-\todo{Brapper, https://github.com/biomics/icef}
+Next a second service process is started. The service is a wrapper for the coreASM implementation and its name is Brapper (BIOMICS wrapper). This Brapper service executes enhanced ASM code named BSL that offers additional language primitives specifically designed during the BIOMICS project. Those features mainly include interaction features used to model biochemical systems, nevertheless, and actually because of that they are also suitable for decentralized and distributed computer system.
+
+When a Brapper is going to be started it needs to be register at a manager instance. As described in section \ref{sec:icef-intro} it is possible to start multiple Brappers. Once a simulation is submitted to the manager, the manager is distributing the different simulations including their ASIMs to different Brapper services for executing them there trying to spread the load equally.
+
+For the sake of simplicity the environment starts only one Brapper by default. In the final implementation it'll be possible to configure the number of Brappers used for execution.
+
+\subsubsection{Submit ICEF definition file}: Finally after the service processes are running it is possible to submit a specification file to the manager. This is done by the executing bash script which is calling a  nodejs client:
+
+\begin{lstlisting}
+	...
+	node loadICEF.js $project/ASIMSpec/run.icef localhost 9090
+	...
+\end{lstlisting}
+
+The above listing uses a \textit{\$project} variable containing the path of ASIMSpec to find the icef specification. By convention the icef definition file of the ASIM Specifications is called \textit{run.icef} to clearly identify the entry point for the environment.
+The last two parameters for the script are host as well as port where the manager services is running and waiting for requests.
 
 \subsection{Development}
+\label{sec:development}
 
-\todo{do we need?}
+For developing new simulations it is important to have a proper development environment. There are existing many IDE/Tool/Debuggers for Java and JavaScript which are used for Brapper, Manager or coreAS(I)M plugin development but there are only limited IDE choices for implementing AS(I)Ms.
+
+For the public Integrated Development Environment Eclipse, developers of the ICEF framework have adopted the coreASM plugin for supporting the additional language primitives. Thus for working with ASIM implementations of INTERLACE you ideally DO NOT download the coreASM package which is available at the market place of Eclipse. The adopted plugin working with the new language elements is provided by the ICEF framework but is needed to build and imported manually into Eclipse.
+
+\textbf{Import the IDE Eclipse plugin for coreASIM}
+\todo{rewrite import - quick info}
+1) Build Framework
+
+You can call
+
+./execute /bin/bash
+
+to enter the container and do the next steps from "inside" or if you've got maven installed you can do them directly on your host from "outside".
+
+So you'd need 
+
+%cd icef/coreASIM/org.coreasim.parent/ && mvn package install
+
+which copies the engine and util jars then
+
+%cd icef/coreASIM/org.coreasim.eclipse && mvn package install
+   
+to build the packages and copy the jar files for the plugin automatically.
+
+
+2) Setup Eclipse
+
+* Install the Eclipse PDE (Plug-in Development Environment) from the marketplace for your Eclipse installation (restart)
+* Then import the Eclipse project from icef/coreASIM/org.coreasim.eclipse    (File -> Import: Existing Project into Workspace)
+ before actually importing the plugin you could try if everything works by starting a second eclipse instance including the ASIM plugin by right clicking the project -> Run As -> Eclipse Application
+* Finally you'd need to import the plugin by going to the export wizard: File/Export -> There look for export "Deployable plug-ins and fragments", select the compiled plug-in fragment org.coreasim.eclipse, and then in the lower half of the page select "Install into host"-> finish.
+
 
 \section{ICEF - The Interaction Computing Execution Framework}
 \label{sec:icef-intro}
 
 The interaction framework is wrapping the original coreASM framework in order to extend it and giving it the capabilities to execute concurrent and distributed. It has been developed in a project called BIOMICS and financed by the European Commission.
 
-This wrapping took place on three levels:
+\textbf{This wrapping took place on three levels:}
 
-First the interpreter coreASM had to be extended supporting additional languages primitives as well as communications features. Here BSL replaces ASM as a new language having a new interpreter coreASIM.
+\textbf{First} the interpreter coreASM had to be extended supporting additional languages primitives as well as communications features. Here BSL replaces ASM as a new language having a new interpreter coreASIM.
 
-Second a place has been created were the now so called Abstract State Interaction Machines (ASIMs) take over and are able to execute in parallel. This environment is called Brapper (short for BIOMICS Wrapper).
+\textbf{Second} a place has been created were the now so called Abstract State Interaction Machines (ASIMs) take over and are able to execute in parallel. This environment is called Brapper (short for BIOMICS Wrapper).
 
-Third a central server called manager takes care handling distributed Brapper instances dealing with message and scheduling issues.
+\textbf{Third} a central server called manager takes care handling distributed Brapper instances dealing with message and scheduling issues.
 
-Technology wise coreASIM changes the coreASM implementation in Java. Brappers are written in Java as well but the managers are coordinating the Brappers using nodejs.
+Technology wise coreASIM changes the coreASM implementation in Java. Brappers are written in Java as well but the managers are coordinating the Brappers using nodejs and therefor written in JavaScript.
 
 \subsection{Framework Stack}
+
+Next, the framework stack of ICEF in terms of the INTERLACE implementation is described more detailed. In figure \ref{fig:icef-intro-asim} the stack can be viewed in different levels of granularity.
+
+As a stable base for the INTERLACE execution environment stack a Linux based system, Ubuntu 16.04 LTS, has been chosen. A LTS (Long Term Support) version is chosen to be sure to have a reliable platform which is maintained by the distributor for long time. Ubuntu publishes those version every two years and promises a maintenance duration of five years\footnote{https://www.ubuntu.com/info/release-end-of-life}.
+
+In listing \ref{lst:icef-json-spec} it is possible to see how the specification for the simulation is looking like. Side note: A definition for the client here is not given because the client which is sending credit, debit or other requests is spawned and destroyed on demand by the scheduler ASIM.
+
+\begin{lstlisting}[language=json,firstnumber=1,caption={ICEF Json Specification for Interlace},captionpos=b,label=lst:icef-json-spec]
+{
+   "id": "interlace", 
+   "schedulers": [
+       {
+	   "file": "casim/scheduler.casim",
+	   "start": true
+       }
+   ], 
+   "asims": [       
+       {
+           "file": "casim/server.casim",
+           "start": true
+       }
+   ]
+}
+\end{lstlisting}
 
 \begin{figure}[htbp]
   \centering
