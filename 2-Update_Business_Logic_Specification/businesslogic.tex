@@ -11,9 +11,6 @@ The business logic specification provided in Deliverable D2.1 \cite{INTERLACE_D2
 
 The description of the Permissioning iterative refinement relies mainly on graphical depictions of the variables and functions involved. As this reflects the process that was used to build a shared understanding within the INTERLACE team itself, it is hoped that it will also make it easier for newcomers to the INTERLACE open source community to understand the implementation.
 
-\section{Overview}
-Figure \ref{fig:transactabilitywkflow} shows the high-level view of the process, including how example PreviewRequest and PerformRequest rules specified in D2.1 map onto it. The process can be seen to start on the left of the figure, when a user or the System initiates the request for a transaction. The request must pass the three tests shown: Transfer Types, Account Connectivity, and MetaData. Upon successful completion of these three tests, the user is shown a preview screen that summarizes all the transaction data. When the user issues the command to proceed, the three tests are repeated and a final test on the account limits (e.g.\ sufficient funds) performed. If also this fourth test is passed, the transaction is executed. We now describe each step in detail.
-
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=16cm]{Figures/Transactability_Workflow}
@@ -21,7 +18,51 @@ Figure \ref{fig:transactabilitywkflow} shows the high-level view of the process,
 \label{fig:transactabilitywkflow}
 \end{figure}
 
+\section{Overview}
+Figure \ref{fig:transactabilitywkflow} shows the high-level view of the process, including how example PreviewRequest and PerformRequest rules specified in D2.1 map onto it. The process can be seen to start on the left of the figure, when a user or the System initiates the request for a transaction. The request must pass the three tests shown: Transfer Types, Account Connectivity, and MetaData. Upon successful completion of these three tests, the user is shown a preview screen that summarizes all the transaction data. When the user issues the command to proceed, the three tests are repeated and a final test on the account limits (e.g.\ sufficient funds) performed. If also this fourth test is passed, the transaction is executed. We now describe each step in detail.
+
 \section{Detailed Discussion}
+\subsection{Groups}
+The original Sardex system divides its users into 29 different types, called `groups'. This generates a great deal of complexity that is drastically reduced in the INTERLACE version of the platform. The new user type taxonomy involves only 9 groups, as shown in Table \ref{tab:groups}.
+
+%&\hspace{0.5cm}\\
+
+\setcounter{table}{0}
+\setlength{\tabcolsep}{10pt}
+\begin{table}[htbp]
+\begin{centering}
+\small
+{
+\begin{tabular}{| l | l | }
+\hline
+\textbf{Group}	& \textbf{Description} \\
+\hline
+$welcome$ & User who has joined and signed the contract, but has not yet been cleared to start trading \\
+\hline
+$retail$ & Retailer who can \emph{only} participate in B2C operations (not B2E and not B2B) \\
+\hline
+$company$ & Company, which could be a retailer, that can use B2E and B2B but \emph{not} B2C \\
+\hline
+$full$ & Has all the functions of $retailer$ and of $company$ \\
+\hline
+$employee$ & Employee of $company$ or of $full$ \\
+\hline
+$on$\_$hold$ & User whose privileges have been suspended (for whateve reason) \\
+\hline
+$consumer$ & Person not registered to the circuit who can only interact through B2C Use Case 2 \\
+\hline
+$consumer$\_$verified$ & $consumer$ who has registered and can now also purchase with SRD (B2C Use Case 3)  \\
+\hline
+$MNGR$ & Manager of the circuit (e.g.\ Sardex S.p.A.) acting as $company$ rather than $SysAdmin$ \\
+\hline
+\end{tabular}
+}
+\caption{\small\textbf{New user types (groups) for the INTERLACE platform}}
+\label{tab:groups}
+\end{centering}
+\end{table}
+
+$SysAdmin$ is not defined explicitly as a group, in this model, although technically it too is a user type. $SysAdmin$ has special privileges, some of which are discussed where relevant in what follows.
 
 \subsection{Currencies and Channels}
 As shown in Figure \ref{fig:currchan}, the Sardex/INTERLACE platform supports transactions in both Sardex credits (SRD) and Euros (Euro) over two kinds of channels. `Service' refers to transactions mediated either by a computer (web application) or a mobile phone (either a web application or a phone App). `POS' means `Point of Sale' and refers to the standard terminal used by retailers that accepts credit or debit cards, through which SRD transactions can be routed via an API. The figure also shows the four possible $\{ currency, channel \}$ combinations that we need to support in the definition and implementation of the permissioning tests discussed in the next sections.
@@ -38,12 +79,10 @@ The interactions between circuit participants can be described from different po
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=10cm]{Figures/Stack}
+\includegraphics[width=9cm]{Figures/Stack}
 \caption{\small\textbf{Stack view of the INTERLACE communication, economic, and financial  interactions}}
 \label{fig:stack}
 \end{figure}
-
-Figure \ref{fig:stack} extends the two communication levels described in D2.1, but does so qualitatively. For the purposes of the implementation, we need a smaller set of levels but a more precise and specific vocabulary to identify the end-points of the transaction. Figure \ref{fig:vocabulary} shows this additional information as concerns levels 2, 3 and 4, which are labelled in the first column in the same way as in Figure \ref{fig:stack}, along with a great deal more information. In particular, this figure could be seen to integrate aspects of Figures \ref{fig:stack} and \ref{fig:transactabilitywkflow}, with the purpose of facilitating the conceptual understanding of the specification. `Groups' refer to user types, while `MetaData' to the parameters allocated to each user type or group. For example, the $\%$ of SRD accepted by a given user over 1000-EUR transaction values is a MetaData field of the Company group but not the Consumer\_Verified group.
 
 \begin{figure}[htbp]
 \centering
@@ -52,19 +91,50 @@ Figure \ref{fig:stack} extends the two communication levels described in D2.1, b
 \label{fig:vocabulary}
 \end{figure}
 
-\subsection{Visibility}
-Before the initiator of a transaction can even issue a transaction request he/she must be able to \emph{see} the recipient. Figure \ref{fig:visibility}
+Figure \ref{fig:stack} extends the two communication levels described in D2.1, but does so qualitatively. For the purposes of the implementation, we need a smaller set of levels but a more precise and specific vocabulary to identify the end-points of the transaction. Figure \ref{fig:vocabulary} shows this additional information as concerns levels 2, 3 and 4, which are labelled in the first column in the same way as in Figure \ref{fig:stack}, along with a great deal more information. In particular, this figure could be seen to integrate aspects of Figures \ref{fig:stack} and \ref{fig:transactabilitywkflow}, with the purpose of facilitating the conceptual understanding of the specification. `Groups' refer to user types, while `MetaData' to the parameters allocated to each user type or group. For example, the $\%$ of SRD accepted by a given user over 1000-EUR transaction values is a MetaData field of the Company group but not the Consumer\_Verified group.
 
-\begin{figure}[htbp]
+\subsection{Visibility}
+Figure \ref{fig:visibility} shows which groups ($toGroups$) are visible to which groups ($fromGroups$) by a `1' at the intersection of the $(row, column)$ corresponding to a choice of $(fromGroup, toGroup)$. For example, $company$ is visible to $employee$, meaning that $employee$ can do a search for $company$, but not vice versa. In this case $employee$ is not visible due to privacy legislation.
+
+In general, transactability correlates to visibility. However, there is not a strict 1-1 relationship between them. For the example of a $company$ paying its own $employees$ as part of the B2E programme, $employee$ remains invisible to a search, but $company$ has the $username$ of the $employee$ and can perform a credit transaction to pay (part of) their salary.
+
+On the right of Figure \ref{fig:visibility} we show that some groups are always invisible $\{ F \}$ others are always visibile $\{ T \}$, and others could be either $\{T, F\}$. For example, a company could be put in the shadow state if it has reached its maximum positive credit limit.
+
+\begin{figure}[H]
 \centering
-\includegraphics[width=10cm]{Figures/Visibility}
+\includegraphics[width=12cm]{Figures/Visibility}
 \caption{\small\textbf{Mutual visibility of different groups}}
 \label{fig:visibility}
 \end{figure}
 
+\subsection{B2C Operations}
+This report extends the use cases covered by D2.1 by adding also the Business to Consumer (B2C) use cases. B2C was developed to increase the number and volume of transactions, i.e.\ the size of the Sardex economy, by extending the ability to transact in SRD to people not otherwise connected to the circuit. The principle involves offering the opportunity to $retail$ers to reward their EUR customers with an SRD rebate.
+
+The amount of the reward is a percent, in SRD, of the amount in EUR paid by $consumer$ to $retail$, where the percent is set by $retail$ and it is an example of the $MetaData$ for this group. The reward is stored on a smart card that is offered to $consumer$ at the time of purchase. This is shown as a child transaction in B2C Use Case 2, Figure \ref{fig:B2C1}.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=16cm]{Figures/B2C1}
+\caption{\small\textbf{kajdshkjahdfg}}
+\label{fig:B2C1}
+\end{figure}
+
+Use Case 2 also involves a second child transaction, a 2\% fee, in EUR, paid from $retail$'s Prepaid account to $MNGR$'s Topup account. The asterisks next to these account names, in the figure, indicate that these two accounts are \emph{owned} by these two users but are not \emph{controlled} by them. They are controlled by $SysAdmin$. These EUR accounts are `statistical' rather than `real', meaning that they simply keep track of actual EUR amounts but do not themselves hold Euros. Sardex S.p.A. would need to be a bank for that to be possible.
 
 
 
+
+
+
+and \ref{fig:B2C2}.
+
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=16.5cm]{Figures/B2C2}
+\caption{\small\textbf{lskvlkjslkhg}}
+\label{fig:B2C2}
+\end{figure}
 
 
 
