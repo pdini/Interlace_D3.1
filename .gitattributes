@@ -3,3 +3,4 @@
 .gitignore text eol=lf
 *.md text eol=lf
 *.tex text eol=lf
+*.bib text eol=lf
