@@ -21,13 +21,11 @@ The description of the Permissioning iterative refinement relies mainly on graph
 \section{Overview}
 Figure \ref{fig:transactabilitywkflow} shows the high-level view of the process, including how example PreviewRequest and PerformRequest rules specified in D2.1 map onto it. The process can be seen to start on the left of the figure, when a user or the System initiates the request for a transaction. The request must pass the three tests shown: Transfer Types, Account Connectivity, and MetaData. Upon successful completion of these three tests, the user is shown a preview screen that summarizes all the transaction data. When the user issues the command to proceed, the three tests are repeated and a final test on the account limits (e.g.\ sufficient funds) performed. If also this fourth test is passed, the transaction is executed. We now describe each step in detail.
 
-\section{Detailed Discussion}
+\section{Permissioning Model Taxonomy}
 \subsection{Groups}
 The original Sardex system divides its users into 29 different types, called `groups'. This generates a great deal of complexity that is drastically reduced in the INTERLACE version of the platform. The new user type taxonomy involves only 9 groups, as shown in Table \ref{tab:groups}.
 
-%&\hspace{0.5cm}\\
-
-\setcounter{table}{0}
+%\setcounter{table}{0}
 \setlength{\tabcolsep}{10pt}
 \begin{table}[htbp]
 \begin{centering}
@@ -64,6 +62,43 @@ $MNGR$ & Manager of the circuit (e.g.\ Sardex S.p.A.) acting as $company$ rather
 
 $SysAdmin$ is not defined explicitly as a group, in this model, although technically it too is a user type. $SysAdmin$ has special privileges, some of which are discussed where relevant in what follows.
 
+\subsection{Accounts}
+As shown in Table \ref{tab:accounts}, the accounts implemented in the model reflect the current operations of the Sardex system and the needs of a wide range of business operations and interactions. Some of the account types, for example MIRROR, may be phased out as the high-level architecture of the family of Sardex circuits grows and different algorithms replace the current strict controls on the balance of payments between different circuits.
+
+
+%\setcounter{table}{0}
+\setlength{\tabcolsep}{10pt}
+\begin{table}[htbp]
+\begin{centering}
+\small
+{
+\begin{tabular}{| l | l | }
+\hline
+\textbf{Account}	& \textbf{Description} \\
+\hline
+$CC$ & Standard Sardex credits (SRD) account \\
+\hline
+$DOMU$ & SRD account used for larger operations, such as for real estate or capital equipment\\
+\hline
+$MIRROR$ & Account controlled by $MNGR$, used for inter-circuit purchases \\
+\hline
+$Income$ & Statistical EUR account owned by $retail$ or $full$ that collects B2C payments\\
+\hline
+$Prepaid$ & Stastical EUR account from which the 2\% child B2C transaction fee is drawn \\
+\hline
+$Bisoo$ & Statistical EUR account used by $consumer$ to pay into Income \\
+\hline
+$Topup$ & Statistical EUR account used by $MNGR$ to recharge $retail$'s Prepaid account upon receipt of \\
+&\hspace{0.5cm} EUR payment. It is recharged back to zero gradually with each B2C transaction. \\
+\hline
+\end{tabular}
+}
+\caption{\small\textbf{New user types (groups) for the INTERLACE platform}}
+\label{tab:accounts}
+\end{centering}
+\end{table}
+
+
 \subsection{Currencies and Channels}
 As shown in Figure \ref{fig:currchan}, the Sardex/INTERLACE platform supports transactions in both Sardex credits (SRD) and Euros (Euro) over two kinds of channels. `Service' refers to transactions mediated either by a computer (web application) or a mobile phone (either a web application or a phone App). `POS' means `Point of Sale' and refers to the standard terminal used by retailers that accepts credit or debit cards, through which SRD transactions can be routed via an API. The figure also shows the four possible $\{ currency, channel \}$ combinations that we need to support in the definition and implementation of the permissioning tests discussed in the next sections.
 
@@ -98,14 +133,14 @@ Figure \ref{fig:visibility} shows which groups ($toGroups$) are visible to which
 
 In general, transactability correlates to visibility. However, there is not a strict 1-1 relationship between them. For the example of a $company$ paying its own $employees$ as part of the B2E programme, $employee$ remains invisible to a search, but $company$ has the $username$ of the $employee$ and can perform a credit transaction to pay (part of) their salary.
 
-On the right of Figure \ref{fig:visibility} we show that some groups are always invisible $\{ F \}$ others are always visibile $\{ T \}$, and others could be either $\{T, F\}$. For example, a company could be put in the shadow state if it has reached its maximum positive credit limit.
-
 \begin{figure}[H]
 \centering
 \includegraphics[width=12cm]{Figures/Visibility}
 \caption{\small\textbf{Mutual visibility of different groups}}
 \label{fig:visibility}
 \end{figure}
+
+On the right of Figure \ref{fig:visibility} we show that some groups are always invisible $\{ F \}$ others are always visibile $\{ T \}$, and others could be either $\{T, F\}$. For example, a company could be put in the shadow state if it has reached its maximum positive credit limit.
 
 \subsection{B2C Operations}
 This report extends the use cases covered by D2.1 by adding also the Business to Consumer (B2C) use cases. B2C was developed to increase the number and volume of transactions, i.e.\ the size of the Sardex economy, by extending the ability to transact in SRD to people not otherwise connected to the circuit. The principle involves offering the opportunity to $retail$ers to reward their EUR customers with an SRD rebate.
@@ -114,37 +149,103 @@ The amount of the reward is a percent, in SRD, of the amount in EUR paid by $con
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=16cm]{Figures/B2C1}
-\caption{\small\textbf{kajdshkjahdfg}}
+\includegraphics[width=15cm]{Figures/B2C1}
+\caption{\small\textbf{Recharging of $retail$'s Prepaid account and standard B2C EUR transaction}}
 \label{fig:B2C1}
 \end{figure}
 
-Use Case 2 also involves a second child transaction, a 2\% fee, in EUR, paid from $retail$'s Prepaid account to $MNGR$'s Topup account. The asterisks next to these account names, in the figure, indicate that these two accounts are \emph{owned} by these two users but are not \emph{controlled} by them. They are controlled by $SysAdmin$. These EUR accounts are `statistical' rather than `real', meaning that they simply keep track of actual EUR amounts but do not themselves hold Euros. Sardex S.p.A. would need to be a bank for that to be possible.
-
-
-
-
-
-
-and \ref{fig:B2C2}.
-
+Use Case 2 also involves a second child transaction, a 2\% fee, in EUR, paid from $retail$'s Prepaid account to $MNGR$'s Topup account. The asterisks next to these account names, in the figure, indicate that these two accounts are \emph{owned} by these two users but are not \emph{controlled} by them. They are controlled by $SysAdmin$. These EUR accounts are `statistical' rather than `real', meaning that they simply keep track of actual EUR amounts but do not themselves hold Euros. Sardex S.p.A. would need to be a bank for that to be possible. For Use Case 2 to be executable, for a given $retail$er, its Prepaid account needs to have sufficient funds. When it runs out of statistical Euros, $retail$ can pay $MNGR$ some amount of Euros using any of the standard payment systems, through a bank or a payment service provider like PayPal. This triggers Use Case 1, also shown in Figure \ref{fig:B2C1}.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=16.5cm]{Figures/B2C2}
-\caption{\small\textbf{lskvlkjslkhg}}
+\includegraphics[width=15cm]{Figures/B2C2}
+\caption{\small\textbf{B2C SRD transaction}}
 \label{fig:B2C2}
 \end{figure}
 
+Figure \ref{fig:B2C2} shows the SRD transaction a $consumer$ can perform, i.e.\ the spending of the SRD accumulated as rewards, once they have registered and have become $consumer$\_$verified$.
+
+\subsection{Initial Account State}
+Figure \ref{fig:Initial_Acct_Sets} shows the initial allocation of accounts to the different user groups. The allocation is `initial' because  depending on the history of a given user the number of its accounts could change. For legal reasons, as a general principle \emph{change} can only mean \emph{increase}. In other words, once a user has become the owner of an account it can never be taken away from them, even if its access to it is, for example, suspended due to misbehaviour.
+
+Another example is a $retail$ user who upgrades to $full$ and a year later changes its mind and goes back to $retail$. It will retain its DOMU account even if it won't be able to use it anymore.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=17.5cm]{Figures/Initial_Acct_Sets}
+\caption{\small\textbf{Initial account sets for different user groups \textcolor{red}{(THIS FIGURE WILL BE UPDATED)}}}
+\label{fig:Initial_Acct_Sets}
+\end{figure}
+
+\section{Transactability Tests}
+\subsection{Transfer Types}
+As shown in Figure \ref{fig:transactabilitywkflow}, the first test for transactability involves so-called Transfer Types. Transfer Types are mathematical functions of the source groups ($fromGroups$) whose values are sets of target groups ($toGroups$). There is one different function for each combination of ordered pairs $(x, y)$, where $x \in \{ credit, debit \}$ and $y \in \{ SRD, EUR \}$, leading to four different functions. More formally,
+
+\begin{align}
+TT^{Credit,SRD}\colon &Groups\ \rightarrow\ Groups \times Groups \times \cdots \times Groups \\
+TT^{Debit,SRD}\colon &Groups\ \rightarrow\ Groups \times Groups \times \cdots \times Groups \\
+TT^{Credit,EUR}\colon &Groups\ \rightarrow\ Groups \times Groups \times \cdots \times Groups \\
+TT^{Debit,EUR}\colon &Groups\ \rightarrow\ Groups \times Groups \times \cdots \times Groups,
+\end{align}
+where
+\begin{align}
+Groups &= \{ welcome, retail, company, full, employee, on\text{\_}hold,  \nonumber \\
+		& \qquad\qquad\qquad\qquad\qquad\qquad\qquad
+			consumer, consumer\text{\_}verified, MNGR \}.
+\end{align}
+If, with an abuse of notation and shamelessly overloading the terminology, we define for convenience the following target groups as different ``transfer types''
+\begin{align*}
+TT_1 &= \{ retail \},		&& TT_2 = \{ retail, company \},		&& TT_3 = \{ company, employee \} \\
+TT_4 &= \{ company \},	&& TT_5 = \{ MNGR \},			&& TT_6 = \{ full \},
+\end{align*}
+we can now express the four functions as the following tables:
+
+\setlength{\tabcolsep}{10pt}
+\setlength\extrarowheight{3pt}
+\begin{table}[htbp]
+\begin{centering}
+\small
+{
+\begin{tabular}{ r | c | c | c | c |}
+\textbf{Group}	& $\bm{TT}^{\bm{Credit,SRD}}$ & $\bm{TT}^{\bm{Debit,SRD}}$ 
+			& $\bm{TT}^{\bm{Credit,EUR}}$ & $\bm{TT}^{\bm{Debit,EUR}}$\\
+\hline
+$welcome$	& $\emptyset$ 				& $\emptyset$	& $\emptyset$	& $\emptyset$	 \\[3pt]
+\hline
+$retail$		& $\emptyset$				& $TT_1$ 		& $\emptyset$	& $TT_1$	 \\[3pt]
+\hline
+$company$	& $TT_3 \cup TT_5 \cup TT_6$ & $TT_4$		& $\emptyset$	& $\emptyset$	 \\[3pt]
+\hline
+$full$		& $TT_3 \cup TT_5 \cup TT_6$ & $TT_6$		& $\emptyset$	& $TT_6$	 \\[3pt]
+\hline
+$employee$	& $TT_2 \cup TT_6$ 		& $\emptyset$	&$\emptyset$ 	& $\emptyset$	 \\[3pt]
+\hline
+$on$\_$hold$	& $\emptyset$				& $\emptyset$	& $\emptyset$	& $\emptyset$	 \\[3pt]
+\hline
+$consumer$	& $\emptyset$				& $\emptyset$	& $\emptyset$	&$\emptyset$ 	 \\[3pt]
+\hline
+$consumer$\_$verified$ & $TT_1 \cup TT_6$ 	& $\emptyset$	& $\emptyset$ 	& $\emptyset$	 \\[3pt]
+\hline
+$MNGR$ 		& $TT_2 \cup TT_3 \cup TT_5 \cup TT_6$ & $TT_2 \cup TT_5 \cup TT_6$ & $\emptyset$ & $\emptyset$	 \\[3pt]
+\hline
+\end{tabular}
+}
+\caption{\small\textbf{The four Transfer Types functions}}
+\label{tab:TTs}
+\end{centering}
+\end{table}
+
+\subsection{Account Connectivity}
 
 
 
+\subsection{MetaData}
 
 
+\subsection{Group Transactability Functions}
 
 
-
-
+\section{Account Limit Tests}
 
 
 
