@@ -126,10 +126,12 @@ The provisioning process can be separated into 3 steps which are executed when \
 
 For development purposes the ASIMSpec as well as the ICEF framework are cloned into directories which are available from the host machine and the virtual guest machine. This is necessary because then it is possible to directly edit the source or debug from outside and execute the code from within the container. Consequently it is not necessary to copy the code into the container when changes where done.
 
-For \textbf{Vagrant} shared folder is configured over the vagrant file
+For \textbf{Vagrant} shared folder is configured over the vagrant file shown here
 
 \begin{lstlisting}
+	...
 	config.vm.synced_folder "./data", "/vagrant-data"
+	...
 \end{lstlisting}
 
 saying that on the host system the folder \textit{data} is used and on the guest system a folder \textit{vagrant-data} is mounted which are shared and thus containing the same content. Additionally during provisioning a symbolic link in the home directory is created called project (\textit{/home/ubuntu/project}) which is linking the mounted root folder /vagrant-data.
@@ -138,13 +140,13 @@ When the virtual machine is stopped the data directory on the host is kept and c
 
 For \textbf{Docker} we need to first clone all GitHub sources to the host machine and can only then share the files into the guest container by using the command line option "-v"
 
-\begin{lstlisting}
+\begin{lstlisting}[language=bash]
 	docker run -v "$1/ASIMSpec:/home/ASIMSpec" \
 	           -v "$1/icef:/home/icef" \
 	           --name active_asim -it asim /$2
 \end{lstlisting}
 
-This line is part of the script \textit{scripts/runDocker.sh}. \$1 here stands for the local directory of the environment and \$2 will be explained later in section \ref{sec:env-exec-stack-exec-stack}. Important to note is that the \textit{ASIMSpec} folder of the host machine is shared into \textit{/home/ASIMSpec} of the docker container and the \textit{icef} directory is shared into \textit{/home/icef}.
+This line is part of the script \textit{scripts/runDocker.sh}. \$1 here stands for the local directory of the environment and \$2 is normally defaulted to the main execution script started inside the docker container. Important to note is that the \textit{ASIMSpec} folder of the host machine is shared into \textit{/home/ASIMSpec} of the docker container and the \textit{icef} directory is shared into \textit{/home/icef}.
 
 \subsection{Execution}
 \label{sec:env-exec-stack-exe}
@@ -189,34 +191,39 @@ For developing new simulations it is important to have a proper development envi
 
 For the public Integrated Development Environment Eclipse, developers of the ICEF framework have adopted the coreASM plugin for supporting the additional language primitives. Thus for working with ASIM implementations of INTERLACE you ideally DO NOT download the coreASM package which is available at the market place of Eclipse. The adopted plugin working with the new language elements is provided by the ICEF framework but is needed to build and imported manually into Eclipse.
 
-\textbf{Import the IDE Eclipse plugin for coreASIM}
-\todo{rewrite import - quick info}
-1) Build Framework
 
-You can call
+\textbf{Import/Install of the IDE Eclipse plugin for coreASIM}
+\begin{description}
+	\item[Build Framework] For adding the ASIM plugin to Eclipse it is required to build and install the coreASIM plugin manually first because it is not downloadable from the Eclipse marketplace and only available as source version delivered with the ICEF framework and part of the coreASIM engine. Building and installing can be done by calling
+	\begin{lstlisting}
+		cd icef/coreASIM/org.coreasim.eclipse && mvn package install
+	\end{lstlisting}
+	Note that the icef directory is placed on different folders in the two environments!
+	
+	\item[Install Plug-In Development Environment in Eclipse] To install the ASIM Plug-in it is necessary to first add another Plug-in called Eclipse PDE (Plug-In Development Environment) from the marketplace for the current Eclipse installation or get a distribution which already contains that Plug-in.
+	
+	\item[Import Plugin as Project] Next the plugin needs to be imported to the workspace which can be done in Eclipse using the import wizard. To reach the wizard go to "File" $\rightarrow$ "Import...", search for "Existing Projects into Workspace" and click to get to "Import Project"-Window. Then click "Finish" to import the project.
+	
+	\item[Dry-Run Eclipse with coreASIM-Plug-In] This optional step can be done to check if the Plug-In is working correctly. For that it is necessary to right click the imported eclipse project and go to "Run As" $\rightarrow$ "Eclipse Application". Then a second Eclipse instance is started but this time a new tab should appear named "coreASIM" as well as when opening a file with extension \textit{casim} the ASIM definition should be syntax highlighted.
 
-./execute /bin/bash
+	\item[Enable the Plug-In] If the (optional) dry-run has been successful the export wizard will export the Plug-In into the running Eclipse installation by opening "File" $\rightarrow$  "Export" then choosing "Deployable Plug-ins and fragments" in the new Dialogue. The window which is opened next will offer to export fragment  \textit{org.coreasim.eclipse} by selecting the check box beside. Before clicking finish the combo box "Install into host" has to be chosen.
+	
+\end{description}
 
-to enter the container and do the next steps from "inside" or if you've got maven installed you can do them directly on your host from "outside".
+When finishing these steps on restart Eclipse offers a new tab in the top menu bar called "CoreASIM".
 
-So you'd need 
+\textbf{Notes on the Docker environment}
+\label{sec_inner:note-docker}
 
-%cd icef/coreASIM/org.coreasim.parent/ && mvn package install
+Normally the ASIM Specifications are started by calling \textit{execute} from the main directory which is starting a script which will run the services and sent the ICEF definition. When stopping the container it instantly goes back to his original state before execution. Only the shared directories ASIMSpec and icef keep changes.
 
-which copies the engine and util jars then
+If it is necessary or convenient, like if the host is missing development packages (e.g. maven, nodejs, ...) which are available inside the container, it is possible to work from within the container by calling
 
-%cd icef/coreASIM/org.coreasim.eclipse && mvn package install
-   
-to build the packages and copy the jar files for the plugin automatically.
+\begin{lstlisting}
+	./execute /bin/bash
+\end{lstlisting}
 
-
-2) Setup Eclipse
-
-* Install the Eclipse PDE (Plug-in Development Environment) from the marketplace for your Eclipse installation (restart)
-* Then import the Eclipse project from icef/coreASIM/org.coreasim.eclipse    (File -> Import: Existing Project into Workspace)
- before actually importing the plugin you could try if everything works by starting a second eclipse instance including the ASIM plugin by right clicking the project -> Run As -> Eclipse Application
-* Finally you'd need to import the plugin by going to the export wizard: File/Export -> There look for export "Deployable plug-ins and fragments", select the compiled plug-in fragment org.coreasim.eclipse, and then in the lower half of the page select "Install into host"-> finish.
-
+which starts the docker container, runs a bash shell, keeping the STDIN open and connect a pseudo TTY. In this way it is possible to work with that bash shell, similar to connecting to a machine over SSH.
 
 \section{ICEF - The Interaction Computing Execution Framework}
 \label{sec:icef-intro}
