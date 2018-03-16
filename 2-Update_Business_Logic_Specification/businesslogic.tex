@@ -59,12 +59,23 @@ $MNGR$ & Manager of the circuit (e.g.\ Sardex S.p.A.) acting as $company$ rather
 \label{tab:groups}
 \end{centering}
 \end{table}
+\vspace{-0.5cm}
 
 $SysAdmin$ is not defined explicitly as a group, in this model, although technically it too is a user type. $SysAdmin$ has special privileges, some of which are discussed where relevant in what follows.
 
+\subsection{Currencies and Channels}
+As shown in Figure \ref{fig:currchan}, the Sardex/INTERLACE platform supports transactions in both Sardex credits (SRD) and Euros (Euro) over two kinds of channels. `Service' refers to transactions mediated either by a computer (web application) or a mobile phone (either a web application or a phone App). `POS' means `Point of Sale' and refers to the standard terminal used by retailers that accepts credit or debit cards, through which SRD transactions can be routed via an API. The figure also shows the four possible $\{ currency, channel \}$ combinations that we need to support in the definition and implementation of the permissioning tests discussed in the next sections.
+
+\vspace{-0.3cm}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=10cm]{Figures/Curr_Chan}
+\caption{\small\textbf{Currencies and channels supported by the platform}}
+\label{fig:currchan}
+\end{figure}
+
 \subsection{Accounts}
 As shown in Table \ref{tab:accounts}, the accounts implemented in the model reflect the current operations of the Sardex system and the needs of a wide range of business operations and interactions. Some of the account types, for example MIRROR, may be phased out as the high-level architecture of the family of Sardex circuits grows and different algorithms replace the current strict controls on the balance of payments between different circuits.
-
 
 %\setcounter{table}{0}
 \setlength{\tabcolsep}{10pt}
@@ -95,19 +106,15 @@ $Topup$ & Statistical EUR account used by $MNGR$ to recharge $retail$'s Prepaid 
 }
 \caption{\small\textbf{New user types (groups) for the INTERLACE platform}}
 \label{tab:accounts}
+\vspace{-0.5cm}
 \end{centering}
 \end{table}
 
-
-\subsection{Currencies and Channels}
-As shown in Figure \ref{fig:currchan}, the Sardex/INTERLACE platform supports transactions in both Sardex credits (SRD) and Euros (Euro) over two kinds of channels. `Service' refers to transactions mediated either by a computer (web application) or a mobile phone (either a web application or a phone App). `POS' means `Point of Sale' and refers to the standard terminal used by retailers that accepts credit or debit cards, through which SRD transactions can be routed via an API. The figure also shows the four possible $\{ currency, channel \}$ combinations that we need to support in the definition and implementation of the permissioning tests discussed in the next sections.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=10cm]{Figures/Curr_Chan}
-\caption{\small\textbf{Currencies and channels supported by the platform}}
-\label{fig:currchan}
-\end{figure}
+\subsection{Operations}
+As already specified in D2.1, transactions are effected through two operations: Credit and Debit:
+\begin{align}
+Operations = \{ Credit, Debit \}.
+\end{align}
 
 \subsection{Interaction Levels}
 The interactions between circuit participants can be described from different points of view that correlate loosely to a stack view of the system. As shown in Figure \ref{fig:stack}, it is helpful to identify qualitatively the different levels of such a stack, acknowledging that it is \emph{more} than a networking communication stack in terms of scope but \emph{less} than one in terms of precision. `A' and `B' refer to the Initiator and the Target of the transaction, which do not necessarily correspond to the Buyer and the Seller.
@@ -118,6 +125,8 @@ The interactions between circuit participants can be described from different po
 \caption{\small\textbf{Stack view of the INTERLACE communication, economic, and financial  interactions}}
 \label{fig:stack}
 \end{figure}
+\vspace{-0.5cm}
+
 
 \begin{figure}[htbp]
 \centering
@@ -131,14 +140,14 @@ Figure \ref{fig:stack} extends the two communication levels described in D2.1, b
 \subsection{Visibility}
 Figure \ref{fig:visibility} shows which groups ($toGroups$) are visible to which groups ($fromGroups$) by a `1' at the intersection of the $(row, column)$ corresponding to a choice of $(fromGroup, toGroup)$. For example, $company$ is visible to $employee$, meaning that $employee$ can do a search for $company$, but not vice versa. In this case $employee$ is not visible due to privacy legislation.
 
-In general, transactability correlates to visibility. However, there is not a strict 1-1 relationship between them. For the example of a $company$ paying its own $employees$ as part of the B2E programme, $employee$ remains invisible to a search, but $company$ has the $username$ of the $employee$ and can perform a credit transaction to pay (part of) their salary.
-
 \begin{figure}[H]
 \centering
 \includegraphics[width=12cm]{Figures/Visibility}
 \caption{\small\textbf{Mutual visibility of different groups}}
 \label{fig:visibility}
 \end{figure}
+
+In general, transactability correlates to visibility. However, there is not a strict 1-1 relationship between them. For the example of a $company$ paying its own $employees$ as part of the B2E programme, $employee$ remains invisible to a search, but $company$ has the $username$ of the $employee$ and can perform a credit transaction to pay (part of) their salary.
 
 On the right of Figure \ref{fig:visibility} we show that some groups are always invisible $\{ F \}$ others are always visibile $\{ T \}$, and others could be either $\{T, F\}$. For example, a company could be put in the shadow state if it has reached its maximum positive credit limit.
 
@@ -257,18 +266,8 @@ Figure \ref{fig:SysAdmin_Acct_Connectivity} shows a similar connectivity functio
 \label{fig:SysAdmin_Acct_Connectivity}
 \end{figure}
 
-\subsection{MetaData}
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=17cm]{Figures/MetaData1}
-\caption{\small\textbf{MetaData for different user types \textcolor{red}{(THIS FIGURE WILL BE UPDATED)}}}
-\label{fig:MetaData1}
-\end{figure}
-
-
 \subsection{Group Transactability Functions}
-
+The effect of the Transfer Types test together with the Account Connectivity test results in what we call the Group Transactability Function (GTF). Since there are 4 combinations of currencies and channel, there are 4 different GTFs. There is no need to use them as an additional test, since they do not add anything new to Tests 1 and 2 of Figure \ref{fig:transactabilitywkflow}. However, it is still useful to include them here as another visualization of these first two tests of the Permissioning workflow, see Figures \ref{fig:GTF1}-\ref{fig:GTF4}.
 
 \begin{figure}[htbp]
 \centering
@@ -277,7 +276,6 @@ Figure \ref{fig:SysAdmin_Acct_Connectivity} shows a similar connectivity functio
 \label{fig:GTF1}
 \end{figure}
 
-
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=17cm]{Figures/GTF2}
@@ -285,14 +283,12 @@ Figure \ref{fig:SysAdmin_Acct_Connectivity} shows a similar connectivity functio
 \label{fig:GTF2}
 \end{figure}
 
-
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=17cm]{Figures/GTF3}
 \caption{\small\textbf{Group Transactability Function 3}}
 \label{fig:GTF3}
 \end{figure}
-
 
 \begin{figure}[htbp]
 \centering
@@ -302,6 +298,14 @@ Figure \ref{fig:SysAdmin_Acct_Connectivity} shows a similar connectivity functio
 \end{figure}
 
 
+\subsection{MetaData}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=17cm]{Figures/MetaData1}
+\caption{\small\textbf{MetaData for different user types \textcolor{red}{(THIS FIGURE WILL BE UPDATED)}}}
+\label{fig:MetaData1}
+\end{figure}
 
 
 
