@@ -3,7 +3,7 @@
 
 \vspace{-1cm}
 \begin{center}
-Paolo Dini, Luca Carboni, Giuseppe Littera, and Chrystopher Nehaniv
+Paolo Dini, Luca Carboni, Giuseppe Littera, Egon B\"orger and Chrystopher Nehaniv
 \end{center}
 
 \section{Context}
@@ -179,8 +179,9 @@ Another example is a $retail$ user who upgrades to $full$ and a year later chang
 
 \section{Transactability Tests}
 \subsection{Transfer Types}
-As shown in Figure \ref{fig:transactabilitywkflow}, the first test for transactability involves so-called Transfer Types. Transfer Types are mathematical functions of the source groups ($fromGroups$) whose values are sets of target groups ($toGroups$). There is one different function for each combination of ordered pairs $(x, y)$, where $x \in \{ credit, debit \}$ and $y \in \{ SRD, EUR \}$, leading to four different functions. More formally,
+As shown in Figure \ref{fig:transactabilitywkflow}, the first test for transactability involves so-called Transfer Types. Transfer Types are mathematical functions of the source groups ($fromGroups$) whose values are sets of target groups ($toGroups$). There is one different function for each combination of ordered pairs $(x, y)$, where $x \in \{ credit, debit \}$ and $y \in \{ SRD, EUR \}$, leading to four different functions.
 
+More formally,
 \begin{align}
 TT^{Credit,SRD}\colon &Groups\ \rightarrow\ Groups \times Groups \times \cdots \times Groups \\
 TT^{Debit,SRD}\colon &Groups\ \rightarrow\ Groups \times Groups \times \cdots \times Groups \\
@@ -235,14 +236,73 @@ $MNGR$ 		& $TT_2 \cup TT_3 \cup TT_5 \cup TT_6$ & $TT_2 \cup TT_5 \cup TT_6$ & $
 \end{centering}
 \end{table}
 
+The Transfer Type test shown in Figure \ref{fig:transactabilitywkflow} involves checking whether the recipient of a Credit or Debit transaction in a given currency is in the range of the corresponding $TT$ function of the initiator. In other words, the initiator, or $fromGroup$ member, is the independent or input parameter to the function and appears in the left column in Table \ref{tab:TTs}.
+
 \subsection{Account Connectivity}
+Figure \ref{fig:User_Acct_Connectivity} shows the account connectivity function used for Test 2 in Figure \ref{fig:transactabilitywkflow}. As for Visibility, a `1' indicates that the Source and Destination accounts are connected and funds can be transferred from one to the other.
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=17cm]{Figures/User_Acct_Connectivity}
+\caption{\small\textbf{Account connectivity for user-initiated transactions: Test 2 in Figure \ref{fig:transactabilitywkflow}}}
+\label{fig:User_Acct_Connectivity}
+\end{figure}
 
+Figure \ref{fig:SysAdmin_Acct_Connectivity} shows a similar connectivity function for accounts that are controlled by $SysAdmin$. In this case, however, this function does not imply a transactability test since the permissions are hard-wired and SysAdmin does not need to test for transactability.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=17cm]{Figures/SysAdmin_Acct_Connectivity}
+\caption{\small\textbf{Account connectivity for system-initiated transactions: Not a test, hard-wired. }}
+\label{fig:SysAdmin_Acct_Connectivity}
+\end{figure}
 
 \subsection{MetaData}
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=17cm]{Figures/MetaData1}
+\caption{\small\textbf{MetaData for different user types \textcolor{red}{(THIS FIGURE WILL BE UPDATED)}}}
+\label{fig:MetaData1}
+\end{figure}
+
 
 \subsection{Group Transactability Functions}
+
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=17cm]{Figures/GTF1}
+\caption{\small\textbf{Group Transactability Function 1}}
+\label{fig:GTF1}
+\end{figure}
+
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=17cm]{Figures/GTF2}
+\caption{\small\textbf{Group Transactability Function 2}}
+\label{fig:GTF2}
+\end{figure}
+
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=17cm]{Figures/GTF3}
+\caption{\small\textbf{Group Transactability Function 3}}
+\label{fig:GTF3}
+\end{figure}
+
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=17cm]{Figures/GTF4}
+\caption{\small\textbf{Group Transactability Function 4}}
+\label{fig:GTF4}
+\end{figure}
+
+
+
 
 
 \section{Account Limit Tests}
