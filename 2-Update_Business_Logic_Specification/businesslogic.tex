@@ -269,28 +269,28 @@ Figure \ref{fig:SysAdmin_Acct_Connectivity} shows a similar connectivity functio
 \subsection{Group Transactability Functions}
 The effect of the Transfer Types test together with the Account Connectivity test results in what we call the Group Transactability Function (GTF). Since there are 4 combinations of currencies and channel, there are 4 different GTFs. There is no need to use them as an additional test, since they do not add anything new to Tests 1 and 2 of Figure \ref{fig:transactabilitywkflow}. However, it is still useful to include them here as another visualization of these first two tests of the Permissioning workflow, see Figures \ref{fig:GTF1}-\ref{fig:GTF4}.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=17cm]{Figures/GTF1}
 \caption{\small\textbf{Group Transactability Function 1}}
 \label{fig:GTF1}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=17cm]{Figures/GTF2}
 \caption{\small\textbf{Group Transactability Function 2}}
 \label{fig:GTF2}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=17cm]{Figures/GTF3}
 \caption{\small\textbf{Group Transactability Function 3}}
 \label{fig:GTF3}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=17cm]{Figures/GTF4}
 \caption{\small\textbf{Group Transactability Function 4}}
@@ -300,12 +300,169 @@ The effect of the Transfer Types test together with the Account Connectivity tes
 
 \subsection{MetaData}
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=17cm]{Figures/MetaData1}
-\caption{\small\textbf{MetaData for different user types \textcolor{red}{(THIS FIGURE WILL BE UPDATED)}}}
-\label{fig:MetaData1}
-\end{figure}
+
+%\Xhline{1pt}
+%\multirow{3}{*}
+%{$\begin{array}{c}
+%\text{Configuration}
+%\end{array}$}
+
+\setlength{\tabcolsep}{7pt}
+\setlength\extrarowheight{3pt}
+\begin{table}[htbp]
+\begin{centering}
+\small
+{
+\begin{tabular}{ r | c | l | l }
+\textbf{Group}	& {\bf MetaData} & {\bf Type} & {\bf Description} \\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$welcome$	& {\bf welcomeMemberID}	&Integer & Unique member identifier \\
+			& {\bf firstName}			&String & First name \\
+			& {\bf surName}			&String & Surname \\
+\cline{2-2}
+			 & \emph{(Optional MetaData)}& & \\
+\cline{2-2}
+			& {\bf email}				&String & e-mail address \\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$retail$		& {\bf retailMemberID}		&Integer & Unique member identifier \\
+			& {\bf firstName	}		&String & First name \\
+			& {\bf surName}			&String & Surname \\
+			& {\bf capacity}				&Double & Commitment to maximum balance or yearly volume \\
+			& {\bf capacityDate}			&DateTime & Date capacity was set \\
+			& {\bf availableCapacity}		&Double & Difference of capacity and current balance \\
+			& {\bf account[]}			&Account & Accounts associated with user \\
+\cline{2-2}
+			 & \emph{(Optional MetaData)}& & \\
+\cline{2-2}
+			& {\bf email}				&String & e-mail address \\
+			& {\bf euroFee}				&Double & Percent fee on Euro sales \\
+			& {\bf rewardOn}			&Bool & Effect reward to consumer Y/N \\
+			& {\bf verifiedOn}			&Bool & Accept purchases by $consumer$\_$verified$ Y/N \\
+			& {\bf rewardRate}			&Double & Credit reward rate to consumer \\
+			& {\bf acceptanceRate}		&Double & Rate of credits acceptance in consumer purchases\\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$company$	& {\bf companyMemberID}	&Integer & Unique member identifier \\
+			& {\bf firstName}			&String & First name \\
+			& {\bf surName}			&String & Surname \\
+			& {\bf capacity}				&Double & Commitment to maximum balance or yearly volume \\
+			& {\bf capacityDate}			&DateTime & Date capacity was set \\
+			& {\bf availableCapacity}		&Double & Difference of capacity and current balance \\
+			& {\bf creditPercent}			&Double & \% credit acceptance for transactions above 1000 \\
+			& {\bf account[]}			&Account & Accounts associated with user \\
+\cline{2-2}
+			 & \emph{(Optional MetaData)}& & \\
+\cline{2-2}
+			& {\bf email} 				&String & e-mail address \\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$full$		& {\bf fullMemberID}			&Integer & Unique member identifier \\
+			& {\bf firstName}			&String & First name \\
+			& {\bf surName}			&String & Surname \\
+			& {\bf capacity}				&Double & Commitment to maximum balance or yearly volume \\
+			& {\bf capacityDate}			&DateTime & Date capacity was set \\
+			& {\bf availableCapacity}		&Double & Difference of capacity and current balance \\
+			& {\bf creditPercent}			&Double & \% credit acceptance for transactions above 1000 \\
+			& {\bf account[]}			&Account & Accounts associated with user \\
+\cline{2-2}
+			 & \emph{(Optional MetaData)}& & \\
+\cline{2-2}
+			& {\bf email}				&String & e-mail address \\
+			& {\bf euroFee}				&Double & Percent fee on Euro sales \\
+			& {\bf rewardOn}			&Bool & Effect reward to consumer Y/N \\
+			& {\bf verifiedOn}			&Bool & Accept purchases by $consumer$\_$verified$ Y/N \\
+			& {\bf rewardRate}			&Double & Credit reward rate to consumer \\
+			& {\bf acceptanceRate}		&Double & Rate of credits acceptance in consumer purchases\\
+\Xhline{1.5pt}
+\end{tabular}
+}
+\caption{\small\textbf{MetaData  for $welcome$, $retail$, $company$, and $full$ groups}}
+\label{tab:GroupMetaData}
+\end{centering}
+\end{table}
+
+
+
+
+\setlength{\tabcolsep}{10pt}
+\setlength\extrarowheight{3pt}
+\begin{table}[htbp]
+\begin{centering}
+\small
+{
+\begin{tabular}{ r | c | l | l }
+\textbf{Group}	& {\bf MetaData} & {\bf Type} & {\bf Description} \\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$employee$	& {\bf employeeMemberID}	&Integer & Unique member identifier \\
+			& {\bf firstName}			&String & First name \\
+			& {\bf surName}			&String & Surname \\
+\cline{2-2}
+			 & \emph{(Optional MetaData)}& & \\
+\cline{2-2}
+			& {\bf email}				&String & e-mail address \\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$on$\_$hold$	& {\bf onHoldMemberID}		&Integer & Unique member identifier \\
+			& {\bf firstName}			&String & First name \\
+			& {\bf surName}			&String & Surname \\
+\cline{2-2}
+			 & \emph{(Optional MetaData)}& & \\
+\cline{2-2}
+			& {\bf email}				&String & e-mail address \\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$consumer$	& {\bf consumerMemberID}	&Integer & Unique member identifier \\
+			& {\bf account[]}			&Account & Accounts associated with user \\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$consumer$\_$verified$ & {\bf consumerVerifiedMemberID}	&Integer & Unique member identifier \\
+			& {\bf firstName}			&String & First name \\
+			& {\bf surName}			&String & Surname \\
+			& {\bf account[]}			&Account & Accounts associated with user \\
+\cline{2-2}
+			& \emph{(Optional MetaData)} & & \\
+\cline{2-2}
+			& {\bf email}				&String & e-mail address \\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$MNGR$ 		& {\bf MNGRMemberID}		&Integer & Unique member identifier \\
+			& {\bf firstName}			&String & First name \\
+			& {\bf surName}			&String & Surname \\
+\cline{2-2}
+			 & \emph{(Optional MetaData)}& & \\
+\cline{2-2}
+			& {\bf email}				&String & e-mail address \\
+\Xhline{1.5pt}
+\end{tabular}
+}
+\caption{\small\textbf{MetaData for $employee$, $on$\_$hold$, $consumer$, $consumer$\_$verified$, and $MNGR$ groups}}
+\label{tab:GroupMetaData}
+\end{centering}
+\end{table}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
