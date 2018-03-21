@@ -318,50 +318,57 @@ The effect of the Transfer Types test together with the Account Connectivity tes
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$welcome$	& {\bf welcomeMemberID}	&Integer & Unique member identifier \\
-			& {\bf firstName}			&String & First name \\
-			& {\bf surName}			&String & Surname \\
-			& {\bf email}				&String & e-mail address \\
+$welcome$	& {\bf MemberID}			&Integer	& Unique member identifier \\
+			& {\bf firstName}			&String	& First name \\
+			& {\bf surName}			&String	& Surname \\
+			& {\bf email}				&String	& e-mail address \\
 			& {\bf phone[]}				&String	& phone number(s) \\
+			& {\bf address}				&String	& Street address \\
+			& {\bf gps[]}				&Double	& GPS coordinates \\			
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
-			& {\bf }					&String &  \\
+			& {\bf entityName}			&String & Legal entity name \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$retail$		& {\bf retailMemberID}		&Integer & Unique member identifier \\
-			& {\bf firstName	}		&String & First name \\
-			& {\bf surName}			&String & Surname \\
-			& {\bf email}				&String & e-mail address \\
+$retail$		& {\bf MemberID}			&Integer	& Unique member identifier \\
+			& {\bf entityName}			&String	& Legal entity name \\
+			& {\bf email}				&String	& e-mail address \\
 			& {\bf phone[]}				&String	& phone number(s) \\
-			& {\bf capacity}				&Double & Commitment to maximum balance or yearly volume \\
+			& {\bf address}				&String	& Street address \\
+			& {\bf gps[]}				&Double	& GPS coordinates \\	
+			& {\bf capacity}				&Double	& Commitment to maximum balance or yearly volume \\
 			& {\bf capacityDate}			&DateTime & Date capacity was set \\
-			& {\bf availableCapacity}		&Double & Difference of capacity and current balance \\
+			& {\bf availableCapacity}		&Double	& Difference of capacity and current balance \\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
-			& {\bf euroFee}				&Double & Percent fee on Euro sales \\
-			& {\bf rewardOn}			&Bool & Effect reward to consumer Y/N \\
-			& {\bf verifiedOn}			&Bool & Accept purchases by $consumer$\_$verified$ Y/N \\
-			& {\bf rewardRate}			&Double & Credit reward rate to consumer \\
-			& {\bf acceptanceRate}		&Double & Rate of credits acceptance in consumer purchases\\
+			& {\bf firstName	}			&String	& First name \\
+			& {\bf surName}			&String	& Surname \\
+			& {\bf euroFee}				&Double	& Percent fee on Euro sales \\
+			& {\bf rewardOn}			&Bool	& Effect reward to consumer Y/N \\
+			& {\bf verifiedOn}			&Bool	& Accept purchases by $consumer$\_$verified$ Y/N \\
+			& {\bf rewardRate}			&Double	& Credit reward rate to consumer \\
+			& {\bf acceptanceRate}		&Double	& Rate of credits acceptance in consumer purchases\\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$company$	& {\bf companyMemberID}	&Integer & Unique member identifier \\
-			& {\bf firstName}			&String & First name \\
-			& {\bf surName}			&String & Surname \\
-			& {\bf email}				&String & e-mail address \\
+$company$	& {\bf MemberID}			&Integer	& Unique member identifier \\
+			& {\bf entityName}			&String	& Legal entity name \\
+			& {\bf email}				&String	& e-mail address \\
 			& {\bf phone[]}				&String	& phone number(s) \\
-			& {\bf capacity}				&Double & Commitment to maximum balance or yearly volume \\
+			& {\bf address}				&String	& Street address \\
+			& {\bf gps[]}				&Double	& GPS coordinates \\	
+			& {\bf capacity}				&Double	& Commitment to maximum balance or yearly volume \\
 			& {\bf capacityDate}			&DateTime & Date capacity was set \\
-			& {\bf availableCapacity}		&Double & Difference of capacity and current balance \\
-			& {\bf creditPercent}			&Double & \% credit acceptance for transactions above 1000 \\
+			& {\bf availableCapacity}		&Double	& Difference of capacity and current balance \\
+			& {\bf creditPercent}			&Double	& \% credit acceptance for transactions above 1000 \\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
-			& {\bf } 				&String &  \\
+			& {\bf firstName	}			&String & First name \\
+			& {\bf surName}			&String & Surname \\
 \Xhline{1.5pt}
 \end{tabular}
 }
@@ -379,31 +386,35 @@ $company$	& {\bf companyMemberID}	&Integer & Unique member identifier \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$full$		& {\bf fullMemberID}			&Integer & Unique member identifier \\
-			& {\bf firstName}			&String & First name \\
-			& {\bf surName}			&String & Surname \\
-			& {\bf email}				&String & e-mail address \\
+$full$		& {\bf MemberID}			&Integer	& Unique member identifier \\
+			& {\bf entityName}			&String	& Legal entity name \\
+			& {\bf email}				&String	& e-mail address \\
 			& {\bf phone[]}				&String	& phone number(s) \\
-			& {\bf capacity}				&Double & Commitment to maximum balance or yearly volume \\
+			& {\bf address}				&String	& Street address \\
+			& {\bf gps[]}				&Double	& GPS coordinates \\	
+			& {\bf capacity}				&Double	& Commitment to maximum balance or yearly volume \\
 			& {\bf capacityDate}			&DateTime & Date capacity was set \\
-			& {\bf availableCapacity}		&Double & Difference of capacity and current balance \\
-			& {\bf creditPercent}			&Double & \% credit acceptance for transactions above 1000 \\
+			& {\bf availableCapacity}		&Double	& Difference of capacity and current balance \\
+			& {\bf creditPercent}			&Double	& \% credit acceptance for transactions above 1000 \\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
-			& {\bf euroFee}				&Double & Percent fee on Euro sales \\
-			& {\bf rewardOn}			&Bool & Effect reward to consumer Y/N \\
-			& {\bf verifiedOn}			&Bool & Accept purchases by $consumer$\_$verified$ Y/N \\
-			& {\bf rewardRate}			&Double & Credit reward rate to consumer \\
-			& {\bf acceptanceRate}		&Double & Rate of credits acceptance in consumer purchases\\
+			& {\bf firstName}			&String	& First name \\
+			& {\bf surName}			&String	& Surname \\
+			& {\bf euroFee}				&Double	& Percent fee on Euro sales \\
+			& {\bf rewardOn}			&Bool	& Effect reward to consumer Y/N \\
+			& {\bf verifiedOn}			&Bool	& Accept purchases by $consumer$\_$verified$ Y/N \\
+			& {\bf rewardRate}			&Double	& Credit reward rate to consumer \\
+			& {\bf acceptanceRate}		&Double	& Rate of credits acceptance in consumer purchases\\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$employee$	& {\bf employeeMemberID}	&Integer	& Unique member identifier \\
+$employee$	& {\bf MemberID}			&Integer	& Unique member identifier \\
 			& {\bf firstName}			&String	& First name \\
 			& {\bf surName}			&String	& Surname \\
 			& {\bf email}				&String	& e-mail address \\
 			& {\bf phone[]}				&String	& phone number(s) \\
+			& {\bf entityName}			&String	& Name of legal entity employed by \\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
@@ -425,26 +436,28 @@ $employee$	& {\bf employeeMemberID}	&Integer	& Unique member identifier \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$on$\_$hold$	& {\bf onHoldMemberID}		&Integer & Unique member identifier \\
-			& {\bf firstName}			&String & First name \\
-			& {\bf surName}			&String & Surname \\
-			& {\bf email}				&String & e-mail address \\
+$on$\_$hold$	& {\bf MemberID}			&Integer	& Unique member identifier \\
+			& {\bf entityName}			&String	& Legal entity name \\
+			& {\bf email}				&String	& e-mail address \\
 			& {\bf phone[]}				&String	& phone number(s) \\
+			& {\bf address}				&String	& Street address \\
+			& {\bf gps[]}				&Double	& GPS coordinates \\	
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
-			& {\bf }				&String &  \\
+			& {\bf firstName}			&String	& First name \\
+			& {\bf surName}			&String	& Surname \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$consumer$	& {\bf consumerMemberID}	&Integer & Unique member identifier \\
+$consumer$	& {\bf MemberID}	&Integer & Unique member identifier \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$consumer$\_$verified$ & {\bf consumerVerifiedMemberID}	&Integer & Unique member identifier \\
-			& {\bf firstName}			&String & First name \\
-			& {\bf surName}			&String & Surname \\
-			& {\bf email}				&String & e-mail address \\
+$consumer$\_$verified$ & {\bf MemberID}		&Integer	& Unique member identifier \\
+			& {\bf firstName}			&String	& First name \\
+			& {\bf surName}			&String	& Surname \\
+			& {\bf email}				&String	& e-mail address \\
 			& {\bf phone[]}				&String	& phone number(s) \\
 \cline{2-2}
 			& \emph{(Optional MetaData)} & & \\
@@ -453,11 +466,13 @@ $consumer$\_$verified$ & {\bf consumerVerifiedMemberID}	&Integer & Unique member
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$MNGR$ 		& {\bf MNGRMemberID}		&Integer & Unique member identifier \\
-			& {\bf firstName}			&String & First name \\
-			& {\bf surName}			&String & Surname \\
-			& {\bf email}				&String & e-mail address \\
+$MNGR$ 		& {\bf MemberID}			&Integer	& Unique member identifier \\
+			& {\bf firstName}			&String	& First name \\
+			& {\bf surName}			&String	& Surname \\
+			& {\bf email}				&String	& e-mail address \\
 			& {\bf phone[]}				&String	& phone number(s) \\
+			& {\bf address}				&String	& Street address \\
+			& {\bf gps[]}				&Double	& GPS coordinates \\	
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
@@ -469,6 +484,104 @@ $MNGR$ 		& {\bf MNGRMemberID}		&Integer & Unique member identifier \\
 \label{tab:GroupMetaData}
 \end{centering}
 \end{table}
+
+
+
+\begin{table}[H]
+\begin{centering}
+\small
+{
+\begin{tabular}{ r | c | l | l }
+\textbf{Account}	& {\bf MetaData} & {\bf Type} & {\bf Description} \\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$CC$		& {\bf AccountID}			&Integer	& Unique account identifier \\
+			& {\bf accountOwner}		&String	& Legal entity name \\
+			& {\bf limit}				&Double	& Credit limit \\
+\cline{2-2}
+			 & \emph{(Optional MetaData)}& & \\
+\cline{2-2}
+			& {\bf firstName}			&String	& First name \\
+			& {\bf surName}			&String	& Surname \\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$DOMU$		& {\bf AccountID}			&Integer	& Unique account identifier \\
+			& {\bf accountOwner}		&String	& Legal entity name \\
+			& {\bf limit}				&Double	& Credit limit \\
+\cline{2-2}
+			& \emph{(Optional MetaData)} & & \\
+\cline{2-2}
+			& {\bf firstName}			&String	& First name \\
+			& {\bf surName}			&String	& Surname \\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$MIRROR$ 	& {\bf AccountID}			&Integer	& Unique account identifier \\
+			& {\bf accountOwner}		&String	& Legal entity name \\
+			& {\bf limit}				&Double	& Credit limit \\
+\cline{2-2}
+			& \emph{(Optional MetaData)} & & \\
+\cline{2-2}
+			& {\bf firstName}			&String	& First name \\
+			& {\bf surName}			&String	& Surname \\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$Income$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
+			& {\bf accountOwner}		&String	& Legal entity name \\
+\cline{2-2}
+			 & \emph{(Optional MetaData)}& & \\
+\cline{2-2}
+			& {\bf firstName}			&String	& First name \\
+			& {\bf surName}			&String	& Surname \\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$Prepaid$ 	& {\bf AccountID}			&Integer	& Unique account identifier \\
+			& {\bf accountOwner}		&String	& Legal entity name \\
+\cline{2-2}
+			 & \emph{(Optional MetaData)}& & \\
+\cline{2-2}
+			& {\bf firstName}			&String	& First name \\
+			& {\bf surName}			&String	& Surname \\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$Bisoo$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
+			& {\bf accountOwner}		&String	& Legal entity name \\
+\cline{2-2}
+			 & \emph{(Optional MetaData)}& & \\
+\cline{2-2}
+			& {\bf firstName}			&String	& First name \\
+			& {\bf surName}			&String	& Surname \\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$Topup$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
+			& {\bf accountOwner}		&String	& Legal entity name \\
+\cline{2-2}
+			 & \emph{(Optional MetaData)}& & \\
+\cline{2-2}
+			& {\bf firstName}			&String	& First name \\
+			& {\bf surName}			&String	& Surname \\
+\Xhline{1.5pt}
+\end{tabular}
+}
+\caption{\small\textbf{MetaData for $CC$, $DOMU$, $MIRROR$, $Income$, $Prepaid$, $Bisoo$, and $Topup$ accounts}}
+\label{tab:GroupMetaData}
+\end{centering}
+\end{table}
+
+
+
+
+
+
+
+
+
 
 
 
