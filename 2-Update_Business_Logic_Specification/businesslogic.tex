@@ -309,7 +309,7 @@ The effect of the Transfer Types test together with the Account Connectivity tes
 
 \setlength{\tabcolsep}{7pt}
 \setlength\extrarowheight{3pt}
-\begin{table}[htbp]
+\begin{table}[H]
 \begin{centering}
 \small
 {
@@ -321,24 +321,26 @@ The effect of the Transfer Types test together with the Account Connectivity tes
 $welcome$	& {\bf welcomeMemberID}	&Integer & Unique member identifier \\
 			& {\bf firstName}			&String & First name \\
 			& {\bf surName}			&String & Surname \\
+			& {\bf email}				&String & e-mail address \\
+			& {\bf phone[]}				&String	& phone number(s) \\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
-			& {\bf email}				&String & e-mail address \\
+			& {\bf }					&String &  \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
 $retail$		& {\bf retailMemberID}		&Integer & Unique member identifier \\
 			& {\bf firstName	}		&String & First name \\
 			& {\bf surName}			&String & Surname \\
+			& {\bf email}				&String & e-mail address \\
+			& {\bf phone[]}				&String	& phone number(s) \\
 			& {\bf capacity}				&Double & Commitment to maximum balance or yearly volume \\
 			& {\bf capacityDate}			&DateTime & Date capacity was set \\
 			& {\bf availableCapacity}		&Double & Difference of capacity and current balance \\
-			& {\bf account[]}			&Account & Accounts associated with user \\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
-			& {\bf email}				&String & e-mail address \\
 			& {\bf euroFee}				&Double & Percent fee on Euro sales \\
 			& {\bf rewardOn}			&Bool & Effect reward to consumer Y/N \\
 			& {\bf verifiedOn}			&Bool & Accept purchases by $consumer$\_$verified$ Y/N \\
@@ -350,49 +352,25 @@ $retail$		& {\bf retailMemberID}		&Integer & Unique member identifier \\
 $company$	& {\bf companyMemberID}	&Integer & Unique member identifier \\
 			& {\bf firstName}			&String & First name \\
 			& {\bf surName}			&String & Surname \\
-			& {\bf capacity}				&Double & Commitment to maximum balance or yearly volume \\
-			& {\bf capacityDate}			&DateTime & Date capacity was set \\
-			& {\bf availableCapacity}		&Double & Difference of capacity and current balance \\
-			& {\bf creditPercent}			&Double & \% credit acceptance for transactions above 1000 \\
-			& {\bf account[]}			&Account & Accounts associated with user \\
-\cline{2-2}
-			 & \emph{(Optional MetaData)}& & \\
-\cline{2-2}
-			& {\bf email} 				&String & e-mail address \\
-\Xhline{1.5pt}
-			& \emph{(Obligatory MetaData)} & & \\
-\cline{2-2}
-$full$		& {\bf fullMemberID}			&Integer & Unique member identifier \\
-			& {\bf firstName}			&String & First name \\
-			& {\bf surName}			&String & Surname \\
-			& {\bf capacity}				&Double & Commitment to maximum balance or yearly volume \\
-			& {\bf capacityDate}			&DateTime & Date capacity was set \\
-			& {\bf availableCapacity}		&Double & Difference of capacity and current balance \\
-			& {\bf creditPercent}			&Double & \% credit acceptance for transactions above 1000 \\
-			& {\bf account[]}			&Account & Accounts associated with user \\
-\cline{2-2}
-			 & \emph{(Optional MetaData)}& & \\
-\cline{2-2}
 			& {\bf email}				&String & e-mail address \\
-			& {\bf euroFee}				&Double & Percent fee on Euro sales \\
-			& {\bf rewardOn}			&Bool & Effect reward to consumer Y/N \\
-			& {\bf verifiedOn}			&Bool & Accept purchases by $consumer$\_$verified$ Y/N \\
-			& {\bf rewardRate}			&Double & Credit reward rate to consumer \\
-			& {\bf acceptanceRate}		&Double & Rate of credits acceptance in consumer purchases\\
+			& {\bf phone[]}				&String	& phone number(s) \\
+			& {\bf capacity}				&Double & Commitment to maximum balance or yearly volume \\
+			& {\bf capacityDate}			&DateTime & Date capacity was set \\
+			& {\bf availableCapacity}		&Double & Difference of capacity and current balance \\
+			& {\bf creditPercent}			&Double & \% credit acceptance for transactions above 1000 \\
+\cline{2-2}
+			 & \emph{(Optional MetaData)}& & \\
+\cline{2-2}
+			& {\bf } 				&String &  \\
 \Xhline{1.5pt}
 \end{tabular}
 }
-\caption{\small\textbf{MetaData  for $welcome$, $retail$, $company$, and $full$ groups}}
+\caption{\small\textbf{MetaData  for $welcome$, $retail$, and $company$ groups}}
 \label{tab:GroupMetaData}
 \end{centering}
 \end{table}
 
-
-
-
-\setlength{\tabcolsep}{10pt}
-\setlength\extrarowheight{3pt}
-\begin{table}[htbp]
+\begin{table}[H]
 \begin{centering}
 \small
 {
@@ -401,65 +379,96 @@ $full$		& {\bf fullMemberID}			&Integer & Unique member identifier \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$employee$	& {\bf employeeMemberID}	&Integer & Unique member identifier \\
+$full$		& {\bf fullMemberID}			&Integer & Unique member identifier \\
 			& {\bf firstName}			&String & First name \\
 			& {\bf surName}			&String & Surname \\
+			& {\bf email}				&String & e-mail address \\
+			& {\bf phone[]}				&String	& phone number(s) \\
+			& {\bf capacity}				&Double & Commitment to maximum balance or yearly volume \\
+			& {\bf capacityDate}			&DateTime & Date capacity was set \\
+			& {\bf availableCapacity}		&Double & Difference of capacity and current balance \\
+			& {\bf creditPercent}			&Double & \% credit acceptance for transactions above 1000 \\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
-			& {\bf email}				&String & e-mail address \\
+			& {\bf euroFee}				&Double & Percent fee on Euro sales \\
+			& {\bf rewardOn}			&Bool & Effect reward to consumer Y/N \\
+			& {\bf verifiedOn}			&Bool & Accept purchases by $consumer$\_$verified$ Y/N \\
+			& {\bf rewardRate}			&Double & Credit reward rate to consumer \\
+			& {\bf acceptanceRate}		&Double & Rate of credits acceptance in consumer purchases\\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$employee$	& {\bf employeeMemberID}	&Integer	& Unique member identifier \\
+			& {\bf firstName}			&String	& First name \\
+			& {\bf surName}			&String	& Surname \\
+			& {\bf email}				&String	& e-mail address \\
+			& {\bf phone[]}				&String	& phone number(s) \\
+\cline{2-2}
+			 & \emph{(Optional MetaData)}& & \\
+\cline{2-2}
+			& {\bf }				&String &  \\
+\Xhline{1.5pt}
+\end{tabular}
+}
+\caption{\small\textbf{MetaData  for $full$ and $employee$ groups}}
+\label{tab:GroupMetaData}
+\end{centering}
+\end{table}
+
+\begin{table}[H]
+\begin{centering}
+\small
+{
+\begin{tabular}{ r | c | l | l }
+\textbf{Group}	& {\bf MetaData} & {\bf Type} & {\bf Description} \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
 $on$\_$hold$	& {\bf onHoldMemberID}		&Integer & Unique member identifier \\
 			& {\bf firstName}			&String & First name \\
 			& {\bf surName}			&String & Surname \\
+			& {\bf email}				&String & e-mail address \\
+			& {\bf phone[]}				&String	& phone number(s) \\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
-			& {\bf email}				&String & e-mail address \\
+			& {\bf }				&String &  \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
 $consumer$	& {\bf consumerMemberID}	&Integer & Unique member identifier \\
-			& {\bf account[]}			&Account & Accounts associated with user \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
 $consumer$\_$verified$ & {\bf consumerVerifiedMemberID}	&Integer & Unique member identifier \\
 			& {\bf firstName}			&String & First name \\
 			& {\bf surName}			&String & Surname \\
-			& {\bf account[]}			&Account & Accounts associated with user \\
+			& {\bf email}				&String & e-mail address \\
+			& {\bf phone[]}				&String	& phone number(s) \\
 \cline{2-2}
 			& \emph{(Optional MetaData)} & & \\
 \cline{2-2}
-			& {\bf email}				&String & e-mail address \\
+			& {\bf }				&String &  \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
 $MNGR$ 		& {\bf MNGRMemberID}		&Integer & Unique member identifier \\
 			& {\bf firstName}			&String & First name \\
 			& {\bf surName}			&String & Surname \\
+			& {\bf email}				&String & e-mail address \\
+			& {\bf phone[]}				&String	& phone number(s) \\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
-			& {\bf email}				&String & e-mail address \\
+			& {\bf }				&String &  \\
 \Xhline{1.5pt}
 \end{tabular}
 }
-\caption{\small\textbf{MetaData for $employee$, $on$\_$hold$, $consumer$, $consumer$\_$verified$, and $MNGR$ groups}}
+\caption{\small\textbf{MetaData for $on$\_$hold$, $consumer$, $consumer$\_$verified$, and $MNGR$ groups}}
 \label{tab:GroupMetaData}
 \end{centering}
 \end{table}
-
-
-
-
-
-
-
-
-
 
 
 
