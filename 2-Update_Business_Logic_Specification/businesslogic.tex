@@ -241,7 +241,7 @@ $MNGR$ 		& $\{ CC, Topup^*, MIRROR \}$ \\
 \small
 {
 \begin{tabular}{ r | c | l | l }
-\textbf{Group}	& {\bf MetaData} & {\bf Type} & {\bf Description} \\
+\textbf{Group}	& {\bf Identity MetaData} & {\bf Type} & {\bf Description} \\
 \Xhline{1.5pt}
 $welcome$	& {\bf MemberID}			&Integer	& Unique member identifier \\
 			& {\bf email}				&String	& e-mail address \\		
@@ -280,38 +280,41 @@ $MNGR$ 		& {\bf MemberID}			&Integer	& Unique member identifier \\
 \end{tabular}
 }
 \caption{\small\textbf{Identity MetaData for all the groups}}
-\label{tab:GroupMetaData}
+\label{tab:IdentityMetaData}
 \end{centering}
+\vspace{-1cm}
 \end{table}
 
 
 \subsection{Profile MetaData}
-
 
 \begin{table}[H]
 \begin{centering}
 \small
 {
 \begin{tabular}{ r | c | l | l }
-\textbf{Group}	& {\bf MetaData} & {\bf Type} & {\bf Description} \\
+\textbf{Group}	& {\bf Profile MetaData} & {\bf Type} & {\bf Description} \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$welcome$	& {\bf firstName}			&String	& First name \\
-			& {\bf surName}			&String	& Surname \\
-			& {\bf address}				&String	& Street address \\
-			& {\bf gps[]}				&Double	& GPS coordinates \\			
+$welcome$	& {\bf entityName}			&String	& Legal entity name \\
+			& {\bf entityAddress}			&String	& Legal entity's street address \\
+			& {\bf gps[]}				&Double	& Legal entity's GPS coordinates \\			
+			& {\bf VAT}				&String	& Legal entity's VAT number \\
+			& {\bf capacity}				&Double	& Commitment to maximum yearly CC volume \\
+			& {\bf capacityDate}			&DateTime & Date capacity was set \\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
-			& {\bf entityName}			&String & Legal entity name \\
+			& {\bf firstName}			&String	& First name \\
+			& {\bf surName}			&String	& Surname \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
 $retail$		& {\bf entityName}			&String	& Legal entity name \\
-			& {\bf address}				&String	& Street address \\
-			& {\bf gps[]}				&Double	& GPS coordinates \\	
-			& {\bf capacity}				&Double	& Commitment to maximum balance or yearly volume \\
+			& {\bf entityAddress}			&String	& Legal entity's street address \\
+			& {\bf gps[]}				&Double	& Legal entity's GPS coordinates \\			
+			& {\bf capacity}				&Double	& Commitment to maximum yearly CC volume \\
 			& {\bf capacityDate}			&DateTime & Date capacity was set \\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
@@ -322,12 +325,29 @@ $retail$		& {\bf entityName}			&String	& Legal entity name \\
 			& {\bf verifiedOn}			&Bool	& Accept purchases by $consumer$\_$verified$ Y/N \\
 			& {\bf acceptanceRate}		&Double	& Rate of credits acceptance in consumer purchases\\
 \Xhline{1.5pt}
+\end{tabular}
+}
+\caption{\small\textbf{Profile MetaData for $welcome$ and $retail$ groups}}
+\label{tab:ProfileMetaData1}
+\end{centering}
+\end{table}
+
+
+
+\begin{table}[H]
+\begin{centering}
+\small
+{
+\begin{tabular}{ r | c | l | l }
+\textbf{Group}	& {\bf Profile MetaData} & {\bf Type} & {\bf Description} \\
+\Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
 $company$	& {\bf entityName}			&String	& Legal entity name \\
-			& {\bf address}				&String	& Street address \\
-			& {\bf gps[]}				&Double	& GPS coordinates \\	
-			& {\bf capacity}				&Double	& Commitment to maximum balance or yearly volume \\
+			& {\bf entityAddress}			&String	& Legal entity's street address \\
+			& {\bf gps[]}				&Double	& Legal entity's GPS coordinates \\
+			& {\bf VAT}				&String	& Legal entity's VAT number \\
+			& {\bf capacity}				&Double	& Commitment to maximum yearly CC volume \\
 			& {\bf capacityDate}			&DateTime & Date capacity was set \\
 			& {\bf creditPercent}			&Double	& \% credit acceptance for transactions above 1000 \\
 \cline{2-2}
@@ -339,9 +359,10 @@ $company$	& {\bf entityName}			&String	& Legal entity name \\
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
 $full$		& {\bf entityName}			&String	& Legal entity name \\
-			& {\bf address}				&String	& Street address \\
-			& {\bf gps[]}				&Double	& GPS coordinates \\	
-			& {\bf capacity}				&Double	& Commitment to maximum balance or yearly volume \\
+			& {\bf entityAddress}			&String	& Legal entity's street address \\
+			& {\bf gps[]}				&Double	& Legal entity's GPS coordinates \\
+			& {\bf VAT}				&String	& Legal entity's VAT number \\
+			& {\bf capacity}				&Double	& Commitment to maximum yearly CC volume \\
 			& {\bf capacityDate}			&DateTime & Date capacity was set \\
 			& {\bf creditPercent}			&Double	& \% credit acceptance for transactions above 1000 \\
 \cline{2-2}
@@ -357,27 +378,16 @@ $full$		& {\bf entityName}			&String	& Legal entity name \\
 \cline{2-2}
 $employee$	& {\bf firstName}			&String	& First name \\
 			& {\bf surName}			&String	& Surname \\
-			& {\bf entityName}			&String	& Name of legal entity employed by \\
-\Xhline{1.5pt}
-\end{tabular}
-}
-\caption{\small\textbf{Profile MetaData for $welcome$, $retail$, $company$, $full$, and $employee$ groups}}
-\label{tab:GroupMetaData}
-\end{centering}
-\end{table}
-
-\begin{table}[H]
-\begin{centering}
-\small
-{
-\begin{tabular}{ r | c | l | l }
-\textbf{Group}	& {\bf MetaData} & {\bf Type} & {\bf Description} \\
+			& {\bf employedBy}			&String	& Name of legal entity employed by \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
 $on$\_$hold$	& {\bf entityName}			&String	& Legal entity name \\
-			& {\bf address}				&String	& Street address \\
-			& {\bf gps[]}				&Double	& GPS coordinates \\	
+			& {\bf entityAddress}			&String	& Legal entity's street address \\
+			& {\bf gps[]}				&Double	& Legal entity's GPS coordinates \\
+			& {\bf VAT}				&String	& Legal entity's VAT number \\
+			& {\bf capacity}				&Double	& Commitment to maximum yearly CC volume \\
+			& {\bf capacityDate}			&DateTime & Date capacity was set \\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
@@ -396,13 +406,14 @@ $consumer$\_$verified$ & {\bf firstName}			&String	& First name \\
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
 $MNGR$ 		& {\bf entityName}			&String	& Legal entity name \\
-			& {\bf address}				&String	& Street address \\
-			& {\bf gps[]}				&Double	& GPS coordinates \\	
+			& {\bf entityAddress}			&String	& Legal entity's street address \\
+			& {\bf gps[]}				&Double	& Legal entity's GPS coordinates \\
+			& {\bf VAT}				&String	& Legal entity's VAT number \\
 \Xhline{1.5pt}
 \end{tabular}
 }
-\caption{\small\textbf{Profile MetaData for $on$\_$hold$, $consumer$, $consumer$\_$verified$, and $MNGR$ groups}}
-\label{tab:GroupMetaData}
+\caption{\small\textbf{Profile MetaData for $company$, $full$, $employee$, $on$\_$hold$, $consumer$, $consumer$\_$verified$, and $MNGR$ groups}}
+\label{tab:ProfileMetaData2}
 \end{centering}
 \end{table}
 
@@ -489,31 +500,31 @@ Figure \ref{fig:SysAdmin_Acct_Connectivity} shows a similar connectivity functio
 \subsection{Group Transactability Functions}
 The effect of the Transfer Types test together with the Account Connectivity test results in what we call the Group Transactability Function (GTF). Since there are 4 combinations of currencies and channel, there are 4 different GTFs. There is no need to use them as an additional test, since they do not add anything new to Tests 1 and 2 of Figure \ref{fig:transactabilitywkflow}. However, it is still useful to include them here as another visualization of these first two tests of the Permissioning workflow, see Figures \ref{fig:GTF1}-\ref{fig:GTF4}.
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
-\includegraphics[width=16cm]{Figures/GTF1}
+\includegraphics[width=17cm]{Figures/GTF1}
 \caption{\small\textbf{Group Transactability Function 1}}
 \label{fig:GTF1}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
-\includegraphics[width=16cm]{Figures/GTF2}
+\includegraphics[width=17cm]{Figures/GTF2}
 \caption{\small\textbf{Group Transactability Function 2}}
 \label{fig:GTF2}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
-\includegraphics[width=16cm]{Figures/GTF3}
+\includegraphics[width=17cm]{Figures/GTF3}
 \caption{\small\textbf{Group Transactability Function 3}}
 \label{fig:GTF3}
-\vspace{-1.5cm}
+\vspace{-1cm}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
-\includegraphics[width=16cm]{Figures/GTF4}
+\includegraphics[width=17cm]{Figures/GTF4}
 \caption{\small\textbf{Group Transactability Function 4}}
 \label{fig:GTF4}
 \end{figure}
@@ -526,17 +537,14 @@ The effect of the Transfer Types test together with the Account Connectivity tes
 \small
 {
 \begin{tabular}{ r | c | l | l }
-\textbf{Group}	& {\bf MetaData} & {\bf Type} & {\bf Description} \\
+\textbf{Group}	& {\bf Transaction MetaData} & {\bf Type} & {\bf Description} \\
 \Xhline{1.5pt}
-$retail$		& {\bf availableCapacity}		&Double	& Difference of capacity and current balance \\
-			& {\bf euroFeeB2C}			&Double	& Percent fee on B2C Euro sales \\
+$retail$		& {\bf euroFeeB2C}			&Double	& Percent fee on B2C Euro sales \\
 			& {\bf rewardRate}			&Double	& Credit reward rate to consumer \\
 \hline
-$company$	& {\bf availableCapacity}		&Double	& Difference of capacity and current balance \\
-			& {\bf euroFeeInterCircuit}		&Double	& Percent fee on inter-circuit {\bf CC} sales \\
+$company$	& {\bf euroFeeInterCircuit}		&Double	& Percent fee on inter-circuit {\bf CC} sales \\
 \hline
-$full$		& {\bf availableCapacity}		&Double	& Difference of capacity and current balance \\
-			& {\bf euroFeeB2C}			&Double	& Percent fee on B2C Euro sales \\
+$full$		& {\bf euroFeeB2C}			&Double	& Percent fee on B2C Euro sales \\
 			& {\bf euroFeeInterCircuit}		&Double	& Percent fee on inter-circuit {\bf CC} sales \\
 			& {\bf rewardRate}			&Double	& Credit reward rate to consumer \\
 \Xhline{1.5pt}
@@ -556,79 +564,82 @@ $full$		& {\bf availableCapacity}		&Double	& Difference of capacity and current 
 \small
 {
 \begin{tabular}{ r | c | l | l }
-\textbf{Account}	& {\bf MetaData} & {\bf Type} & {\bf Description} \\
+\textbf{Account}	& {\bf Account MetaData} & {\bf Type} & {\bf Description} \\
 \Xhline{1.5pt}
-			& \emph{(Obligatory MetaData)} & & \\
-\cline{2-2}
 $CC$		& {\bf AccountID}			&Integer	& Unique account identifier \\
-			& {\bf accountOwner}		&String	& Legal entity name \\
-			& {\bf limit}				&Double	& Credit limit \\
-\cline{2-2}
-			 & \emph{(Optional MetaData)}& & \\
-\cline{2-2}
-			& {\bf firstName}			&String	& First name \\
-			& {\bf surName}			&String	& Surname \\
+			& {\bf accountOwnerProfileID}	&String	& ProfileID of account owner \\
+			& {\bf unit}					&String	& Account currency \\
+			& {\bf balance}				&Double	& Account balance (positive or negative) \\
+			& {\bf creditLimit}			&Double	& Credit limit (positive number) \\
+			& {\bf creditLimitDate}		&DateTime & Date at which credit limit was set \\
+			& {\bf availableBalance}		&Double	& $balance + creditLimit$ (positive number) \\
+			& {\bf upperLimit}			&Double	& Upper balance limit (positive number) \\
+			& \textcolor{red}{\bf availableCapacity}	&Double	& $capacity - balance$ (positive number) \\
+			& {\bf lowBalanceAlert}		&Double	& Alert if $(creditLimit + balance) < lowBalanceAlert$ buffer \\
+			& {\bf highBalanceAlert}		&Double	& Alert if $(upperLimit - balance) < highBalanceAlert$ buffer \\
 \Xhline{1.5pt}
-			& \emph{(Obligatory MetaData)} & & \\
-\cline{2-2}
 $DOMU$		& {\bf AccountID}			&Integer	& Unique account identifier \\
-			& {\bf accountOwner}		&String	& Legal entity name \\
-			& {\bf limit}				&Double	& Credit limit \\
-\cline{2-2}
-			& \emph{(Optional MetaData)} & & \\
-\cline{2-2}
-			& {\bf firstName}			&String	& First name \\
-			& {\bf surName}			&String	& Surname \\
+			& {\bf accountOwnerProfileID}	&String	& ProfileID of account owner \\
+			& {\bf unit}					&String	& Account currency \\
+			& {\bf balance}				&Double	& Account balance (positive or negative) \\
+			& {\bf creditLimit}			&Double	& Credit limit (positive number) \\
+			& {\bf creditLimitDate}		&DateTime & Date at which credit limit was set \\
+			& {\bf availableBalance}		&Double	& $balance + creditLimit$ (positive number) \\
+			& {\bf upperLimit}			&Double	& Upper balance limit (positive number) \\
+			& \textcolor{red}{\bf availableCapacity}	&Double	& $capacity - balance$ (positive number) \\
+			& {\bf lowBalanceAlert}		&Double	& Alert if $(creditLimit + balance) < lowBalanceAlert$ buffer \\
+			& {\bf highBalanceAlert}		&Double	& Alert if $(upperLimit - balance) < highBalanceAlert$ buffer \\
 \Xhline{1.5pt}
-			& \emph{(Obligatory MetaData)} & & \\
-\cline{2-2}
 $MIRROR$ 	& {\bf AccountID}			&Integer	& Unique account identifier \\
-			& {\bf accountOwner}		&String	& Legal entity name \\
-\Xhline{1.5pt}
-			& \emph{(Obligatory MetaData)} & & \\
-\cline{2-2}
-$Income$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
-			& {\bf accountOwner}		&String	& Legal entity name \\
-\cline{2-2}
-			 & \emph{(Optional MetaData)}& & \\
-\cline{2-2}
-			& {\bf firstName}			&String	& First name \\
-			& {\bf surName}			&String	& Surname \\
-\Xhline{1.5pt}
-			& \emph{(Obligatory MetaData)} & & \\
-\cline{2-2}
-$Prepaid$ 	& {\bf AccountID}			&Integer	& Unique account identifier \\
-			& {\bf accountOwner}		&String	& Legal entity name \\
-\cline{2-2}
-			 & \emph{(Optional MetaData)}& & \\
-\cline{2-2}
-			& {\bf firstName}			&String	& First name \\
-			& {\bf surName}			&String	& Surname \\
-\Xhline{1.5pt}
-			& \emph{(Obligatory MetaData)} & & \\
-\cline{2-2}
-$Bisoo$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
-			& {\bf accountOwner}		&String	& Legal entity name \\
-\cline{2-2}
-			 & \emph{(Optional MetaData)}& & \\
-\cline{2-2}
-			& {\bf firstName}			&String	& First name \\
-			& {\bf surName}			&String	& Surname \\
-\Xhline{1.5pt}
-			& \emph{(Obligatory MetaData)} & & \\
-\cline{2-2}
-$Topup$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
-			& {\bf accountOwner}		&String	& Legal entity name \\
-\cline{2-2}
-			 & \emph{(Optional MetaData)}& & \\
-\cline{2-2}
-			& {\bf firstName}			&String	& First name \\
-			& {\bf surName}			&String	& Surname \\
+			& {\bf accountOwnerProfileID}	&String	& ProfileID of account owner \\
+			& {\bf unit}					&String	& Account currency \\
+			& {\bf balance}				&Double	& Account balance (positive or negative) \\
+			& {\bf creditLimit}			&Double	& Credit limit (positive number) \\
+			& {\bf creditLimitDate}		&DateTime & Date at which credit limit was set \\
+			& {\bf availableBalance}		&Double	& $balance + creditLimit$ (positive number) \\
+			& {\bf upperLimit}			&Double	& Upper balance limit (positive number) \\
+			& \textcolor{red}{\bf availableCapacity}	&Double	& $capacity - balance$ (positive number) \\
+			& {\bf lowBalanceAlert}		&Double	& Alert if $(creditLimit + balance) < lowBalanceAlert$ buffer \\
+			& {\bf highBalanceAlert}		&Double	& Alert if $(upperLimit - balance) < highBalanceAlert$ buffer \\
 \Xhline{1.5pt}
 \end{tabular}
 }
-\caption{\small\textbf{MetaData for $CC$, $DOMU$, $MIRROR$, $Income$, $Prepaid$, $Bisoo$, and $Topup$ accounts}}
-\label{tab:AccountMetaData}
+\caption{\small\textbf{MetaData for $CC$, $DOMU$, and $MIRROR$ accounts}}
+\label{tab:AccountMetaData1}
+\end{centering}
+\end{table}
+
+\begin{table}[H]
+\begin{centering}
+\small
+{
+\begin{tabular}{ r | c | l | l }
+\textbf{Account}	& {\bf Account MetaData} & {\bf Type} & {\bf Description} \\
+\Xhline{1.5pt}
+$Income$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
+			& {\bf accountOwnerProfileID}	&String	& ProfileID of account owner \\
+			& {\bf unit}					&String	& Account currency \\
+			& {\bf balance}				&Double	& Account balance (positive or negative) \\
+\Xhline{1.5pt}
+$Prepaid$ 	& {\bf AccountID}			&Integer	& Unique account identifier \\
+			& {\bf accountOwnerProfileID}	&String	& ProfileID of account owner \\
+			& {\bf unit}					&String	& Account currency \\
+			& {\bf balance}				&Double	& Account balance (positive or zero) \\
+			& {\bf creditLimit}			&Double	& Credit limit (can only be 0) \\
+			& {\bf lowBalanceAlert}		&Double	& Alert if $(creditLimit + balance) < lowBalanceAlert$ buffer \\
+\Xhline{1.5pt}
+$Bisoo$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
+			& {\bf accountOwnerProfileID}	&String	& ProfileID of account owner \\
+			& {\bf unit}					&String	& Account currency \\
+\Xhline{1.5pt}
+$Topup$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
+			& {\bf accountOwnerProfileID}	&String	& ProfileID of account owner \\
+			& {\bf unit}					&String	& Account currency \\
+\Xhline{1.5pt}
+\end{tabular}
+}
+\caption{\small\textbf{MetaData for $Income$, $Prepaid$, $Bisoo$, and $Topup$ accounts}}
+\label{tab:AccountMetaData2}
 \end{centering}
 \end{table}
 
