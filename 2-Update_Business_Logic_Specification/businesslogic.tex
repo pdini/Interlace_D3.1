@@ -11,17 +11,27 @@ The business logic specification provided in Deliverable D2.1 \cite{INTERLACE_D2
 
 The description of the Permissioning iterative refinement relies mainly on graphical depictions of the variables and functions involved. As this reflects the process that was used to build a shared understanding within the INTERLACE team itself, it is hoped that it will also make it easier for newcomers to the INTERLACE open source community to understand the implementation.
 
-At the highest level the INTERLACE transactional platform is a dynamic information system that interacts with a database at the backend and with live users at the front-end. As already discussed in D2.1, the transaction engine relies on many categories of concepts that, together, constitute the domain model of the system. According to the ASM methodology, these have been subdivided into ASIMs comprised of rules, programs, and various kinds of functions. Whereas concepts such as `user' or 'transaction amount' are immediately clear, many more concepts and data structures are needed to specify and model the system. In addition to the transaction workflow, another organising principle that can be helpful in making sense of the transaction engine as an abstract machine is the level of dynamicity of the variables. In a physics context this could be described as the characteristic time-scale at which different kinds of variables change as the transactional workflow is carried out. Figure \ref{fig:metadata} shows how this principle applies to the system's meta-data.
+At the highest level the INTERLACE transactional platform is a dynamic information system that interacts with a database at the backend and with live users at the front-end. As already discussed in D2.1, the transaction engine relies on many categories of concepts that, together, constitute the domain model of the system. According to the ASM methodology, these have been subdivided into ASIMs comprised of rules, programs, and various kinds of functions. Whereas concepts such as `user' or 'transaction amount' are immediately clear, many more concepts and data structures are needed to specify and model the system. In addition to the transaction workflow, another organising principle that can be helpful in making sense of the transaction engine as an abstract machine is the level of dynamicity of the variables. In a physics context this could be described as the characteristic time-scale at which different kinds of variables change as the transactional workflow is carried out. Figure \ref{fig:staticdynamicmetadata} shows how this principle applies to the system's meta-data.
+\begin{figure}[h]
+\centering
+\includegraphics[width=13cm]{Figures/Static_Dynamic_MetaData}
+\caption{\small\textbf{Relative dynamicity of different types of meta-data of the INTERLACE transaction engine}}
+\label{fig:staticdynamicmetadata}
+\end{figure}
+
+Finally, the third principle that influences the architecture of the system at a global level is the need to comply with the GDPR directive. Figure \ref{fig:privatepublicmetaData} shows how from this point of view the Transaction MetaData can be regarded as more private than the Account MetaData since it contains information on, for example, Euro transaction fees chargeable with certain kinds of transactions. The figure also shows that sub-dividing the meta-data in this manner makes it possible to limit the need for GDPR compliance\footnote{General Data Protection Regulation: \url{https://www.eugdpr.org/}} only to the
+Identity and Profile MetaData.
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=13cm]{Figures/MetaData}
-\caption{\small\textbf{Relative dynamicity of different types of meta-data of the INTERLACE transaction engine}}
-\label{fig:metadata}
+\includegraphics[width=13cm]{Figures/Private_Public_MetaData}
+\caption{\small\textbf{Relative privacy of different types of meta-data of the INTERLACE transaction engine}}
+\label{fig:privatepublicmetaData}
 \end{figure}
 
 Figure \ref{fig:transactabilitywkflow} shows the high-level view of the transaction workflow, including how the PreviewRequest and PerformRequest rules specified in D2.1 map onto it. The process can be seen to start on the left of the figure, when a user or $SysAdmin$ initiates the request for a transaction. The request must pass the three tests shown: Transfer Types, Account Connectivity and, in B2C or Inter-Circuit operations, the euroFee is calculated and shown to the user. If the first two tests are passed, the user is shown a preview screen that summarizes all the transaction data. When the user issues the command to proceed, the first two tests are repeated and a final test on the account limits (e.g.\ sufficient funds) is performed. If also this fourth test is passed, the transaction is executed. We now describe each stage of this process in detail.
 %\vspace{-2cm}
+
 
 \begin{figure}[h]
 \centering
@@ -138,6 +148,7 @@ The interactions between circuit participants can be described from different po
 \end{figure}
 \vspace{-0.5cm}
 
+Figure \ref{fig:stack} extends the two communication levels described in D2.1, but does so qualitatively. For the purposes of the implementation, we need a smaller set of levels but a more precise and specific vocabulary to identify the end-points of the transaction.
 
 \begin{figure}[htbp]
 \centering
@@ -146,7 +157,7 @@ The interactions between circuit participants can be described from different po
 \label{fig:vocabulary}
 \end{figure}
 
-Figure \ref{fig:stack} extends the two communication levels described in D2.1, but does so qualitatively. For the purposes of the implementation, we need a smaller set of levels but a more precise and specific vocabulary to identify the end-points of the transaction. Figure \ref{fig:vocabulary} shows this additional information as concerns levels 2, 3 and 4, which are labelled in the first column in the same way as in Figure \ref{fig:stack}, along with a great deal more information. In particular, this figure could be seen to integrate aspects of Figures \ref{fig:stack} and \ref{fig:transactabilitywkflow}, with the purpose of facilitating the conceptual understanding of the specification. `Groups' refer to user types, while `MetaData' to the parameters allocated to each user type or group. For example, the $\%$ of SRD accepted by a given user over 1000-EUR transaction values is a MetaData field of the Company group but not the Consumer\_Verified group.
+Figure \ref{fig:vocabulary} shows this additional information as concerns levels 2, 3 and 4, which are labelled in the first column in the same way as in Figure \ref{fig:stack}, along with a great deal more information. In particular, this figure could be seen to integrate aspects of Figures \ref{fig:stack} and \ref{fig:transactabilitywkflow}, with the purpose of facilitating the conceptual understanding of the specification. `Groups' refer to user types, while `MetaData' to the parameters allocated to each user type or group. For example, the $\%$ of SRD accepted by a given user over 1000-EUR transaction values is a MetaData field of the Company group but not the Consumer\_Verified group.
 
 \subsection{Visibility}
 Figure \ref{fig:visibility} shows which groups ($toGroups$) are visible to which groups ($fromGroups$) by a `1' at the intersection of the $(row, column)$ corresponding to a choice of $(fromGroup, toGroup)$. For example, $company$ is visible to $employee$, meaning that $employee$ can do a search for $company$, but not vice versa. In this case $employee$ is not visible due to privacy legislation.
@@ -176,7 +187,7 @@ The amount of the reward is a percent, in SRD, of the amount in EUR paid by $con
 
 Use Case 2 also involves a second child transaction, a 2\% fee, in EUR, paid from $retail$'s Prepaid account to $MNGR$'s Topup account. The asterisks next to these account names, in the figure, indicate that these two accounts are \emph{owned} by these two users but are not \emph{controlled} by them. They are controlled by $SysAdmin$. These EUR accounts are `statistical' rather than `real', meaning that they simply keep track of actual EUR amounts but do not themselves hold Euros. Sardex S.p.A. would need to be a bank for that to be possible. For Use Case 2 to be executable, for a given $retail$er, its Prepaid account needs to have sufficient funds. When it runs out of statistical Euros, $retail$ can pay $MNGR$ some amount of Euros using any of the standard payment systems, through a bank or a payment service provider like PayPal. This triggers Use Case 1, also shown in Figure \ref{fig:B2C1}.
 
-\begin{figure}[htbp]
+\begin{figure}[h]
 \centering
 \includegraphics[width=15cm]{Figures/B2C2}
 \caption{\small\textbf{B2C SRD transaction}}
@@ -186,22 +197,214 @@ Use Case 2 also involves a second child transaction, a 2\% fee, in EUR, paid fro
 Figure \ref{fig:B2C2} shows the SRD transaction a $consumer$ can perform, i.e.\ the spending of the SRD accumulated as rewards, once they have registered and have become $consumer$\_$verified$.
 
 \subsection{Initial Account State}
-Figure \ref{fig:Initial_Acct_Sets} shows the initial allocation of accounts to the different user groups. The allocation is `initial' because  depending on the history of a given user the number of its accounts could change. For legal reasons, as a general principle \emph{change} can only mean \emph{increase}. In other words, once a user has become the owner of an account it can never be taken away from them, even if its access to it is, for example, suspended due to misbehaviour.
+Table \ref{tab:InitialAccountSets} shows the initial allocation of accounts to the different user groups. The allocation is `initial' because  depending on the history of a given user the number of its accounts could change. For legal reasons, as a general principle \emph{change} can only mean \emph{increase}. In other words, once a user has become the owner of an account it can never be taken away from them, even if its access to it is, for example, suspended due to misbehaviour. Another example is a $retail$ user who upgrades to $full$ and a year later changes its mind and goes back to $retail$. It will retain its DOMU account even if it won't be able to use it anymore. {\bf Note: Each user can have no more than one account of a given type.}
 
-Another example is a $retail$ user who upgrades to $full$ and a year later changes its mind and goes back to $retail$. It will retain its DOMU account even if it won't be able to use it anymore.
+\begin{table}[h]
+\begin{centering}
+\small
+{
+\begin{tabular}{ r | l  }
+\textbf{Group}	& {\bf Initial Account Set} \\
+\Xhline{1.5pt}
+$welcome$	& $\{ \}$ \\
+\hline
+$retail$		& $\{ CC, Prepaid^*, Income \}$ \\
+\hline
+$company$	& $\{ CC, DOMU \}$ \\
+\hline
+$full$		& $\{ CC, DOMU, Prepaid^*, Income \}$ \\
+\hline
+$employee$	& $\{ CC \}$ \\
+\hline
+$on$\_$hold$	& $\{  \}$ \\
+\hline
+$consumer$	& $\{ CC, Bisoo^* \}$ \\
+\hline
+$consumer$\_$verified$ & $\{ CC, Bisoo^* \}$ \\
+\hline
+$MNGR$ 		& $\{ CC, Topup^*, MIRROR \}$ \\
+\Xhline{1.5pt}
+\end{tabular}
+}
+\caption{\small\textbf{Initial sets of accounts assigned to the groups}\\ (*Indicates an account under the control of $SysAdmin$, not of the user it belongs to.)}
+\label{tab:InitialAccountSets}
+\end{centering}
+\end{table}
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=17.5cm]{Figures/Initial_Acct_Sets}
-\caption{\small\textbf{Initial account sets for different user groups \textcolor{red}{(THIS FIGURE WILL BE UPDATED)}}}
-\label{fig:Initial_Acct_Sets}
-\end{figure}
 
 \section{Transactability Workflow}
 
 \subsection{Identity MetaData}
 
+\begin{table}[H]
+\begin{centering}
+\small
+{
+\begin{tabular}{ r | c | l | l }
+\textbf{Group}	& {\bf MetaData} & {\bf Type} & {\bf Description} \\
+\Xhline{1.5pt}
+$welcome$	& {\bf MemberID}			&Integer	& Unique member identifier \\
+			& {\bf email}				&String	& e-mail address \\		
+			& {\bf phone[]}				&String	& phone number(s) \\
+\hline
+$retail$		& {\bf MemberID}			&Integer	& Unique member identifier \\
+			& {\bf email}				&String	& e-mail address \\
+			& {\bf phone[]}				&String	& phone number(s) \\
+\hline
+$company$	& {\bf MemberID}			&Integer	& Unique member identifier \\
+			& {\bf email}				&String	& e-mail address \\
+			& {\bf phone[]}				&String	& phone number(s) \\
+\hline
+$full$		& {\bf MemberID}			&Integer	& Unique member identifier \\
+			& {\bf email}				&String	& e-mail address \\
+			& {\bf phone[]}				&String	& phone number(s) \\
+\hline
+$employee$	& {\bf MemberID}			&Integer	& Unique member identifier \\
+			& {\bf email}				&String	& e-mail address \\
+			& {\bf phone[]}				&String	& phone number(s) \\
+\hline
+$on$\_$hold$	& {\bf MemberID}			&Integer	& Unique member identifier \\
+			& {\bf email}				&String	& e-mail address \\
+			& {\bf phone[]}				&String	& phone number(s) \\
+\hline
+$consumer$	& {\bf MemberID}	&Integer & Unique member identifier \\
+\hline
+$consumer$\_$verified$ & {\bf MemberID}		&Integer	& Unique member identifier \\
+			& {\bf email}				&String	& e-mail address \\
+			& {\bf phone[]}				&String	& phone number(s) \\
+\hline
+$MNGR$ 		& {\bf MemberID}			&Integer	& Unique member identifier \\
+			& {\bf email}				&String	& e-mail address \\
+			& {\bf phone[]}				&String	& phone number(s) \\
+\Xhline{1.5pt}
+\end{tabular}
+}
+\caption{\small\textbf{Identity MetaData for all the groups}}
+\label{tab:GroupMetaData}
+\end{centering}
+\end{table}
+
+
 \subsection{Profile MetaData}
+
+
+\begin{table}[H]
+\begin{centering}
+\small
+{
+\begin{tabular}{ r | c | l | l }
+\textbf{Group}	& {\bf MetaData} & {\bf Type} & {\bf Description} \\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$welcome$	& {\bf firstName}			&String	& First name \\
+			& {\bf surName}			&String	& Surname \\
+			& {\bf address}				&String	& Street address \\
+			& {\bf gps[]}				&Double	& GPS coordinates \\			
+\cline{2-2}
+			 & \emph{(Optional MetaData)}& & \\
+\cline{2-2}
+			& {\bf entityName}			&String & Legal entity name \\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$retail$		& {\bf entityName}			&String	& Legal entity name \\
+			& {\bf address}				&String	& Street address \\
+			& {\bf gps[]}				&Double	& GPS coordinates \\	
+			& {\bf capacity}				&Double	& Commitment to maximum balance or yearly volume \\
+			& {\bf capacityDate}			&DateTime & Date capacity was set \\
+\cline{2-2}
+			 & \emph{(Optional MetaData)}& & \\
+\cline{2-2}
+			& {\bf firstName	}			&String	& First name \\
+			& {\bf surName}			&String	& Surname \\
+			& {\bf rewardOn}			&Bool	& Effect reward to consumer Y/N \\
+			& {\bf verifiedOn}			&Bool	& Accept purchases by $consumer$\_$verified$ Y/N \\
+			& {\bf acceptanceRate}		&Double	& Rate of credits acceptance in consumer purchases\\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$company$	& {\bf entityName}			&String	& Legal entity name \\
+			& {\bf address}				&String	& Street address \\
+			& {\bf gps[]}				&Double	& GPS coordinates \\	
+			& {\bf capacity}				&Double	& Commitment to maximum balance or yearly volume \\
+			& {\bf capacityDate}			&DateTime & Date capacity was set \\
+			& {\bf creditPercent}			&Double	& \% credit acceptance for transactions above 1000 \\
+\cline{2-2}
+			 & \emph{(Optional MetaData)}& & \\
+\cline{2-2}
+			& {\bf firstName	}			&String & First name \\
+			& {\bf surName}			&String & Surname \\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$full$		& {\bf entityName}			&String	& Legal entity name \\
+			& {\bf address}				&String	& Street address \\
+			& {\bf gps[]}				&Double	& GPS coordinates \\	
+			& {\bf capacity}				&Double	& Commitment to maximum balance or yearly volume \\
+			& {\bf capacityDate}			&DateTime & Date capacity was set \\
+			& {\bf creditPercent}			&Double	& \% credit acceptance for transactions above 1000 \\
+\cline{2-2}
+			 & \emph{(Optional MetaData)}& & \\
+\cline{2-2}
+			& {\bf firstName}			&String	& First name \\
+			& {\bf surName}			&String	& Surname \\
+			& {\bf rewardOn}			&Bool	& Effect reward to consumer Y/N \\
+			& {\bf verifiedOn}			&Bool	& Accept purchases by $consumer$\_$verified$ Y/N \\
+			& {\bf rewardRate}			&Double	& Credit reward rate to consumer \\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$employee$	& {\bf firstName}			&String	& First name \\
+			& {\bf surName}			&String	& Surname \\
+			& {\bf entityName}			&String	& Name of legal entity employed by \\
+\Xhline{1.5pt}
+\end{tabular}
+}
+\caption{\small\textbf{Profile MetaData for $welcome$, $retail$, $company$, $full$, and $employee$ groups}}
+\label{tab:GroupMetaData}
+\end{centering}
+\end{table}
+
+\begin{table}[H]
+\begin{centering}
+\small
+{
+\begin{tabular}{ r | c | l | l }
+\textbf{Group}	& {\bf MetaData} & {\bf Type} & {\bf Description} \\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$on$\_$hold$	& {\bf entityName}			&String	& Legal entity name \\
+			& {\bf address}				&String	& Street address \\
+			& {\bf gps[]}				&Double	& GPS coordinates \\	
+\cline{2-2}
+			 & \emph{(Optional MetaData)}& & \\
+\cline{2-2}
+			& {\bf firstName}			&String	& First name \\
+			& {\bf surName}			&String	& Surname \\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$consumer$	& {\bf MemberID}	&Integer & Unique member identifier \\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$consumer$\_$verified$ & {\bf firstName}			&String	& First name \\
+			& {\bf surName}			&String	& Surname \\
+\Xhline{1.5pt}
+			& \emph{(Obligatory MetaData)} & & \\
+\cline{2-2}
+$MNGR$ 		& {\bf entityName}			&String	& Legal entity name \\
+			& {\bf address}				&String	& Street address \\
+			& {\bf gps[]}				&Double	& GPS coordinates \\	
+\Xhline{1.5pt}
+\end{tabular}
+}
+\caption{\small\textbf{Profile MetaData for $on$\_$hold$, $consumer$, $consumer$\_$verified$, and $MNGR$ groups}}
+\label{tab:GroupMetaData}
+\end{centering}
+\end{table}
 
 
 \subsection{Transfer Types}
@@ -229,14 +432,14 @@ we can now express the four functions as the following tables:
 
 \setlength{\tabcolsep}{10pt}
 \setlength\extrarowheight{3pt}
-\begin{table}[htbp]
+\begin{table}[h]
 \begin{centering}
 \small
 {
-\begin{tabular}{ r | c | c | c | c |}
+\begin{tabular}{ r | c | c | c | c }
 \textbf{Group}	& $\bm{TT}^{\bm{Credit,SRD}}$ & $\bm{TT}^{\bm{Debit,SRD}}$ 
 			& $\bm{TT}^{\bm{Credit,EUR}}$ & $\bm{TT}^{\bm{Debit,EUR}}$\\
-\hline
+\Xhline{1.5pt}
 $welcome$	& $\emptyset$ 				& $\emptyset$	& $\emptyset$	& $\emptyset$	 \\[3pt]
 \hline
 $retail$		& $\emptyset$				& $TT_1$ 		& $\emptyset$	& $TT_1$	 \\[3pt]
@@ -254,7 +457,7 @@ $consumer$	& $\emptyset$				& $\emptyset$	& $\emptyset$	&$\emptyset$ 	 \\[3pt]
 $consumer$\_$verified$ & $TT_1 \cup TT_6$ 	& $\emptyset$	& $\emptyset$ 	& $\emptyset$	 \\[3pt]
 \hline
 $MNGR$ 		& $TT_2 \cup TT_3 \cup TT_5 \cup TT_6$ & $TT_2 \cup TT_5 \cup TT_6$ & $\emptyset$ & $\emptyset$	 \\[3pt]
-\hline
+\Xhline{1.5pt}
 \end{tabular}
 }
 \caption{\small\textbf{The four Transfer Types functions}}
@@ -267,49 +470,50 @@ The Transfer Type test shown in Figure \ref{fig:transactabilitywkflow} involves 
 \subsection{Account Connectivity}
 Figure \ref{fig:User_Acct_Connectivity} shows the account connectivity function used for Test 2 in Figure \ref{fig:transactabilitywkflow}. As for Visibility, a `1' indicates that the Source and Destination accounts are connected and funds can be transferred from one to the other.
 
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
 \includegraphics[width=17cm]{Figures/User_Acct_Connectivity}
 \caption{\small\textbf{Account connectivity for user-initiated transactions: Test 2 in Figure \ref{fig:transactabilitywkflow}}}
 \label{fig:User_Acct_Connectivity}
 \end{figure}
 
-Figure \ref{fig:SysAdmin_Acct_Connectivity} shows a similar connectivity function for accounts that are controlled by $SysAdmin$. In this case, however, this function does not imply a transactability test since the permissions are hard-wired and SysAdmin does not need to test for transactability.
-
-\begin{figure}[htbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=17cm]{Figures/SysAdmin_Acct_Connectivity}
 \caption{\small\textbf{Account connectivity for system-initiated transactions: Not a test, hard-wired. }}
 \label{fig:SysAdmin_Acct_Connectivity}
 \end{figure}
 
+Figure \ref{fig:SysAdmin_Acct_Connectivity} shows a similar connectivity function for accounts that are controlled by $SysAdmin$. In this case, however, this function does not imply a transactability test since the permissions are hard-wired and SysAdmin does not need to test for transactability.
+
 \subsection{Group Transactability Functions}
 The effect of the Transfer Types test together with the Account Connectivity test results in what we call the Group Transactability Function (GTF). Since there are 4 combinations of currencies and channel, there are 4 different GTFs. There is no need to use them as an additional test, since they do not add anything new to Tests 1 and 2 of Figure \ref{fig:transactabilitywkflow}. However, it is still useful to include them here as another visualization of these first two tests of the Permissioning workflow, see Figures \ref{fig:GTF1}-\ref{fig:GTF4}.
 
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
-\includegraphics[width=17cm]{Figures/GTF1}
+\includegraphics[width=16cm]{Figures/GTF1}
 \caption{\small\textbf{Group Transactability Function 1}}
 \label{fig:GTF1}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
-\includegraphics[width=17cm]{Figures/GTF2}
+\includegraphics[width=16cm]{Figures/GTF2}
 \caption{\small\textbf{Group Transactability Function 2}}
 \label{fig:GTF2}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
-\includegraphics[width=17cm]{Figures/GTF3}
+\includegraphics[width=16cm]{Figures/GTF3}
 \caption{\small\textbf{Group Transactability Function 3}}
 \label{fig:GTF3}
+\vspace{-1.5cm}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
-\includegraphics[width=17cm]{Figures/GTF4}
+\includegraphics[width=16cm]{Figures/GTF4}
 \caption{\small\textbf{Group Transactability Function 4}}
 \label{fig:GTF4}
 \end{figure}
@@ -317,15 +521,6 @@ The effect of the Transfer Types test together with the Account Connectivity tes
 
 \subsection{Transaction MetaData}
 
-
-%\Xhline{1pt}
-%\multirow{3}{*}
-%{$\begin{array}{c}
-%\text{Configuration}
-%\end{array}$}
-
-\setlength{\tabcolsep}{7pt}
-\setlength\extrarowheight{3pt}
 \begin{table}[H]
 \begin{centering}
 \small
@@ -333,175 +528,27 @@ The effect of the Transfer Types test together with the Account Connectivity tes
 \begin{tabular}{ r | c | l | l }
 \textbf{Group}	& {\bf MetaData} & {\bf Type} & {\bf Description} \\
 \Xhline{1.5pt}
-			& \emph{(Obligatory MetaData)} & & \\
-\cline{2-2}
-$welcome$	& {\bf MemberID}			&Integer	& Unique member identifier \\
-			& {\bf firstName}			&String	& First name \\
-			& {\bf surName}			&String	& Surname \\
-			& {\bf email}				&String	& e-mail address \\
-			& {\bf phone[]}				&String	& phone number(s) \\
-			& {\bf address}				&String	& Street address \\
-			& {\bf gps[]}				&Double	& GPS coordinates \\			
-\cline{2-2}
-			 & \emph{(Optional MetaData)}& & \\
-\cline{2-2}
-			& {\bf entityName}			&String & Legal entity name \\
-\Xhline{1.5pt}
-			& \emph{(Obligatory MetaData)} & & \\
-\cline{2-2}
-$retail$		& {\bf MemberID}			&Integer	& Unique member identifier \\
-			& {\bf entityName}			&String	& Legal entity name \\
-			& {\bf email}				&String	& e-mail address \\
-			& {\bf phone[]}				&String	& phone number(s) \\
-			& {\bf address}				&String	& Street address \\
-			& {\bf gps[]}				&Double	& GPS coordinates \\	
-			& {\bf capacity}				&Double	& Commitment to maximum balance or yearly volume \\
-			& {\bf capacityDate}			&DateTime & Date capacity was set \\
-			& {\bf availableCapacity}		&Double	& Difference of capacity and current balance \\
-\cline{2-2}
-			 & \emph{(Optional MetaData)}& & \\
-\cline{2-2}
-			& {\bf firstName	}			&String	& First name \\
-			& {\bf surName}			&String	& Surname \\
-			& {\bf euroFee}				&Double	& Percent fee on Euro sales \\
-			& {\bf rewardOn}			&Bool	& Effect reward to consumer Y/N \\
-			& {\bf verifiedOn}			&Bool	& Accept purchases by $consumer$\_$verified$ Y/N \\
+$retail$		& {\bf availableCapacity}		&Double	& Difference of capacity and current balance \\
+			& {\bf euroFeeB2C}			&Double	& Percent fee on B2C Euro sales \\
 			& {\bf rewardRate}			&Double	& Credit reward rate to consumer \\
-			& {\bf acceptanceRate}		&Double	& Rate of credits acceptance in consumer purchases\\
-\Xhline{1.5pt}
-			& \emph{(Obligatory MetaData)} & & \\
-\cline{2-2}
-$company$	& {\bf MemberID}			&Integer	& Unique member identifier \\
-			& {\bf entityName}			&String	& Legal entity name \\
-			& {\bf email}				&String	& e-mail address \\
-			& {\bf phone[]}				&String	& phone number(s) \\
-			& {\bf address}				&String	& Street address \\
-			& {\bf gps[]}				&Double	& GPS coordinates \\	
-			& {\bf capacity}				&Double	& Commitment to maximum balance or yearly volume \\
-			& {\bf capacityDate}			&DateTime & Date capacity was set \\
-			& {\bf availableCapacity}		&Double	& Difference of capacity and current balance \\
-			& {\bf creditPercent}			&Double	& \% credit acceptance for transactions above 1000 \\
-\cline{2-2}
-			 & \emph{(Optional MetaData)}& & \\
-\cline{2-2}
-			& {\bf firstName	}			&String & First name \\
-			& {\bf surName}			&String & Surname \\
-\Xhline{1.5pt}
-\end{tabular}
-}
-\caption{\small\textbf{MetaData  for $welcome$, $retail$, and $company$ groups}}
-\label{tab:GroupMetaData}
-\end{centering}
-\end{table}
-
-\begin{table}[H]
-\begin{centering}
-\small
-{
-\begin{tabular}{ r | c | l | l }
-\textbf{Group}	& {\bf MetaData} & {\bf Type} & {\bf Description} \\
-\Xhline{1.5pt}
-			& \emph{(Obligatory MetaData)} & & \\
-\cline{2-2}
-$full$		& {\bf MemberID}			&Integer	& Unique member identifier \\
-			& {\bf entityName}			&String	& Legal entity name \\
-			& {\bf email}				&String	& e-mail address \\
-			& {\bf phone[]}				&String	& phone number(s) \\
-			& {\bf address}				&String	& Street address \\
-			& {\bf gps[]}				&Double	& GPS coordinates \\	
-			& {\bf capacity}				&Double	& Commitment to maximum balance or yearly volume \\
-			& {\bf capacityDate}			&DateTime & Date capacity was set \\
-			& {\bf availableCapacity}		&Double	& Difference of capacity and current balance \\
-			& {\bf creditPercent}			&Double	& \% credit acceptance for transactions above 1000 \\
-\cline{2-2}
-			 & \emph{(Optional MetaData)}& & \\
-\cline{2-2}
-			& {\bf firstName}			&String	& First name \\
-			& {\bf surName}			&String	& Surname \\
-			& {\bf euroFee}				&Double	& Percent fee on Euro sales \\
-			& {\bf rewardOn}			&Bool	& Effect reward to consumer Y/N \\
-			& {\bf verifiedOn}			&Bool	& Accept purchases by $consumer$\_$verified$ Y/N \\
+\hline
+$company$	& {\bf availableCapacity}		&Double	& Difference of capacity and current balance \\
+			& {\bf euroFeeInterCircuit}		&Double	& Percent fee on inter-circuit {\bf CC} sales \\
+\hline
+$full$		& {\bf availableCapacity}		&Double	& Difference of capacity and current balance \\
+			& {\bf euroFeeB2C}			&Double	& Percent fee on B2C Euro sales \\
+			& {\bf euroFeeInterCircuit}		&Double	& Percent fee on inter-circuit {\bf CC} sales \\
 			& {\bf rewardRate}			&Double	& Credit reward rate to consumer \\
-			& {\bf acceptanceRate}		&Double	& Rate of credits acceptance in consumer purchases\\
-\Xhline{1.5pt}
-			& \emph{(Obligatory MetaData)} & & \\
-\cline{2-2}
-$employee$	& {\bf MemberID}			&Integer	& Unique member identifier \\
-			& {\bf firstName}			&String	& First name \\
-			& {\bf surName}			&String	& Surname \\
-			& {\bf email}				&String	& e-mail address \\
-			& {\bf phone[]}				&String	& phone number(s) \\
-			& {\bf entityName}			&String	& Name of legal entity employed by \\
-\cline{2-2}
-			 & \emph{(Optional MetaData)}& & \\
-\cline{2-2}
-			& {\bf }				&String &  \\
 \Xhline{1.5pt}
 \end{tabular}
 }
-\caption{\small\textbf{MetaData  for $full$ and $employee$ groups}}
-\label{tab:GroupMetaData}
+\caption{\small\textbf{Transaction MetaData applies only to the $retail$, $company$, and $full$ groups}}
+\label{tab:TransactionMetaData}
 \end{centering}
 \end{table}
 
-\begin{table}[H]
-\begin{centering}
-\small
-{
-\begin{tabular}{ r | c | l | l }
-\textbf{Group}	& {\bf MetaData} & {\bf Type} & {\bf Description} \\
-\Xhline{1.5pt}
-			& \emph{(Obligatory MetaData)} & & \\
-\cline{2-2}
-$on$\_$hold$	& {\bf MemberID}			&Integer	& Unique member identifier \\
-			& {\bf entityName}			&String	& Legal entity name \\
-			& {\bf email}				&String	& e-mail address \\
-			& {\bf phone[]}				&String	& phone number(s) \\
-			& {\bf address}				&String	& Street address \\
-			& {\bf gps[]}				&Double	& GPS coordinates \\	
-\cline{2-2}
-			 & \emph{(Optional MetaData)}& & \\
-\cline{2-2}
-			& {\bf firstName}			&String	& First name \\
-			& {\bf surName}			&String	& Surname \\
-\Xhline{1.5pt}
-			& \emph{(Obligatory MetaData)} & & \\
-\cline{2-2}
-$consumer$	& {\bf MemberID}	&Integer & Unique member identifier \\
-\Xhline{1.5pt}
-			& \emph{(Obligatory MetaData)} & & \\
-\cline{2-2}
-$consumer$\_$verified$ & {\bf MemberID}		&Integer	& Unique member identifier \\
-			& {\bf firstName}			&String	& First name \\
-			& {\bf surName}			&String	& Surname \\
-			& {\bf email}				&String	& e-mail address \\
-			& {\bf phone[]}				&String	& phone number(s) \\
-\cline{2-2}
-			& \emph{(Optional MetaData)} & & \\
-\cline{2-2}
-			& {\bf }				&String &  \\
-\Xhline{1.5pt}
-			& \emph{(Obligatory MetaData)} & & \\
-\cline{2-2}
-$MNGR$ 		& {\bf MemberID}			&Integer	& Unique member identifier \\
-			& {\bf firstName}			&String	& First name \\
-			& {\bf surName}			&String	& Surname \\
-			& {\bf email}				&String	& e-mail address \\
-			& {\bf phone[]}				&String	& phone number(s) \\
-			& {\bf address}				&String	& Street address \\
-			& {\bf gps[]}				&Double	& GPS coordinates \\	
-\cline{2-2}
-			 & \emph{(Optional MetaData)}& & \\
-\cline{2-2}
-			& {\bf }				&String &  \\
-\Xhline{1.5pt}
-\end{tabular}
-}
-\caption{\small\textbf{MetaData for $on$\_$hold$, $consumer$, $consumer$\_$verified$, and $MNGR$ groups}}
-\label{tab:GroupMetaData}
-\end{centering}
-\end{table}
 
+\subsection{Account MetaData}
 
 
 \begin{table}[H]
@@ -537,12 +584,6 @@ $DOMU$		& {\bf AccountID}			&Integer	& Unique account identifier \\
 \cline{2-2}
 $MIRROR$ 	& {\bf AccountID}			&Integer	& Unique account identifier \\
 			& {\bf accountOwner}		&String	& Legal entity name \\
-			& {\bf limit}				&Double	& Credit limit \\
-\cline{2-2}
-			& \emph{(Optional MetaData)} & & \\
-\cline{2-2}
-			& {\bf firstName}			&String	& First name \\
-			& {\bf surName}			&String	& Surname \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
@@ -587,14 +628,14 @@ $Topup$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
 \end{tabular}
 }
 \caption{\small\textbf{MetaData for $CC$, $DOMU$, $MIRROR$, $Income$, $Prepaid$, $Bisoo$, and $Topup$ accounts}}
-\label{tab:GroupMetaData}
+\label{tab:AccountMetaData}
 \end{centering}
 \end{table}
 
 
 
 
-\subsection{Account MetaData}
+
 
 
 
