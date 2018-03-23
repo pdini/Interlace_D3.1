@@ -7,31 +7,31 @@ Paolo Dini, Luca Carboni, Giuseppe Littera, Egon B\"orger and Chrystopher Nehani
 \end{center}
 
 \section{Context and Overview}
-The business logic specification provided in Deliverable D2.1 \cite{INTERLACE_D21} concerns user-initiated transactions. Although this is a subset of all possible operations (initiated by the users or by the System) that a mutual credit system platform must support, it is a viable starting point for testing an initial executable CoreASIM model. D2.1 did not provide all the details of the transaction request operations, it left their specification at a fairly abstract level. This chapter provides the next step in the iterative refinement of the specification in the form of a detailed description of the Permissioning workflow, whose implementation as part of the CoreASIM model is then described in Chapter \ref{ch:CoreAsimImplementation}.
+The business logic specification provided in Deliverable D2.1 \cite{INTERLACE_D21} concerns user-initiated transactions. Although this is a subset of all possible operations (initiated by the users or by the System, which we refer to as $SysAdmin$) that a mutual credit system platform must support, it is a viable starting point for testing an initial executable CoreASIM model. D2.1 did not provide all the details of the transaction request operations, it left their specification at a fairly abstract level. This chapter provides the next step in the iterative refinement of the specification in the form of a detailed description of the Permissioning workflow, whose implementation as part of the CoreASIM model is then described in Chapter \ref{ch:CoreAsimImplementation}. The description of the Permissioning iterative refinement relies on graphical and tabular depictions of the variables and functions involved. As this reflects the process that was used to build a shared understanding within the INTERLACE team itself, it is hoped that it will also make it easier for newcomers to the INTERLACE open source community to understand the implementation and the logic behind it.
 
-The description of the Permissioning iterative refinement relies mainly on graphical depictions of the variables and functions involved. As this reflects the process that was used to build a shared understanding within the INTERLACE team itself, it is hoped that it will also make it easier for newcomers to the INTERLACE open source community to understand the implementation.
-
-At the highest level the INTERLACE transactional platform is a dynamic information system that interacts with a database at the backend and with live users at the front-end. As already discussed in D2.1, the transaction engine relies on many categories of concepts that, together, constitute the domain model of the system. According to the ASM methodology, these have been subdivided into ASIMs comprised of rules, programs, and various kinds of functions. Whereas concepts such as `user' or 'transaction amount' are immediately clear, many more concepts and data structures are needed to specify and model the system. In addition to the transaction workflow, another organising principle that can be helpful in making sense of the transaction engine as an abstract machine is the level of dynamicity of the variables. In a physics context this could be described as the characteristic time-scale at which different kinds of variables change as the transactional workflow is carried out. Figure \ref{fig:staticdynamicmetadata} shows how this principle applies to the system's meta-data.
-\begin{figure}[h]
-\centering
-\includegraphics[width=13cm]{Figures/Static_Dynamic_MetaData}
-\caption{\small\textbf{Relative dynamicity of different types of meta-data of the INTERLACE transaction engine}}
-\label{fig:staticdynamicmetadata}
-\end{figure}
-
-Finally, the third principle that influences the architecture of the system at a global level is the need to comply with the GDPR directive. Figure \ref{fig:privatepublicmetaData} shows how from this point of view the Transaction MetaData can be regarded as more private than the Account MetaData since it contains information on, for example, Euro transaction fees chargeable with certain kinds of transactions. The figure also shows that sub-dividing the meta-data in this manner makes it possible to limit the need for GDPR compliance\footnote{General Data Protection Regulation: \url{https://www.eugdpr.org/}} only to the
-Identity and Profile MetaData.
+At the highest level the INTERLACE transactional platform is a dynamic information system that interacts with a database at the backend and with live users at the front-end. As already discussed in D2.1, the transaction engine relies on many categories of concepts that, together, constitute the domain model of the system. According to the ASM methodology \cite{BoergerStaerk2003}, these have been subdivided into ASIMs comprised of rules, programs, and various kinds of functions. Whereas concepts such as `user' or 'transaction amount' are immediately clear, many more concepts and data structures are needed to specify and model the system. Before we get into the details, it helps to introduce three high-level perspectives through which the transaction engine can be characterized as an abstract machine and as a social construct: privacy (private-public dichotomy), dynamics (frequency domain), and transaction workflow already mentioned (time domain).
 
 \begin{figure}[h]
+\vspace{-0.5cm}
 \centering
-\includegraphics[width=13cm]{Figures/Private_Public_MetaData}
+\includegraphics[width=12cm]{Figures/Private_Public_MetaData}
 \caption{\small\textbf{Relative privacy of different types of meta-data of the INTERLACE transaction engine}}
 \label{fig:privatepublicmetaData}
+\vspace{-0.5cm}
 \end{figure}
 
-Figure \ref{fig:transactabilitywkflow} shows the high-level view of the transaction workflow, including how the PreviewRequest and PerformRequest rules specified in D2.1 map onto it. The process can be seen to start on the left of the figure, when a user or $SysAdmin$ initiates the request for a transaction. The request must pass the three tests shown: Transfer Types, Account Connectivity and, in B2C or Inter-Circuit operations, the euroFee is calculated and shown to the user. If the first two tests are passed, the user is shown a preview screen that summarizes all the transaction data. When the user issues the command to proceed, the first two tests are repeated and a final test on the account limits (e.g.\ sufficient funds) is performed. If also this fourth test is passed, the transaction is executed. We now describe each stage of this process in detail.
-%\vspace{-2cm}
+The first principle that influences the architecture of the system at a global level is the need to comply with the GDPR directive. Figure \ref{fig:privatepublicmetaData} shows how from this point of view the Transaction MetaData can be regarded as more private than the Account MetaData since it contains information on, for example, Euro transaction fees chargeable with certain kinds of transactions. The figure also shows that sub-dividing the meta-data in this manner makes it possible to limit the need for GDPR compliance\footnote{General Data Protection Regulation: \url{https://www.eugdpr.org/}} only to the Identity and Profile MetaData. Second, in a physics context the level of dynamicity of the variables could be described as the characteristic frequency (or its inverse, time-scale) at which different kinds of variables change as the transactional workflow is carried out. Figure \ref{fig:staticdynamicmetadata} shows how this principle applies to the system's meta-data.
 
+\begin{figure}[h]
+\vspace{-0.5cm}
+\centering
+\includegraphics[width=12cm]{Figures/Static_Dynamic_MetaData}
+\caption{\small\textbf{Relative dynamicity of different types of meta-data of the INTERLACE transaction engine}}
+\label{fig:staticdynamicmetadata}
+\vspace{-0.5cm}
+\end{figure}
+
+Third, Figure \ref{fig:transactabilitywkflow} shows the high-level view of the transaction workflow, including how the PreviewRequest and PerformRequest rules specified in D2.1 map onto it. The process starts on the left of the figure, when a user or $SysAdmin$ initiates the request for a transaction. The request must pass the three tests shown: Transfer Types, Account Connectivity and, in Inter-Circuit operations, the euroFee is calculated and shown to the user. At this point the user is shown a preview screen that summarizes all the transaction data. When the user issues the command to proceed, the first two tests are repeated and a final test on the account limits (e.g.\ sufficient funds) is performed. If also this fourth test is passed, the transaction is executed.
 
 \begin{figure}[h]
 \centering
@@ -40,11 +40,12 @@ Figure \ref{fig:transactabilitywkflow} shows the high-level view of the transact
 \label{fig:transactabilitywkflow}
 \end{figure}
 
+In the following, first we provide a taxonomy of all the terms and concepts used and needed by the model, and then proceed to explain each step of the transaction workflow.
 
 
 \section{Permissioning Model Taxonomy}
 \subsection{Groups}
-The original Sardex system divides its users into 29 different types, called `groups'. This generates a great deal of complexity that is drastically reduced in the INTERLACE version of the platform. The new user type taxonomy involves only 9 groups, as shown in Table \ref{tab:groups}.
+The original Sardex system divided its users into 29 different types, called `groups'. This generated a great deal of complexity that is drastically reduced in the INTERLACE version of the platform. The new user type taxonomy involves only 9 groups, as shown in Table \ref{tab:groups}.
 
 %\setcounter{table}{0}
 \setlength{\tabcolsep}{10pt}
@@ -85,7 +86,7 @@ $MNGR$ & Manager of the circuit (e.g.\ Sardex S.p.A.) acting as $company$ rather
 $SysAdmin$ is not defined explicitly as a group, in this model, although technically it too is a user type. $SysAdmin$ has special privileges, some of which are discussed where relevant in what follows.
 
 \subsection{Currencies and Channels}
-As shown in Figure \ref{fig:currchan}, the Sardex/INTERLACE platform supports transactions in both Sardex credits (SRD) and Euros (Euro) over two kinds of channels. `Service' refers to transactions mediated either by a computer (web application) or a mobile phone (either a web application or a phone App). `POS' means `Point of Sale' and refers to the standard terminal used by retailers that accepts credit or debit cards, through which SRD transactions can be routed via an API. The figure also shows the four possible $\{ currency, channel \}$ combinations that we need to support in the definition and implementation of the permissioning tests discussed in the next sections.
+As shown in Figure \ref{fig:currchan}, the Sardex/INTERLACE platform supports transactions in both Sardex credits (SRD) and Euros (EUR) over two kinds of channels. `Service' refers to transactions mediated either by a computer (web application) or a mobile phone (either a web application or a phone App). `POS' means `Point of Sale' and refers to the standard terminal used by retailers that accepts credit or debit cards, through which SRD transactions can be routed via an API. The figure also shows the four possible $\{ currency, channel \}$ combinations that we need to support in the definition and implementation of the permissioning tests discussed in the next sections.
 
 \vspace{-0.3cm}
 \begin{figure}[h]
@@ -116,7 +117,7 @@ $MIRROR$ & Account controlled by $MNGR$, used for inter-circuit purchases \\
 \hline
 $Income$ & Statistical EUR account owned by $retail$ or $full$ that collects B2C payments\\
 \hline
-$Prepaid$ & Stastical EUR account from which the 2\% child B2C transaction fee is drawn \\
+$Prepaid$ & Statistical EUR account from which the 2\% child B2C transaction fee is drawn \\
 \hline
 $Bisoo$ & Statistical EUR account used by $consumer$ to pay into Income \\
 \hline
@@ -602,20 +603,6 @@ $MIRROR$ 	& {\bf AccountID}			&Integer	& Unique account identifier \\
 			& {\bf lowBalanceAlert}		&Double	& Alert if $(creditLimit + balance) < lowBalanceAlert$ buffer \\
 			& {\bf highBalanceAlert}		&Double	& Alert if $(upperLimit - balance) < highBalanceAlert$ buffer \\
 \Xhline{1.5pt}
-\end{tabular}
-}
-\caption{\small\textbf{MetaData for $CC$, $DOMU$, and $MIRROR$ accounts}}
-\label{tab:AccountMetaData1}
-\end{centering}
-\end{table}
-
-\begin{table}[H]
-\begin{centering}
-\small
-{
-\begin{tabular}{ r | c | l | l }
-\textbf{Account}	& {\bf Account MetaData} & {\bf Type} & {\bf Description} \\
-\Xhline{1.5pt}
 $Income$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
 			& {\bf accountOwnerProfileID}	&String	& ProfileID of account owner \\
 			& {\bf unit}					&String	& Account currency \\
@@ -628,6 +615,20 @@ $Prepaid$ 	& {\bf AccountID}			&Integer	& Unique account identifier \\
 			& {\bf creditLimit}			&Double	& Credit limit (can only be 0) \\
 			& {\bf lowBalanceAlert}		&Double	& Alert if $(creditLimit + balance) < lowBalanceAlert$ buffer \\
 \Xhline{1.5pt}
+\end{tabular}
+}
+\caption{\small\textbf{MetaData for $CC$, $DOMU$, $MIRROR$, $Income$ and $Prepaid$ accounts}}
+\label{tab:AccountMetaData1}
+\end{centering}
+\end{table}
+
+\begin{table}[H]
+\begin{centering}
+\small
+{
+\begin{tabular}{ r | c | l | l }
+\textbf{Account}	& {\bf Account MetaData} & {\bf Type} & {\bf Description} \\
+\Xhline{1.5pt}
 $Bisoo$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
 			& {\bf accountOwnerProfileID}	&String	& ProfileID of account owner \\
 			& {\bf unit}					&String	& Account currency \\
@@ -638,7 +639,7 @@ $Topup$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
 \Xhline{1.5pt}
 \end{tabular}
 }
-\caption{\small\textbf{MetaData for $Income$, $Prepaid$, $Bisoo$, and $Topup$ accounts}}
+\caption{\small\textbf{MetaData for $Bisoo$, and $Topup$ accounts}}
 \label{tab:AccountMetaData2}
 \end{centering}
 \end{table}
