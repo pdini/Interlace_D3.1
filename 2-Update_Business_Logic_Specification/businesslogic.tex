@@ -53,10 +53,10 @@ The original Sardex system divided its users into 29 different types, called `gr
 \begin{centering}
 \small
 {
-\begin{tabular}{| l | l | }
+\begin{tabular}{ r | l  }
 \hline
 \textbf{Group}	& \textbf{Description} \\
-\hline
+\Xhline{1.5pt}
 $welcome$ & User who has joined and signed the contract, but has not yet been cleared to start trading \\
 \hline
 $retail$ & Retailer who can \emph{only} participate in B2C operations (not B2E and not B2B) \\
@@ -74,7 +74,7 @@ $consumer$ & Person not registered to the circuit who can only interact through 
 $consumer$\_$verified$ & $consumer$ who has registered and can now also purchase with SRD (B2C Use Case 3)  \\
 \hline
 $MNGR$ & Manager of the circuit (e.g.\ Sardex S.p.A.) acting as $company$ rather than $SysAdmin$ \\
-\hline
+\Xhline{1.5pt}
 \end{tabular}
 }
 \caption{\small\textbf{New user types (groups) for the INTERLACE platform}}
@@ -105,10 +105,10 @@ As shown in Table \ref{tab:accounts}, the accounts implemented in the model refl
 \begin{centering}
 \small
 {
-\begin{tabular}{| l | l | }
+\begin{tabular}{ r | l  }
 \hline
 \textbf{Account}	& \textbf{Description} \\
-\hline
+\Xhline{1.5pt}
 $CC$ & Standard Sardex credits (SRD) account \\
 \hline
 $DOMU$ & SRD account used for larger operations, such as for real estate or capital equipment\\
@@ -123,7 +123,7 @@ $Bisoo$ & Statistical EUR account used by $consumer$ to pay into Income \\
 \hline
 $Topup$ & Statistical EUR account used by $MNGR$ to recharge $retail$'s Prepaid account upon receipt of \\
 &\hspace{0.5cm} EUR payment. It is recharged back to zero gradually with each B2C transaction. \\
-\hline
+\Xhline{1.5pt}
 \end{tabular}
 }
 \caption{\small\textbf{New user types (groups) for the INTERLACE platform}}
@@ -131,6 +131,40 @@ $Topup$ & Statistical EUR account used by $MNGR$ to recharge $retail$'s Prepaid 
 \vspace{-0.5cm}
 \end{centering}
 \end{table}
+
+\subsection{Account Limits}
+Table \ref{tab:accountLimits} shows the account limit parameters that apply to the SRD accounts CC, DOMU, and MIRROR. The credit limit is straightforward, it is the maximum negative value the account balance can reach. However, note that it is expressed as a \emph{positive} number. This is important to keep in mind for the calculations that are based on the value of this parameter. The credit limit is set at the time a user signs the contract with Sardex and is reviewed at least every year after that. The upper limit is, similarly, the maximum value the balance of the account is allowed to reach. Whereas the credit limit can be considered to be a safety measure for the circuit, the upper limit is more a safety measure for the user, since if the balance becomes too large-positive it may be difficult for the user to find ways to spend the credits in a useful time (for the user). Capacity is the maximum total sale volume that the user commits to accepting in one year. The alerts are safety buffers set by the user to alert him/her when the account balance and/or the sale volume approach these limits.
+
+\setlength{\tabcolsep}{10pt}
+\begin{table}[htbp]
+\begin{centering}
+\small
+{
+\begin{tabular}{ r | l  }
+\hline
+\textbf{Account Limit Parameter} & \textbf{Description} \\
+\Xhline{1.5pt}
+$creditLimit$& Maximum negative SRD balance allowed (\emph{positive} number) \\
+\hline
+$upperLimit$ & Maximum positive SRD balance allowed (positive number)\\
+\hline
+$capacity$ & Maximum {\bf sale} volume allowed in one year \\
+\hline
+$lowBalanceAlert$ & Buffer set by user: alert if $(creditLimit + balance) < lowBalanceAlert$\\
+\hline
+$highBalanceAlert$ & Buffer set by user: alert if $(upperLimit - balance) < highBalanceAlert$ \\
+\hline
+$highVolumeAlert$ & Buffer set by user: alert if $(capacity - saleVolume) < highVolumeAlert$ \\
+\Xhline{1.5pt}
+\end{tabular}
+}
+\caption{\small\textbf{Account limit parameters}}
+\label{tab:accountLimits}
+\vspace{-0.5cm}
+\end{centering}
+\end{table}
+
+Figure \ref{fig:accountLimits} shows a visualization of the account limits that apply to SRD accounts. The thick vertical green arrows highlight that the calculation of the sale volume is defined as the sum of all the sales performed in one year. Thus, the sum of all the vertical green arrows is 50,000.
 
 \subsection{Operations}
 As already specified in D2.1, transactions are effected through two operations: Credit and Debit:
@@ -143,13 +177,23 @@ The interactions between circuit participants can be described from different po
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=9cm]{Figures/Stack}
-\caption{\small\textbf{Stack view of the INTERLACE communication, economic, and financial  interactions}}
-\label{fig:stack}
+\includegraphics[width=14cm]{Figures/Account_Limits}
+\caption{\small\textbf{Visualization of the SRD account limits}}
+\label{fig:accountLimits}
 \end{figure}
 \vspace{-0.5cm}
 
 Figure \ref{fig:stack} extends the two communication levels described in D2.1, but does so qualitatively. For the purposes of the implementation, we need a smaller set of levels but a more precise and specific vocabulary to identify the end-points of the transaction.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=10cm]{Figures/Stack}
+\caption{\small\textbf{Stack view of the INTERLACE communication, economic, and financial  interactions}}
+\label{fig:stack}
+\vspace{-0.5cm}
+\end{figure}
+
+Figure \ref{fig:vocabulary} shows this additional information as concerns levels 2, 3 and 4, which are labelled in the first column in the same way as in Figure \ref{fig:stack}, along with a great deal more information. In particular, this figure could be seen to integrate aspects of Figures \ref{fig:stack} and \ref{fig:transactabilitywkflow}, with the purpose of facilitating the conceptual understanding of the specification. `Groups' refer to user types, while the different types of `MetaData' relevant to transactions are shown in the approximate position where they are polled. For example, the $\%$ of SRD accepted by a given user over 1000-EUR transaction values is part of the Profile MetaData of the $company$ group but not the $consumer$\_$verified$ group's.
 
 \begin{figure}[htbp]
 \centering
@@ -157,8 +201,6 @@ Figure \ref{fig:stack} extends the two communication levels described in D2.1, b
 \caption{\small\textbf{Actors, parameters, levels, data structures, computational process, and conditions}}
 \label{fig:vocabulary}
 \end{figure}
-
-Figure \ref{fig:vocabulary} shows this additional information as concerns levels 2, 3 and 4, which are labelled in the first column in the same way as in Figure \ref{fig:stack}, along with a great deal more information. In particular, this figure could be seen to integrate aspects of Figures \ref{fig:stack} and \ref{fig:transactabilitywkflow}, with the purpose of facilitating the conceptual understanding of the specification. `Groups' refer to user types, while `MetaData' to the parameters allocated to each user type or group. For example, the $\%$ of SRD accepted by a given user over 1000-EUR transaction values is a MetaData field of the Company group but not the Consumer\_Verified group.
 
 \subsection{Visibility}
 Figure \ref{fig:visibility} shows which groups ($toGroups$) are visible to which groups ($fromGroups$) by a `1' at the intersection of the $(row, column)$ corresponding to a choice of $(fromGroup, toGroup)$. For example, $company$ is visible to $employee$, meaning that $employee$ can do a search for $company$, but not vice versa. In this case $employee$ is not visible due to privacy legislation.
@@ -168,6 +210,7 @@ Figure \ref{fig:visibility} shows which groups ($toGroups$) are visible to which
 \includegraphics[width=12cm]{Figures/Visibility}
 \caption{\small\textbf{Mutual visibility of different groups}}
 \label{fig:visibility}
+\vspace{-0.5cm}
 \end{figure}
 
 In general, transactability correlates to visibility. However, there is not a strict 1-1 relationship between them. For the example of a $company$ paying its own $employees$ as part of the B2E programme, $employee$ remains invisible to a search, but $company$ has the $username$ of the $employee$ and can perform a credit transaction to pay (part of) their salary.
@@ -205,6 +248,7 @@ Table \ref{tab:InitialAccountSets} shows the initial allocation of accounts to t
 %\small
 {
 \begin{tabular}{ r | l  }
+\hline
 \textbf{Group}	& {\bf Initial Account Set} \\
 \Xhline{1.5pt}
 $welcome$	& $\{ \}$ \\
@@ -236,12 +280,14 @@ $MNGR$ 		& $\{ CC, Topup^*, MIRROR \}$ \\
 \section{Transactability Workflow}
 
 \subsection{Identity MetaData}
+Table \ref{tab:IdentityMetaData} collects the identity meta-data for all the groups. $MemberID$ is a unique identifier. $email$ and $phone$ are arrays to support multiple values of each. These values are set at registration and cannot be changed by the user.
 
 \begin{table}[H]
 \begin{centering}
 \small
 {
 \begin{tabular}{ r | c | l | l }
+\hline
 \textbf{Group}	& {\bf Identity MetaData} & {\bf Type} & {\bf Description} \\
 \Xhline{1.5pt}
 $welcome$	& {\bf MemberID}			&Integer	& Unique member identifier \\
@@ -286,8 +332,10 @@ $MNGR$ 		& {\bf MemberID}			&Integer	& Unique member identifier \\
 \vspace{-1cm}
 \end{table}
 
-
 \subsection{Profile MetaData}
+Tables \ref{tab:ProfileMetaData1} and \ref{tab:ProfileMetaData2} show the meta-data \textcolor{red}{\bf some of which} the user can inspect and edit. For example, the user may wish to include his/her personal name in addition to the company name.
+
+\todo{Add asterisk to the fields that can be modified by the user}
 
 \setlength{\tabcolsep}{10pt}
 \begin{table}[H]
@@ -295,6 +343,7 @@ $MNGR$ 		& {\bf MemberID}			&Integer	& Unique member identifier \\
 \small
 {
 \begin{tabular}{ r | c | l | l }
+\hline
 \textbf{Group}	& {\bf Profile MetaData} & {\bf Type} & {\bf Description} \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
@@ -341,6 +390,7 @@ $retail$		& {\bf entityName}			&String	& Legal entity name \\
 \small
 {
 \begin{tabular}{ r | c | l | l }
+\hline
 \textbf{Group}	& {\bf Profile MetaData} & {\bf Type} & {\bf Description} \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
@@ -455,6 +505,7 @@ we can now express the four functions as the following tables:
 \small
 {
 \begin{tabular}{ r | c | c | c | c }
+\hline
 \textbf{Group}	& $\bm{TT}^{\bm{Credit,SRD}}$ & $\bm{TT}^{\bm{Debit,SRD}}$ 
 			& $\bm{TT}^{\bm{Credit,EUR}}$ & $\bm{TT}^{\bm{Debit,EUR}}$\\
 \Xhline{1.5pt}
@@ -505,33 +556,33 @@ Figure \ref{fig:User_Acct_Connectivity} shows the account connectivity function 
 Figure \ref{fig:SysAdmin_Acct_Connectivity} shows a similar connectivity function for accounts that are controlled by $SysAdmin$. In this case, however, this function does not imply a transactability test since the permissions are hard-wired and SysAdmin does not need to test for transactability.
 
 \subsection{Group Transactability Functions}
-The effect of the Transfer Types test together with the Account Connectivity test results in what we call the Group Transactability Function (GTF). Since there are 4 combinations of currencies and channel, there are 4 different GTFs. There is no need to use them as an additional test, since they do not add anything new to Tests 1 and 2 of Figure \ref{fig:transactabilitywkflow}. However, it is still useful to include them here as another visualization of these first two tests of the Permissioning workflow, see Figures \ref{fig:GTF1}-\ref{fig:GTF4}.
+The effect of the Transfer Types test together with the Account Connectivity test results in what we call the Group Transactability Function (GTF). Since there are 4 combinations of currency and channel, there are 4 different GTFs. There is no need to use them as an additional test, since they do not add anything new to Tests 1 and 2 of Figure \ref{fig:transactabilitywkflow}. However, it is still useful to include them here as another visualization of these first two tests of the Permissioning workflow, see Figures \ref{fig:GTF1}-\ref{fig:GTF4}.
 
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
-\includegraphics[width=17cm]{Figures/GTF1}
+\includegraphics[width=17.5cm]{Figures/GTF1}
 \caption{\small\textbf{Group Transactability Function 1}}
 \label{fig:GTF1}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
-\includegraphics[width=17cm]{Figures/GTF2}
+\includegraphics[width=17.5cm]{Figures/GTF2}
 \caption{\small\textbf{Group Transactability Function 2}}
 \label{fig:GTF2}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=17cm]{Figures/GTF3}
+\includegraphics[width=17.5cm]{Figures/GTF3}
 \caption{\small\textbf{Group Transactability Function 3}}
 \label{fig:GTF3}
-\vspace{-1cm}
+%\vspace{-1cm}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=17cm]{Figures/GTF4}
+\includegraphics[width=17.5cm]{Figures/GTF4}
 \caption{\small\textbf{Group Transactability Function 4}}
 \label{fig:GTF4}
 \end{figure}
@@ -541,15 +592,17 @@ The effect of the Transfer Types test together with the Account Connectivity tes
 
 The transaction meta-data consists of only 1 memo message that is to be implemented as part of the transaction. It is not obligatory, i.e.\ the initiator of the transaction can leave it blank. The length is to be determined at the time of implementation but the assumption is that it is ``long enough'' to support a reasonable description of the transaction.
 
+\newpage
 
 \subsection{Account MetaData}
-
+Tables \ref{tab:AccountMetaData1} and \ref{tab:AccountMetaData2} are also organized in terms of obligatory and optional meta-data, where the latter are modifiable by the user. At the implementation stage, for example, the modifiable fields can be included together with the profile meta-data. The fields that can be set by the user are indicated with an asterisk.
 
 \begin{table}[H]
 \begin{centering}
 \small
 {
 \begin{tabular}{ r | c | l | l }
+\hline
 \textbf{Account}	& {\bf Account MetaData} & {\bf Type} & {\bf Description} \\
 \Xhline{1.5pt}
 			 & \emph{(Obligatory MetaData)}& & \\
@@ -566,9 +619,9 @@ $CC$		& {\bf AccountID}			&Integer	& Unique account identifier \\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
-			& {\bf lowBalanceAlert}		&String	& Alert if $(creditLimit + balance) < lowBalanceAlert$ buffer \\
-			& {\bf highBalanceAlert}		&String	& Alert if $(upperLimit - balance) < highBalanceAlert$ buffer \\
-			& {\bf highVolumeAlert}		&String	& Alert if $(capacity - saleVolume) < highVolumeAlert$ buffer \\
+			& {\bf lowBalanceAlert$^*$}		&String	& Alert if $(creditLimit + balance) < lowBalanceAlert$ buffer \\
+			& {\bf highBalanceAlert$^*$}		&String	& Alert if $(upperLimit - balance) < highBalanceAlert$ buffer \\
+			& {\bf highVolumeAlert$^*$}		&String	& Alert if $(capacity - saleVolume) < highVolumeAlert$ buffer \\
 \Xhline{1.5pt}
 			 & \emph{(Obligatory MetaData)}& & \\
 \cline{2-2}
@@ -594,13 +647,14 @@ $MIRROR$ 	& {\bf AccountID}			&Integer	& Unique account identifier \\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
-			& {\bf lowBalanceAlert}		&Double	& Alert if $(creditLimit + balance) < lowBalanceAlert$ buffer \\
-			& {\bf highBalanceAlert}		&Double	& Alert if $(upperLimit - balance) < highBalanceAlert$ buffer \\
-			& {\bf highVolumeAlert}		&String	& Alert if $(capacity - saleVolume) < highVolumeAlert$ buffer \\
+			& {\bf lowBalanceAlert$^*$}		&Double	& Alert if $(creditLimit + balance) < lowBalanceAlert$ buffer \\
+			& {\bf highBalanceAlert$^*$}		&Double	& Alert if $(upperLimit - balance) < highBalanceAlert$ buffer \\
+			& {\bf highVolumeAlert$^*$}		&String	& Alert if $(capacity - saleVolume) < highVolumeAlert$ buffer \\
 \Xhline{1.5pt}
 \end{tabular}
 }
-\caption{\small\textbf{MetaData for $CC$, $DOMU$, and $MIRROR$ accounts}}
+\caption{\small\textbf{MetaData for $CC$, $DOMU$, and $MIRROR$ accounts}\\
+($^*$Indicates fields that can be modified by the user)}
 \label{tab:AccountMetaData1}
 \end{centering}
 \end{table}
@@ -610,6 +664,7 @@ $MIRROR$ 	& {\bf AccountID}			&Integer	& Unique account identifier \\
 \small
 {
 \begin{tabular}{ r | c | l | l }
+\hline
 \textbf{Account}	& {\bf Account MetaData} & {\bf Type} & {\bf Description} \\
 \Xhline{1.5pt}
 $Income$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
@@ -627,7 +682,7 @@ $Prepaid$ 	& {\bf AccountID}			&Integer	& Unique account identifier \\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
-			& {\bf lowBalanceAlert}		&Double	& Alert if $(creditLimit + balance) < lowBalanceAlert$ buffer \\
+			& {\bf lowBalanceAlert$^*$}		&Double	& Alert if $(creditLimit + balance) < lowBalanceAlert$ buffer \\
 \Xhline{1.5pt}
 $Bisoo$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
 			& {\bf MemberID}			&String	& ProfileID of account owner \\
@@ -639,26 +694,32 @@ $Topup$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
 \Xhline{1.5pt}
 \end{tabular}
 }
-\caption{\small\textbf{MetaData for $Income$, $Prepaid$, $Bisoo$, and $Topup$ accounts}}
+\caption{\small\textbf{MetaData for $Income$, $Prepaid$, $Bisoo$, and $Topup$ accounts}\\
+($^*$Indicates fields that can be modified by the user)}
 \label{tab:AccountMetaData2}
 \end{centering}
 \end{table}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 \section{Account Limit Tests}
+The account limit tests are fairly obvious by looking at Figure \ref{fig:accountLimits}. The important thing is that they need to be enforced \emph{before} a transaction is completed. If one of the tests fails the transaction is not executed and the user must be alerted.
+
+The alerts, on the other hand, can be issued \emph{after} a transaction that came close to a limit but did not cross it, if the resulting balance or sale volume exceeds the buffer limits.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
