@@ -335,16 +335,31 @@ Which tells the scheduler to run all agents in \textit{Agents}. If a in contrary
 \section{Model Execution Environment Details}
 \label{sec:exec-env-model-details}
 
-\dirtree{%
-.1 configure.
-.1 Dockerfile.
-.1 execute.
-.1 README.md.
-.1 scripts.
-.2 asimrc.
-.2 buildICEFDocker.sh.
-.2 executeASIMSpec.sh.
-.2 runDocker.sh.
-}
+
+
+\tikzstyle{every node}=[draw=black,thick,anchor=west]
+\tikzstyle{selected}=[draw=red,fill=red!30]
+\tikzstyle{optional}=[dashed,fill=gray!50]
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[%
+  grow via three points={one child at (0.5,-0.7) and
+  two children at (0.5,-0.7) and (0.5,-1.4)},
+  edge from parent path={(\tikzparentnode.south) |- (\tikzchildnode.west)}]
+  \node {Docker\ Environment}
+    child { node {configure}}		
+    child { node {Dockerfile}}
+    child { node {execute}}
+    child { node {README.md}}
+    child { node [selected] {scripts}
+      child { node {asimrc}}
+      child { node {buildICEFDocker.sh}}
+      child { node {executeASIMSpec.sh}}
+      child { node {runDocker.sh}}
+    };
+\end{tikzpicture}
+\caption{Docker Environment File Structure}
+\label{fig:docker-enf-file-struct}
+\end{figure}
 
 \todo{scripts, paths, execution}
