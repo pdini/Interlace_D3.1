@@ -126,7 +126,7 @@ The provisioning process can be separated into 3 steps which are executed when \
 
 For development purposes the ASIMSpec as well as the ICEF framework are cloned into directories which are available from the host machine and the virtual guest machine. This is necessary because then it is possible to directly edit the source or debug from outside and execute the code from within the container. Consequently it is not necessary to copy the code into the container when changes where done.
 
-For \textbf{Vagrant} shared folder is configured over the vagrant file shown here
+For \textbf{Vagrant} a shared folder is configured over the vagrant file shown here
 
 \begin{lstlisting}
 	...
@@ -134,7 +134,7 @@ For \textbf{Vagrant} shared folder is configured over the vagrant file shown her
 	...
 \end{lstlisting}
 
-saying that on the host system the folder \textit{data} is used and on the guest system a folder \textit{vagrant-data} is mounted which are shared and thus containing the same content. Additionally during provisioning a symbolic link in the home directory is created called project (\textit{/home/ubuntu/project}) which is linking the mounted root folder /vagrant-data.
+is referring to the fact that on the host system the folder \textit{data} is used and on the guest system a folder \textit{vagrant-data} is mounted. Those folder are shared and thus containing the same content. Additionally during provisioning a symbolic link in the home directory is created called project (\textit{/home/ubuntu/project}) which is linking the mounted root folder /vagrant-data.
 
 When the virtual machine is stopped the data directory on the host is kept and can be still manipulated or executed (of course only if the framework dependencies are installed on the host as well).
 
@@ -196,6 +196,7 @@ For the public Integrated Development Environment Eclipse, developers of the ICE
 \begin{description}
 	\item[Build Framework] For adding the ASIM plugin to Eclipse it is required to build and install the coreASIM plugin manually first because it is not downloadable from the Eclipse marketplace and only available as source version delivered with the ICEF framework and part of the coreASIM engine. Building and installing can be done by calling
 	\begin{lstlisting}
+		cd icef/coreASIM/org.coreasim.parent && mvn package install
 		cd icef/coreASIM/org.coreasim.eclipse && mvn package install
 	\end{lstlisting}
 	Note that the icef directory is placed on different folders in the two environments!
@@ -211,6 +212,8 @@ For the public Integrated Development Environment Eclipse, developers of the ICE
 \end{description}
 
 When finishing these steps on restart Eclipse offers a new tab in the top menu bar called "CoreASIM".
+
+\textbf{Note on the installation}: When using the \textit{docker}-Environment you could skip the first step \textbf{Build Framework}, because all the necessary build steps are covered by the initial configuration script. Also a separate installation of the Eclipse Plug-In Development Environment (PDE) might omitted because it usually comes in a bundle with most standard J2EE installations of Eclipse.
 
 \textbf{Notes on the Docker environment}
 \label{sec_inner:note-docker}
@@ -244,7 +247,9 @@ Technology wise coreASIM changes the coreASM implementation in Java. Brappers ar
 
 Next, the framework stack of ICEF in terms of the INTERLACE implementation is described more detailed. In figure \ref{fig:icef-intro-asim} the stack can be viewed in different levels of granularity.
 
-As a stable base for the INTERLACE execution environment stack a Linux based system, Ubuntu 16.04 LTS, has been chosen. A LTS (Long Term Support) version is chosen to be sure to have a reliable platform which is maintained by the distributor for long time. Ubuntu publishes those version every two years and promises a maintenance duration of five years\footnote{https://www.ubuntu.com/info/release-end-of-life}.
+As a stable base for the INTERLACE execution environment stack a Linux based system, Ubuntu 16.04 LTS, has been chosen. A LTS (Long Term Support) version is important to be sure to have a reliable platform which is maintained by the distributor for long time. Ubuntu publishes those version every two years and promises a maintenance duration of five years\footnote{https://www.ubuntu.com/info/release-end-of-life}.
+
+After installation of the software described in \ref{sec:env-exec-stack-software-stack} and building the icef components the framework is ready. When the components are started it is possible to transmit a running definition, called ICEF JSON file.
 
 In listing \ref{lst:icef-json-spec} it is possible to see how the specification for the simulation is looking like. Side note: A definition for the client here is not given because the client which is sending credit, debit or other requests is spawned and destroyed on demand by the scheduler ASIM.
 
@@ -266,6 +271,19 @@ In listing \ref{lst:icef-json-spec} it is possible to see how the specification 
 }
 \end{lstlisting}
 
+Detailed description on parameters and options of the JSON ICEF specifications can be found in deliverable D5.2 \cite{BIOMICSD52} of the BIOMICS project.
+
+The implementation idea here is to have a central server which is taking over the various requests from the clients. A scheduler will take care when and what is exactly running. As a second task the scheduler will also spawn new clients which send or receive information/inquiries to other components, but mainly to the server.
+
+\textbf{The Submission Process} of the \textit{run.icef} works the following way:
+
+\begin{description}
+	\item [Loading and parsing of the ICEF-File] is initializing the process. Using that specification file a node.js components transmits the structure to the manager server process which acts as the central managing and communication node.
+	\item [Manager Simulation] is started on the manger service process. Then the service is registering a new simulation and all components necessary for managing the different resources like messaging.
+	\item [Distribute ASIMs] When simulations are initialized requests are sent to one or more Brappers in order to start up the actual running instances of the ASIM-agent.
+	\item [Run ...] finally when all ASIM instances are running the simulation is successfully executing till stopped from outside or by a problem during execution.
+\end{description}
+
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.9\textwidth, clip, trim=1mm 1mm 1mm 1mm]{Figures/environment_asim}
@@ -273,25 +291,35 @@ In listing \ref{lst:icef-json-spec} it is possible to see how the specification 
   \label{fig:icef-intro-asim}
 \end{figure}
 
+Figure \ref{fig:icef-intro-asim} illustrates on different level of detail which components and services are active and necessary to proved the previously described process running a ASIM simulation and in case of INTERLACE the model specifications.
 
-\section{coreASIM}
+\subsection{coreASIM}
+\label{sec:coreasim-details}
 
-\section{Interpreter}
+The very core of the Interaction Computer Execution Framework (ICEF) is an engine which has been developed different people at different  university \footnote{https://github.com/CoreASM/coreasm.core/wiki/About\-CoreASM} and implements a language called ASM. This language is based on Abstract State Machines \cite{BoergerStaerk2003} which is used as a method for high-level system engineering, design and analysis. This engine which is called coreASM got enhanced by the BIOMICS project in order to simulate computer interactions on a logic based programming language.
 
-\section{INTERLACE Model Execution Environment}
-\label{sec:env-exec}
+The resulting engine was called coreASIM including the missing interaction features \cite{BIOMICSD42}\cite{BIOMICSD52}. The changes from the original framework mainly comprise of:
 
-\section{keep for later usage}
-\todo{section remove later}
-What will happen:
 \begin{itemize}
-	\item On the very first execution the script is provisioning a virtual machine based on ubuntu by using vagrant up
-	\item If the virtual machine is not yet running it tries to start the virtual machine.
-	\item If the VM is finally running the script data/execute.sh is called on the guest vm.
+	\item interactions possibilities
+	\item abstract shared storage
+	\item mailing system
+	\item full scheduler
+	\item interpreter enhancements
 \end{itemize}
 
-The actual execution is running inside of the Virtual Machine:
+As this document offers only an overview only the most important implementation is described here, namely the mailbox system. This mailing system can easily be used and can be described as follows:
 
-The script data/execute.sh starts the icef manager as well as one brapper. Then it is submitting the specification (run.icef) located in data/ASIMSpec/ to the manager. When done the script is waiting for a stop command or may also be stopped using \textbf{ctrl + c}.
+\begin{samepage}
+An ASIM $asim_1$ can send a message to another ASIM $asim_2$ by using the send message rule.
+\begin{asm}
+	\textcolor{red}{send}\ Element\ \textcolor{red}{to}\ "asim_2"\ \textcolor{red}{with\ subject}\ String
+\end{asm}
 
-\todo{sections structure, text}
+Where the \textit{Element} can be of any element location used in ASIM language space. Even for example \textit{programm(self)}.
+\end{samepage}
+
+\section{Model Execution Environment Details}
+\label{sec:exec-env-model-details}
+
+\todo{scripts, paths, execution}
