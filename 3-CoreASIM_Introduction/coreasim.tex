@@ -286,7 +286,7 @@ The implementation idea here is to have a central server which is taking over th
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.9\textwidth, clip, trim=1mm 1mm 1mm 1mm]{Figures/environment_asim}
+  \includegraphics[width=1.0\textwidth, clip, trim=1mm 1mm 1mm 1mm]{Figures/environment_asim}
   \caption{ASIM Execution Environment Overview}
   \label{fig:icef-intro-asim}
 \end{figure}
@@ -310,14 +310,14 @@ The resulting engine was called coreASIM including the missing interaction featu
 
 As this document offers only an overview only the most important implementation is described here, namely the mailbox system. This mailing system can easily be used and can be described as follows:
 
-\begin{samepage}
-An ASIM $asim_1$ can send a message to another ASIM $asim_2$ by using the send message rule.
-\begin{asm}
-	\textcolor{red}{send}\ Element\ \textcolor{red}{to}\ "asim_2"\ \textcolor{red}{with\ subject}\ String
-\end{asm}
+\begin{minipage}{1.0\textwidth}
+An ASIM $asim_1$ can send a message to another ASIM $asim_2$ by using the send message rule.\nopagebreak
+\begin{lstlisting}[language=bsl]
+	send Element to "asim_2" with subject String
+\end{lstlisting}
 
 Where the \textit{Element} can be of any element location used in ASIM language space. Even for example \textit{programm(self)}.
-\end{samepage}
+\end{minipage}
 
 \section{Model Execution Environment Details}
 \label{sec:exec-env-model-details}
