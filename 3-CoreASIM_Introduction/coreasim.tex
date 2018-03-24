@@ -45,7 +45,7 @@ Once all software components are installed and the vagrant definitions are clone
 
 from the main directory in order to let the INTERLACE specifications run. Note: when using Windows it is necessary to start that command within git-bash which needs to run in elevated admin mode (right click $\rightarrow$ start as administrator).
 
-On the very first execution the script is provisioning a virtual machine based on ubuntu by calling \texttt{vagrant up} which may take some time. Consecutive calls will be much faster. A detailed description explaining the precise process is covered in section \ref{sec:env-exec}.
+On the very first execution the script is provisioning a virtual machine based on ubuntu by calling \texttt{vagrant up} which may take some time. Consecutive calls will be much faster. A detailed description explaining the precise process is covered in section \ref{sec:exec-env-model-details}.
 
 Once the execution is started it will run until it is stopped by pressing \textbf{ctrl + c} or by calling
 
@@ -334,5 +334,17 @@ Which tells the scheduler to run all agents in \textit{Agents}. If a in contrary
 
 \section{Model Execution Environment Details}
 \label{sec:exec-env-model-details}
+
+\dirtree{%
+.1 configure.
+.1 Dockerfile.
+.1 execute.
+.1 README.md.
+.1 scripts.
+.2 asimrc.
+.2 buildICEFDocker.sh.
+.2 executeASIMSpec.sh.
+.2 runDocker.sh.
+}
 
 \todo{scripts, paths, execution}
