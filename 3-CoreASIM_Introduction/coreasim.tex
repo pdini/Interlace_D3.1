@@ -366,4 +366,30 @@ Starting from the directory structure in Figure \ref{fig:docker-env-file-struct}
 
 \subsection{Environment Configuration}
 
-A crucial step for initializing a proper environment is the so called provisioning of the docker-Environment. The \textit{configure} bash script is handling this process. The script is prepared to be executed on Mac, Windows (using git bash) and Linux. It is tested with docker community edition. It is not yet tested with boot2docker environment and therefor might have problems there.
+A crucial step for initializing a proper environment is the so called provisioning of the docker-Environment. The \textit{configure} bash script is handling this process. The script is prepared to be executed on Mac, Windows (using git bash) and Linux. It is tested with docker community edition. It is not yet tested with boot2docker environment and therefor might have problems during the provisioning process. Figure \ref{fig:docker-env-config-process} shows that configuring process in depth.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\textwidth, clip, trim=1mm 1mm 1mm 1mm]{Figures/docker_configure}
+  \caption{Docker Configuration Process}
+  \label{fig:docker-env-config-process}
+\end{figure}
+
+Summarizing this process the script tries to fetch the ASIMSpecs as well as ICEF from GitHub, builds the docker container and finally builds the ICEF framework if necessary. The ICEF framework build is done by the bash script in directory \textit{script/buildICEFDocker.sh} and is executed inside of the container.
+
+\textbf{Building the docker container} is a core part of this process in which the most important tools and packages are installed. In detail these software packages are listed in section \ref{sec:env-exec-stack-software-stack}. Docker uses a file called \textit{Dockerfile}, listed in figure \ref{fig:docker-env-file-struct}, to know how the container is provisioned. The file contains several commands which are executed in a playbook like manner to produce a deterministic system environment.
+
+\subsection{Execute ASIM Specifications}
+
+After the environment has been configured the Interlace specifications are ready to be executed. This can be done by calling the \textit{execute} script. This script is starting the prepared docker container and initializing a process illustrated in figure \ref{fig:docker-env-config-process}.
+
+This process tries to make development as well as instant executing easier in order to start a manager, one brapper and submitting the ICEF definitions using a single script.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[height=0.9\textwidth, clip, trim=1mm 1mm 1mm 1mm]{Figures/docker_execute}
+  \caption{Docker Execution Process}
+  \label{fig:docker-env-exec-process}
+\end{figure}
+
+Note on the service locations: In directory \textit{scripts} of figure \ref{fig:docker-env-file-struct} a file called \textit{asimrc} is listed and acting for configuring as well as execution as a central configuration file containing the main service locations on the containerized Ubuntu system.
