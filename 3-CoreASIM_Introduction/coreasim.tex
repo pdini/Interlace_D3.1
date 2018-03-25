@@ -335,7 +335,9 @@ Which tells the scheduler to run all agents in \textit{Agents}. If a in contrary
 \section{Model Execution Environment Details}
 \label{sec:exec-env-model-details}
 
+This section will describe and elaborate about the docker-Environment in depth, how the scripts are preparing/building the environment and what is needed to finally execute the Interlace Model Specifications described by \textit{run.icef} of the ASIMSpecs.
 
+Starting from the directory structure in Figure \ref{fig:docker-env-file-struct} a detailed picture will be drawn. Due to performance and  development purposes docker has been chosen in favor of the vagrant-Environment. Although scripts of the two environments are quite similar focus will be laid on docker.
 
 \tikzstyle{every node}=[draw=black,thick,anchor=west]
 \tikzstyle{selected}=[draw=red,fill=red!30]
@@ -359,7 +361,9 @@ Which tells the scheduler to run all agents in \textit{Agents}. If a in contrary
     };
 \end{tikzpicture}
 \caption{Docker Environment File Structure}
-\label{fig:docker-enf-file-struct}
+\label{fig:docker-env-file-struct}
 \end{figure}
 
-\todo{scripts, paths, execution}
+\subsection{Environment Configuration}
+
+A crucial step for initializing a proper environment is the so called provisioning of the docker-Environment. The \textit{configure} bash script is handling this process. The script is prepared to be executed on Mac, Windows (using git bash) and Linux. It is tested with docker community edition. It is not yet tested with boot2docker environment and therefor might have problems there.
