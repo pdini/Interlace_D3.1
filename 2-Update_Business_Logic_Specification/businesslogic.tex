@@ -344,7 +344,7 @@ $MNGR$ 		& {\bf MemberID}			&Integer	& Unique member identifier \\
 \end{table}
 
 \subsection{Profile MetaData}
-Tables \ref{tab:ProfileMetaData1} and \ref{tab:ProfileMetaData2} show the meta-data \textcolor{red}{\bf some of which} the user can inspect and edit. For example, the user may wish to include his/her personal name in addition to the company name. \todo{Add asterisk to the fields that can be modified by the user}
+Tables \ref{tab:ProfileMetaData1} and \ref{tab:ProfileMetaData2} show the meta-data, some of which the user can inspect and edit. For example, the user may wish to include his/her personal name in addition to the company name.
 
 \setlength{\tabcolsep}{10pt}
 \begin{table}[H]
@@ -357,40 +357,40 @@ Tables \ref{tab:ProfileMetaData1} and \ref{tab:ProfileMetaData2} show the meta-d
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$welcome$	& {\bf entityName}			&String	& Legal entity name \\
-			& {\bf entityAddress}			&String	& Legal entity's street address \\
-			& {\bf gps[]}				&Double	& Legal entity's GPS coordinates \\			
-			& {\bf VAT}				&String	& Legal entity's VAT number \\
+$welcome$	& {\bf entityName}$^*$		&String	& Legal entity name \\
+			& {\bf entityAddress}$^*$		&String	& Legal entity's street address \\
+			& {\bf gps[]}$^*$			&Double	& Legal entity's GPS coordinates \\			
+			& {\bf VAT}$^*$				&String	& Legal entity's VAT number \\
 			& {\bf capacity}				&Double	& Commitment to maximum yearly SRD volume \\
 			& {\bf capacityDate}			&DateTime & Date capacity was set \\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
-			& {\bf firstName}			&String	& First name \\
-			& {\bf surName}			&String	& Surname \\
+			& {\bf firstName}$^*$			&String	& First name \\
+			& {\bf surName}$^*$			&String	& Surname \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$retail$		& {\bf entityName}			&String	& Legal entity name \\
-			& {\bf entityAddress}			&String	& Legal entity's street address \\
-			& {\bf gps[]}				&Double	& Legal entity's GPS coordinates \\			
+$retail$		& {\bf entityName}$^*$		&String	& Legal entity name \\
+			& {\bf entityAddress}$^*$		&String	& Legal entity's street address \\
+			& {\bf gps[]}$^*$			&Double	& Legal entity's GPS coordinates \\			
 			& {\bf capacity}				&Double	& Commitment to maximum yearly SRD volume \\
 			& {\bf capacityDate}			&DateTime & Date capacity was set \\
-			& {\bf rewardRate}			&Double	& \% reward rate to consumer, in SRD \\
+			& {\bf rewardRate}$^{**}$		&Double	& \% reward rate to consumer, in SRD \\
 			& {\bf euroFee[]}			&Double	& \% fee on B2C EUR sales, in EUR \\
-			& {\bf acceptanceRate}		&Double	& Rate of SRD acceptance in consumer purchases\\
+			& {\bf acceptanceRate}$^{**}$	&Double	& Rate of SRD acceptance in consumer purchases\\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
-			& {\bf firstName	}			&String	& First name \\
-			& {\bf surName}			&String	& Surname \\
+			& {\bf firstName	}$^*$			&String	& First name \\
+			& {\bf surName}$^*$			&String	& Surname \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$company$	& {\bf entityName}			&String	& Legal entity name \\
-			& {\bf entityAddress}			&String	& Legal entity's street address \\
-			& {\bf gps[]}				&Double	& Legal entity's GPS coordinates \\
-			& {\bf VAT}				&String	& Legal entity's VAT number \\
+$company$	& {\bf entityName}$^*$		&String	& Legal entity name \\
+			& {\bf entityAddress}$^*$		&String	& Legal entity's street address \\
+			& {\bf gps[]}$^*$			&Double	& Legal entity's GPS coordinates \\
+			& {\bf VAT}$^*$				&String	& Legal entity's VAT number \\
 			& {\bf capacity}				&Double	& Commitment to maximum yearly SRD volume \\
 			& {\bf capacityDate}			&DateTime & Date capacity was set \\
 			& {\bf creditPercent}			&Double	& \% SRD acceptance for transactions above 1000 \\
@@ -398,36 +398,38 @@ $company$	& {\bf entityName}			&String	& Legal entity name \\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
-			& {\bf firstName	}			&String & First name \\
-			& {\bf surName}			&String & Surname \\
+			& {\bf firstName	}$^*$			&String & First name \\
+			& {\bf surName}$^*$			&String & Surname \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$full$		& {\bf entityName}			&String	& Legal entity name \\
-			& {\bf entityAddress}			&String	& Legal entity's street address \\
-			& {\bf gps[]}				&Double	& Legal entity's GPS coordinates \\
-			& {\bf VAT}				&String	& Legal entity's VAT number \\
+$full$		& {\bf entityName}$^*$		&String	& Legal entity name \\
+			& {\bf entityAddress}$^*$		&String	& Legal entity's street address \\
+			& {\bf gps[]}$^*$			&Double	& Legal entity's GPS coordinates \\
+			& {\bf VAT}$^*$				&String	& Legal entity's VAT number \\
 			& {\bf capacity}				&Double	& Commitment to maximum yearly SRD volume \\
 			& {\bf capacityDate}			&DateTime & Date capacity was set \\
 			& {\bf creditPercent}			&Double	& \% SRD acceptance for transactions above 1000 \\
-			& {\bf rewardRate}			&Double	& \% reward rate to consumer, in SRD \\
+			& {\bf rewardRate}$^{**}$		&Double	& \% reward rate to consumer, in SRD \\
 			& {\bf euroFee[]}			&Double	& \% fees on B2C EUR sales, inter-circuit SRD sales, in EUR \\
-			& {\bf acceptanceRate}		&Double	& Rate of credits acceptance in consumer purchases\\
+			& {\bf acceptanceRate}$^{**}$	&Double	& Rate of credits acceptance in consumer purchases\\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
-			& {\bf firstName}			&String	& First name \\
-			& {\bf surName}			&String	& Surname \\
+			& {\bf firstName}$^*$			&String	& First name \\
+			& {\bf surName}$^*$			&String	& Surname \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$employee$	& {\bf firstName}			&String	& First name \\
-			& {\bf surName}			&String	& Surname \\
+$employee$	& {\bf firstName}$^*$			&String	& First name \\
+			& {\bf surName}$^*$			&String	& Surname \\
 			& {\bf employedBy}			&String	& Name of legal entity employed by \\
 \Xhline{1.5pt}
 \end{tabular}
 }
-\caption{\small\textbf{Profile MetaData for $welcome$ and $retail$, $company$, $full$, and $employee$ groups}}
+\caption{\small\textbf{Profile MetaData for $welcome$ and $retail$, $company$, $full$, and $employee$ groups}\\
+($^*$Indicates fields that can be modified by the user)\\
+($^{**}$Indicates fields that can be modified by the user but that are updated only at a fixed time interval)}
 \label{tab:ProfileMetaData1}
 \end{centering}
 \end{table}
@@ -444,44 +446,47 @@ $employee$	& {\bf firstName}			&String	& First name \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$on$\_$hold$	& {\bf entityName}			&String	& Legal entity name \\
-			& {\bf entityAddress}			&String	& Legal entity's street address \\
-			& {\bf gps[]}				&Double	& Legal entity's GPS coordinates \\
-			& {\bf VAT}				&String	& Legal entity's VAT number \\
+$on$\_$hold$	& {\bf entityName}$^*$		&String	& Legal entity name \\
+			& {\bf entityAddress}$^*$		&String	& Legal entity's street address \\
+			& {\bf gps[]}$^*$			&Double	& Legal entity's GPS coordinates \\
+			& {\bf VAT}$^*$				&String	& Legal entity's VAT number \\
 			& {\bf capacity}				&Double	& Commitment to maximum yearly SRD volume \\
 			& {\bf capacityDate}			&DateTime & Date capacity was set \\
 			& {\bf creditPercent}			&Double	& \% SRD acceptance for transactions above 1000 \\
-			& {\bf rewardRate}			&Double	& \% reward rate to consumer, in SRD \\
-			& {\bf euroFee[]}			&Double	& \% fees on B2C EUR sales, inter-circuit SRD sales, in EUR \\			& {\bf acceptanceRate}		&Double	& Rate of credits acceptance in consumer purchases\\
+			& {\bf rewardRate}$^{**}$		&Double	& \% reward rate to consumer, in SRD \\
+			& {\bf euroFee[]}			&Double	& \% fees on B2C EUR sales, inter-circuit SRD sales, in EUR \\			& {\bf acceptanceRate}$^{**}$	&Double	& Rate of credits acceptance in consumer purchases\\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
-			& {\bf firstName}			&String	& First name \\
-			& {\bf surName}			&String	& Surname \\
+			& {\bf firstName}$^*$			&String	& First name \\
+			& {\bf surName}$^*$			&String	& Surname \\
 \Xhline{1.5pt}
 $consumer$	& 	& &  \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$consumer$\_$verified$ & {\bf firstName}			&String	& First name \\
-			& {\bf surName}			&String	& Surname \\
+$consumer$\_$verified$ & {\bf firstName}$^*$	&String	& First name \\
+			& {\bf surName}$^*$			&String	& Surname \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$MNGR$ 		& {\bf entityName}			&String	& Legal entity name \\
-			& {\bf entityAddress}			&String	& Legal entity's street address \\
-			& {\bf gps[]}				&Double	& Legal entity's GPS coordinates \\
-			& {\bf VAT}				&String	& Legal entity's VAT number \\
+$MNGR$ 		& {\bf entityName}$^*$		&String	& Legal entity name \\
+			& {\bf entityAddress}$^*$		&String	& Legal entity's street address \\
+			& {\bf gps[]}$^*$			&Double	& Legal entity's GPS coordinates \\
+			& {\bf VAT}$^*$				&String	& Legal entity's VAT number \\
 			& {\bf capacity}				&Double	& Commitment to maximum yearly SRD volume \\
 			& {\bf capacityDate}			&DateTime & Date capacity was set \\
 			& {\bf creditPercent}			&Double	& \% SRD acceptance for transactions above 1000 \\
 \Xhline{1.5pt}
 \end{tabular}
 }
-\caption{\small\textbf{Profile MetaData for $on$\_$hold$, $consumer$, $consumer$\_$verified$, and $MNGR$ groups}}
+\caption{\small\textbf{Profile MetaData for $on$\_$hold$, $consumer$, $consumer$\_$verified$, and $MNGR$ groups}\\
+($^*$Indicates fields that can be modified by the user)\\
+($^{**}$Indicates fields that can be modified by the user but that are updated only at a fixed time interval)
+}
 \label{tab:ProfileMetaData2}
 \end{centering}
-%\vspace{-2cm}
+\vspace{-1cm}
 \end{table}
 
 \subsection{Transfer Types}
