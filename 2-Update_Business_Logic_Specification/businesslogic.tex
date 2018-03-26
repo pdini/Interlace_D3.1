@@ -164,7 +164,9 @@ $highVolumeAlert$ & Buffer set by user: alert if $(capacity - saleVolume) < high
 \end{centering}
 \end{table}
 
-Figure \ref{fig:accountLimits} shows a visualization of the account limits that apply to SRD accounts. The thick vertical green arrows highlight that the calculation of the sale volume is defined as the sum of all the sales performed in one year. Thus, the sum of all the vertical green arrows is 50,000.
+Figure \ref{fig:accountLimitsCC} shows a visualization of the account limits that apply to SRD accounts such as $CC$. The thick vertical green arrows highlight that the calculation of the sale volume is defined as \emph{the sum of all the sales performed in one year}. In this example, the sum of all the vertical green arrows is 50,000.
+
+Figure \ref{fig:accountLimitsPrepaid} is a visualization of the $Prepaid$ EUR account, which is recharged or topped up once in a while (\euro 400 in the figure) and slowly drawn down by B2C transaction fees (see B2C Use Case 2 in Figure \ref{fig:B2C1} below).
 
 \subsection{Operations}
 As already specified in D2.1, transactions are effected through two operations: Credit and Debit:
@@ -172,16 +174,24 @@ As already specified in D2.1, transactions are effected through two operations: 
 Operations = \{ Credit, Debit \}.
 \end{align}
 
-\subsection{Interaction Levels}
-The interactions between circuit participants can be described from different points of view that correlate loosely to a stack view of the system. As shown in Figure \ref{fig:stack}, it is helpful to identify qualitatively the different levels of such a stack, acknowledging that it is \emph{more} than a networking communication stack in terms of scope but \emph{less} than one in terms of precision. `A' and `B' refer to the Initiator and the Target of the transaction, which do not necessarily correspond to the Buyer and the Seller.
+\begin{figure}[H]
+\centering
+\includegraphics[width=15cm]{Figures/Account_Limits_CC}
+\caption{\small\textbf{Visualization of the $CC$ account limit}}
+\label{fig:accountLimitsCC}
+\end{figure}
+\vspace{-0.5cm}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=14cm]{Figures/Account_Limits}
-\caption{\small\textbf{Visualization of the SRD account limits}}
-\label{fig:accountLimits}
+\includegraphics[width=15cm]{Figures/Account_Limits_Prepaid}
+\caption{\small\textbf{Visualization of the $Prepaid$ account limits}}
+\label{fig:accountLimitsPrepaid}
 \end{figure}
 \vspace{-0.5cm}
+
+\subsection{Interaction Levels}
+The interactions between circuit participants can be described from different points of view that correlate loosely to a stack view of the system. As shown in Figure \ref{fig:stack}, it is helpful to identify qualitatively the different levels of such a stack, acknowledging that it is \emph{more} than a networking communication stack in terms of scope but \emph{less} than one in terms of precision. `A' and `B' refer to the Initiator and the Target of the transaction, which do not necessarily correspond to the Buyer and the Seller.
 
 Figure \ref{fig:stack} extends the two communication levels described in D2.1, but does so qualitatively. For the purposes of the implementation, we need a smaller set of levels but a more precise and specific vocabulary to identify the end-points of the transaction.
 
@@ -244,8 +254,9 @@ Figure \ref{fig:B2C2} shows the SRD transaction a $consumer$ can perform, i.e.\ 
 Table \ref{tab:InitialAccountSets} shows the initial allocation of accounts to the different user groups. The allocation is `initial' because  depending on the history of a given user the number of its accounts could change. For legal reasons, as a general principle \emph{change} can only mean \emph{increase}. In other words, once a user has become the owner of an account it can never be taken away from them, even if its access to it is, for example, suspended due to misbehaviour. Another example is a $retail$ user who upgrades to $full$ and a year later changes its mind and goes back to $retail$. It will retain its DOMU account even if it won't be able to use it anymore. {\bf Note: Each user can have no more than one account of a given type.}
 
 \begin{table}[h]
+\vspace{-0.5cm}
 \begin{centering}
-%\small
+\small
 {
 \begin{tabular}{ r | l  }
 \hline
@@ -274,15 +285,15 @@ $MNGR$ 		& $\{ CC, Topup^*, MIRROR \}$ \\
 \caption{\small\textbf{Initial sets of accounts assigned to the groups}\\ (*Indicates an account under the control of $SysAdmin$, not of the user it belongs to.)}
 \label{tab:InitialAccountSets}
 \end{centering}
+\vspace{-1cm}
 \end{table}
 
-
 \section{Transactability Workflow}
-
 \subsection{Identity MetaData}
 Table \ref{tab:IdentityMetaData} collects the identity meta-data for all the groups. $MemberID$ is a unique identifier. $email$ and $phone$ are arrays to support multiple values of each. These values are set at registration and cannot be changed by the user.
 
 \begin{table}[H]
+\vspace{-0.5cm}
 \begin{centering}
 \small
 {
@@ -333,9 +344,7 @@ $MNGR$ 		& {\bf MemberID}			&Integer	& Unique member identifier \\
 \end{table}
 
 \subsection{Profile MetaData}
-Tables \ref{tab:ProfileMetaData1} and \ref{tab:ProfileMetaData2} show the meta-data \textcolor{red}{\bf some of which} the user can inspect and edit. For example, the user may wish to include his/her personal name in addition to the company name.
-
-\todo{Add asterisk to the fields that can be modified by the user}
+Tables \ref{tab:ProfileMetaData1} and \ref{tab:ProfileMetaData2} show the meta-data \textcolor{red}{\bf some of which} the user can inspect and edit. For example, the user may wish to include his/her personal name in addition to the company name. \todo{Add asterisk to the fields that can be modified by the user}
 
 \setlength{\tabcolsep}{10pt}
 \begin{table}[H]
@@ -375,23 +384,6 @@ $retail$		& {\bf entityName}			&String	& Legal entity name \\
 \cline{2-2}
 			& {\bf firstName	}			&String	& First name \\
 			& {\bf surName}			&String	& Surname \\
-\Xhline{1.5pt}
-\end{tabular}
-}
-\caption{\small\textbf{Profile MetaData for $welcome$ and $retail$ groups}}
-\label{tab:ProfileMetaData1}
-\end{centering}
-\end{table}
-
-
-\setlength{\tabcolsep}{5pt}
-\begin{table}[H]
-\begin{centering}
-\small
-{
-\begin{tabular}{ r | c | l | l }
-\hline
-\textbf{Group}	& {\bf Profile MetaData} & {\bf Type} & {\bf Description} \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
@@ -433,6 +425,23 @@ $employee$	& {\bf firstName}			&String	& First name \\
 			& {\bf surName}			&String	& Surname \\
 			& {\bf employedBy}			&String	& Name of legal entity employed by \\
 \Xhline{1.5pt}
+\end{tabular}
+}
+\caption{\small\textbf{Profile MetaData for $welcome$ and $retail$, $company$, $full$, and $employee$ groups}}
+\label{tab:ProfileMetaData1}
+\end{centering}
+\end{table}
+
+
+\setlength{\tabcolsep}{5pt}
+\begin{table}[H]
+\begin{centering}
+\small
+{
+\begin{tabular}{ r | c | l | l }
+\hline
+\textbf{Group}	& {\bf Profile MetaData} & {\bf Type} & {\bf Description} \\
+\Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
 $on$\_$hold$	& {\bf entityName}			&String	& Legal entity name \\
@@ -469,7 +478,7 @@ $MNGR$ 		& {\bf entityName}			&String	& Legal entity name \\
 \Xhline{1.5pt}
 \end{tabular}
 }
-\caption{\small\textbf{Profile MetaData for $company$, $full$, $employee$, $on$\_$hold$, $consumer$, $consumer$\_$verified$, and $MNGR$ groups}}
+\caption{\small\textbf{Profile MetaData for $on$\_$hold$, $consumer$, $consumer$\_$verified$, and $MNGR$ groups}}
 \label{tab:ProfileMetaData2}
 \end{centering}
 %\vspace{-2cm}
@@ -532,6 +541,7 @@ $MNGR$ 		& $TT_2 \cup TT_3 \cup TT_5 \cup TT_6$ & $TT_2 \cup TT_5 \cup TT_6$ & $
 \caption{\small\textbf{The four Transfer Types functions}}
 \label{tab:TTs}
 \end{centering}
+\vspace{-0.5cm}
 \end{table}
 
 The Transfer Type test shown in Figure \ref{fig:transactabilitywkflow} involves checking whether the recipient of a Credit or Debit transaction in a given currency is in the range of the corresponding $TT$ function of the initiator. In other words, the initiator, or $fromGroup$ member, is the independent or input parameter to the function and appears in the left column in Table \ref{tab:TTs}.
@@ -540,15 +550,17 @@ The Transfer Type test shown in Figure \ref{fig:transactabilitywkflow} involves 
 Figure \ref{fig:User_Acct_Connectivity} shows the account connectivity function used for Test 2 in Figure \ref{fig:transactabilitywkflow}. As for Visibility, a `1' indicates that the Source and Destination accounts are connected and funds can be transferred from one to the other.
 
 \begin{figure}[h]
+\vspace{-0.5cm}
 \centering
-\includegraphics[width=17cm]{Figures/User_Acct_Connectivity}
+\includegraphics[width=16cm]{Figures/User_Acct_Connectivity}
 \caption{\small\textbf{Account connectivity for user-initiated transactions: Test 2 in Figure \ref{fig:transactabilitywkflow}}}
 \label{fig:User_Acct_Connectivity}
 \end{figure}
 
 \begin{figure}[H]
+\vspace{-1cm}
 \centering
-\includegraphics[width=17cm]{Figures/SysAdmin_Acct_Connectivity}
+\includegraphics[width=16cm]{Figures/SysAdmin_Acct_Connectivity}
 \caption{\small\textbf{Account connectivity for system-initiated transactions: Not a test, hard-wired. }}
 \label{fig:SysAdmin_Acct_Connectivity}
 \end{figure}
@@ -559,6 +571,7 @@ Figure \ref{fig:SysAdmin_Acct_Connectivity} shows a similar connectivity functio
 The effect of the Transfer Types test together with the Account Connectivity test results in what we call the Group Transactability Function (GTF). Since there are 4 combinations of currency and channel, there are 4 different GTFs. There is no need to use them as an additional test, since they do not add anything new to Tests 1 and 2 of Figure \ref{fig:transactabilitywkflow}. However, it is still useful to include them here as another visualization of these first two tests of the Permissioning workflow, see Figures \ref{fig:GTF1}-\ref{fig:GTF4}.
 
 \begin{figure}[h]
+\vspace{-0.5cm}
 \centering
 \includegraphics[width=17.5cm]{Figures/GTF1}
 \caption{\small\textbf{Group Transactability Function 1}}
@@ -573,6 +586,7 @@ The effect of the Transfer Types test together with the Account Connectivity tes
 \end{figure}
 
 \begin{figure}[H]
+\vspace{-0.5cm}
 \centering
 \includegraphics[width=17.5cm]{Figures/GTF3}
 \caption{\small\textbf{Group Transactability Function 3}}
@@ -651,9 +665,14 @@ $MIRROR$ 	& {\bf AccountID}			&Integer	& Unique account identifier \\
 			& {\bf highBalanceAlert$^*$}		&Double	& Alert if $(upperLimit - balance) < highBalanceAlert$ buffer \\
 			& {\bf highVolumeAlert$^*$}		&String	& Alert if $(capacity - saleVolume) < highVolumeAlert$ buffer \\
 \Xhline{1.5pt}
+$Income$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
+			& {\bf MemberID}			&String	& ProfileID of account owner \\
+			& {\bf unit}					&String	& Account currency \\
+			& {\bf balance}				&Double	& Account balance (positive or negative) \\
+\Xhline{1.5pt}
 \end{tabular}
 }
-\caption{\small\textbf{MetaData for $CC$, $DOMU$, and $MIRROR$ accounts}\\
+\caption{\small\textbf{MetaData for $CC$, $DOMU$, $MIRROR$, and $Income$ accounts}\\
 ($^*$Indicates fields that can be modified by the user)}
 \label{tab:AccountMetaData1}
 \end{centering}
@@ -666,11 +685,6 @@ $MIRROR$ 	& {\bf AccountID}			&Integer	& Unique account identifier \\
 \begin{tabular}{ r | c | l | l }
 \hline
 \textbf{Account}	& {\bf Account MetaData} & {\bf Type} & {\bf Description} \\
-\Xhline{1.5pt}
-$Income$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
-			& {\bf MemberID}			&String	& ProfileID of account owner \\
-			& {\bf unit}					&String	& Account currency \\
-			& {\bf balance}				&Double	& Account balance (positive or negative) \\
 \Xhline{1.5pt}
 			 & \emph{(Obligatory MetaData)}& & \\
 \cline{2-2}
@@ -694,7 +708,7 @@ $Topup$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
 \Xhline{1.5pt}
 \end{tabular}
 }
-\caption{\small\textbf{MetaData for $Income$, $Prepaid$, $Bisoo$, and $Topup$ accounts}\\
+\caption{\small\textbf{MetaData for $Prepaid$, $Bisoo$, and $Topup$ accounts}\\
 ($^*$Indicates fields that can be modified by the user)}
 \label{tab:AccountMetaData2}
 \end{centering}
