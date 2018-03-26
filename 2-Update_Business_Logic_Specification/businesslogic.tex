@@ -720,7 +720,7 @@ $Topup$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
 \end{table}
 
 \section{Account Limit Tests}
-The account limit tests are fairly obvious by looking at Figure \ref{fig:accountLimits}. The important thing is that they need to be enforced \emph{before} a transaction is completed. If one of the tests fails the transaction is not executed and the user must be alerted.
+The account limit tests are fairly obvious by looking at Figures \ref{fig:accountLimitsCC} and \ref{fig:accountLimitsPrepaid}. The important thing is that they need to be enforced \emph{before} a transaction is completed. If one of the tests fails the transaction is not executed and the user must be alerted.
 
 The alerts, on the other hand, can be issued \emph{after} a transaction that came close to a limit but did not cross it, if the resulting balance or sale volume exceeds the buffer limits.
 
