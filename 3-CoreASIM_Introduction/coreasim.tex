@@ -393,3 +393,24 @@ This process tries to make development as well as instant executing easier in or
 \end{figure}
 
 Note on the service locations: In directory \textit{scripts} of figure \ref{fig:docker-env-file-struct} a file called \textit{asimrc} is listed and acting for configuring as well as execution as a central configuration file containing the main service locations on the containerized Ubuntu system.
+
+\subsection{Container and Virtual Machine based environment}
+
+In figure \ref{fig:docker-env-container-vs-vm} two virtualization techniques are shown. They have similar approaches of how to isolate and allocated resources. However, they function very differently because a container reaches virtualizsation over splitting an operating system and virtual machine are virtualizing hardware on which a whole operating system is running. 
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=1.0\textwidth, clip, trim=1mm 1mm 1mm 1mm]{Figures/container_vs_vm}
+  \caption{Container versus Virtual Machine}
+  \label{fig:docker-env-container-vs-vm}
+\end{figure}
+
+Consequences are that containers can be much smaller, more portable and in most of the cases also much faster because they are using the system resources more directly and not as wasteful as a virtual machine does.
+
+To be more specific \textbf{containers} are packaging there libraries and binaries together with application. Then each of the containers can run in parallel on the same machine sharing the OS kernel together with others each running in an isolated process in user space as if it would be a separate OS. Therefor containers have the ability to start instantly, because the operating system they are using is already up and running. Also, they are much smaller as they don't need to carry all the OS specific software parts.
+
+In contrast \textbf{virtualized machines} are running on an abstraction of the physical hardware which is present on the system. That means that a hypervisor doubles, triples, ... the hardware and allows to install full versions of an operating system compatible with the current system. As each virtualization is a full copy of a OS images are much larger and boot times are most of the time much slower. Nevertheless, full operating system might have benefits in some cases over containerized systems.
+
+Coming back to the Interlace environments those two approaches reflect the two approaches used for creating the environments. Vagrant is a controlling command line client for hypervisors (virtual machines) and docker is a command line client for a container based virtualization system with the same name.
+
+The Interlace now lays on the docker-Environment because for running the ICEF definitions in a fast manner the decision has been taken towards docker.
