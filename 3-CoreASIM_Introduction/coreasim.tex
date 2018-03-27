@@ -195,10 +195,9 @@ For the public Integrated Development Environment Eclipse, developers of the ICE
 \textbf{Import/Install of the IDE Eclipse plugin for coreASIM}
 \begin{description}
 	\item[Build Framework] For adding the ASIM plugin to Eclipse it is required to build and install the coreASIM plugin manually first because it is not downloadable from the Eclipse marketplace and only available as source version delivered with the ICEF framework and part of the coreASIM engine. Building and installing can be done by calling
-	\begin{lstlisting}
+	\begin{lstlisting}[language=bash]
 		cd icef/coreASIM/org.coreasim.parent && mvn package install
-		cd icef/coreASIM/org.coreasim.eclipse && mvn package install
-	\end{lstlisting}
+		cd icef/coreASIM/org.coreasim.eclipse && mvn package install\end{lstlisting}
 	Note that the icef directory is placed on different folders in the two environments!
 	
 	\item[Install Plug-In Development Environment in Eclipse] To install the ASIM Plug-in it is necessary to first add another Plug-in called Eclipse PDE (Plug-In Development Environment) from the marketplace for the current Eclipse installation or get a distribution which already contains that Plug-in.
