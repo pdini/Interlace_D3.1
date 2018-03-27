@@ -256,7 +256,7 @@ Table \ref{tab:InitialAccountSets} shows the initial allocation of accounts to t
 \begin{table}[h]
 \vspace{-0.5cm}
 \begin{centering}
-\small
+%\small
 {
 \begin{tabular}{ r | l  }
 \hline
@@ -295,45 +295,17 @@ Table \ref{tab:IdentityMetaData} collects the identity meta-data for all the gro
 \begin{table}[H]
 \vspace{-0.5cm}
 \begin{centering}
-\small
+%\small
 {
 \begin{tabular}{ r | c | l | l }
 \hline
 \textbf{Group}	& {\bf Identity MetaData} & {\bf Type} & {\bf Description} \\
 \Xhline{1.5pt}
-$welcome$	& {\bf MemberID}			&Integer	& Unique member identifier \\
-			& {\bf email[]}				&String	& e-mail address \\		
-			& {\bf phone[]}				&String	& phone number(s) \\
-\hline
-$retail$		& {\bf MemberID}			&Integer	& Unique member identifier \\
-			& {\bf email[]}				&String	& e-mail address \\
-			& {\bf phone[]}				&String	& phone number(s) \\
-\hline
-$company$	& {\bf MemberID}			&Integer	& Unique member identifier \\
-			& {\bf email[]}				&String	& e-mail address \\
-			& {\bf phone[]}				&String	& phone number(s) \\
-\hline
-$full$		& {\bf MemberID}			&Integer	& Unique member identifier \\
-			& {\bf email[]}				&String	& e-mail address \\
-			& {\bf phone[]}				&String	& phone number(s) \\
-\hline
-$employee$	& {\bf MemberID}			&Integer	& Unique member identifier \\
-			& {\bf email[]}				&String	& e-mail address \\
-			& {\bf phone[]}				&String	& phone number(s) \\
-\hline
-$on$\_$hold$	& {\bf MemberID}			&Integer	& Unique member identifier \\
-			& {\bf email[]}				&String	& e-mail address \\
-			& {\bf phone[]}				&String	& phone number(s) \\
+$welcome$, $retail$, $company$,	& {\bf MemberID}			&Integer	& Unique member identifier \\
+$full$, $employee$, $on$\_$hold$,	& {\bf email}				&String[]	& e-mail address \\		
+$consumer$\_$verified$, $MNGR$	& {\bf phone}				&String[]	& phone number(s) \\
 \hline
 $consumer$	& {\bf MemberID}	&Integer & Unique member identifier \\
-\hline
-$consumer$\_$verified$ & {\bf MemberID}		&Integer	& Unique member identifier \\
-			& {\bf email[]}				&String	& e-mail address \\
-			& {\bf phone[]}				&String	& phone number(s) \\
-\hline
-$MNGR$ 		& {\bf MemberID}			&Integer	& Unique member identifier \\
-			& {\bf email[]}				&String	& e-mail address \\
-			& {\bf phone[]}				&String	& phone number(s) \\
 \Xhline{1.5pt}
 \end{tabular}
 }
@@ -359,7 +331,7 @@ Tables \ref{tab:ProfileMetaData1} and \ref{tab:ProfileMetaData2} show the meta-d
 \cline{2-2}
 $welcome$	& {\bf entityName}$^*$		&String	& Legal entity name \\
 			& {\bf entityAddress}$^*$		&String	& Legal entity's street address \\
-			& {\bf gps[]}$^*$			&Double	& Legal entity's GPS coordinates \\			
+			& {\bf gps}$^*$				&Double[]	& Legal entity's GPS coordinates \\			
 			& {\bf VAT}$^*$				&String	& Legal entity's VAT number \\
 			& {\bf capacity}				&Double	& Commitment to maximum yearly SRD volume \\
 			& {\bf capacityDate}			&DateTime & Date capacity was set \\
@@ -373,11 +345,11 @@ $welcome$	& {\bf entityName}$^*$		&String	& Legal entity name \\
 \cline{2-2}
 $retail$		& {\bf entityName}$^*$		&String	& Legal entity name \\
 			& {\bf entityAddress}$^*$		&String	& Legal entity's street address \\
-			& {\bf gps[]}$^*$			&Double	& Legal entity's GPS coordinates \\			
+			& {\bf gps}$^*$				&Double[]	& Legal entity's GPS coordinates \\			
 			& {\bf capacity}				&Double	& Commitment to maximum yearly SRD volume \\
 			& {\bf capacityDate}			&DateTime & Date capacity was set \\
 			& {\bf rewardRate}$^{**}$		&Double	& \% reward rate to consumer, in SRD \\
-			& {\bf euroFee[]}			&Double	& \% fee on B2C EUR sales, in EUR \\
+			& {\bf euroFee}				&Double[]	& \% fee on B2C EUR sales, in EUR \\
 			& {\bf acceptanceRate}$^{**}$	&Double	& Rate of SRD acceptance in consumer purchases\\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
@@ -389,12 +361,12 @@ $retail$		& {\bf entityName}$^*$		&String	& Legal entity name \\
 \cline{2-2}
 $company$	& {\bf entityName}$^*$		&String	& Legal entity name \\
 			& {\bf entityAddress}$^*$		&String	& Legal entity's street address \\
-			& {\bf gps[]}$^*$			&Double	& Legal entity's GPS coordinates \\
+			& {\bf gps}$^*$				&Double[]	& Legal entity's GPS coordinates \\
 			& {\bf VAT}$^*$				&String	& Legal entity's VAT number \\
 			& {\bf capacity}				&Double	& Commitment to maximum yearly SRD volume \\
 			& {\bf capacityDate}			&DateTime & Date capacity was set \\
 			& {\bf creditPercent}			&Double	& \% SRD acceptance for transactions above 1000 \\
-			& {\bf euroFee[]}			&Double	& \% fee on inter-circuit SRD sales, in EUR \\
+			& {\bf euroFee}				&Double[]	& \% fee on inter-circuit SRD sales, in EUR \\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
@@ -405,13 +377,13 @@ $company$	& {\bf entityName}$^*$		&String	& Legal entity name \\
 \cline{2-2}
 $full$		& {\bf entityName}$^*$		&String	& Legal entity name \\
 			& {\bf entityAddress}$^*$		&String	& Legal entity's street address \\
-			& {\bf gps[]}$^*$			&Double	& Legal entity's GPS coordinates \\
+			& {\bf gps}$^*$				&Double[]	& Legal entity's GPS coordinates \\
 			& {\bf VAT}$^*$				&String	& Legal entity's VAT number \\
 			& {\bf capacity}				&Double	& Commitment to maximum yearly SRD volume \\
 			& {\bf capacityDate}			&DateTime & Date capacity was set \\
 			& {\bf creditPercent}			&Double	& \% SRD acceptance for transactions above 1000 \\
 			& {\bf rewardRate}$^{**}$		&Double	& \% reward rate to consumer, in SRD \\
-			& {\bf euroFee[]}			&Double	& \% fees on B2C EUR sales, inter-circuit SRD sales, in EUR \\
+			& {\bf euroFee}				&Double[]	& \% fees on B2C EUR sales, inter-circuit SRD sales, in EUR \\
 			& {\bf acceptanceRate}$^{**}$	&Double	& Rate of credits acceptance in consumer purchases\\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
@@ -448,13 +420,13 @@ $employee$	& {\bf firstName}$^*$			&String	& First name \\
 \cline{2-2}
 $on$\_$hold$	& {\bf entityName}$^*$		&String	& Legal entity name \\
 			& {\bf entityAddress}$^*$		&String	& Legal entity's street address \\
-			& {\bf gps[]}$^*$			&Double	& Legal entity's GPS coordinates \\
+			& {\bf gps}$^*$				&Double[]	& Legal entity's GPS coordinates \\
 			& {\bf VAT}$^*$				&String	& Legal entity's VAT number \\
 			& {\bf capacity}				&Double	& Commitment to maximum yearly SRD volume \\
 			& {\bf capacityDate}			&DateTime & Date capacity was set \\
 			& {\bf creditPercent}			&Double	& \% SRD acceptance for transactions above 1000 \\
 			& {\bf rewardRate}$^{**}$		&Double	& \% reward rate to consumer, in SRD \\
-			& {\bf euroFee[]}			&Double	& \% fees on B2C EUR sales, inter-circuit SRD sales, in EUR \\			& {\bf acceptanceRate}$^{**}$	&Double	& Rate of credits acceptance in consumer purchases\\
+			& {\bf euroFee}				&Double[]	& \% fees on B2C EUR sales, inter-circuit SRD sales, in EUR \\			& {\bf acceptanceRate}$^{**}$	&Double	& Rate of credits acceptance in consumer purchases\\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
@@ -472,7 +444,7 @@ $consumer$\_$verified$ & {\bf firstName}$^*$	&String	& First name \\
 \cline{2-2}
 $MNGR$ 		& {\bf entityName}$^*$		&String	& Legal entity name \\
 			& {\bf entityAddress}$^*$		&String	& Legal entity's street address \\
-			& {\bf gps[]}$^*$			&Double	& Legal entity's GPS coordinates \\
+			& {\bf gps}$^*$				&Double[]	& Legal entity's GPS coordinates \\
 			& {\bf VAT}$^*$				&String	& Legal entity's VAT number \\
 			& {\bf capacity}				&Double	& Commitment to maximum yearly SRD volume \\
 			& {\bf capacityDate}			&DateTime & Date capacity was set \\
