@@ -8,14 +8,14 @@ Eduard Hirsch
 
 In this chapter an overview of the used technologies for running the INTERLACE Specification is given. At the beginning a quick start description is provided in order to jump right into the execution of the model.
 
-Further details which are enabling the Abstract State Interacting Machines (ASIM) specifications to be executed are discussed and why this possible in a simple and stable manner.
+Further details how the Abstract State Interacting Machines (ASIM) specifications are functioning in the environment are discussed and why this is possible in a simple and stable manner.
+
+There are two base environments available - one based on docker and one based on vagrant. The focus shifted from the vagrant environment which can be downloaded at GitHub\footnote{https://github.com/InterlaceProject/ASIMVagrantEnvironment} to a docker based version which is explained in section \ref{sec:quick-start-docker} and also available at GitHub\footnote{https://github.com/InterlaceProject/ASIMDockerEnvironment}. Nevertheless, for developer preferring vagrant, the setup will be still explained.
 
 \section{Quick Start Vagrant}
 \label{sec:quick-start-vagrant}
 
-There are two base environments available. One based one docker and one based on vagrant. The focus shifted from the vagrant environment which can be downloaded at github\footnote{https://github.com/InterlaceProject/ASIMVagrantEnvironment} to a docker based version which is explained in section \ref{sec:quick-start-docker}. Nevertheless, for developer preferring vagrant, the setup will be still explained.
-
-The vagrant definition provides a running environment for executing the INTERLACE ASIM definitions. During the provisioning process an ubuntu vagrant box is set up which installs the necessary components on that box. It is cloning and building the ICEF framework\footnote{https://github.com/biomics/icef} as well as the ASIM Specification\footnote{https://github.com/InterlaceProject/ASIMSpec} into the data directory where it is finally ready for usage.
+The vagrant definition provides a running environment for executing the INTERLACE ASIM definitions. During the provisioning process an Ubuntu vagrant box is set up - all the necessary components are installed on that box. It is cloning and building the ICEF framework\footnote{https://github.com/biomics/icef} as well as the ASIM Specification\footnote{https://github.com/InterlaceProject/ASIMSpec} into the data directory where it is finally ready for usage.
 
 \subsection{Prerequisites}
 
@@ -45,7 +45,7 @@ Once all software components are installed and the vagrant definitions are clone
 
 from the main directory in order to let the INTERLACE specifications run. Note: when using Windows it is necessary to start that command within git-bash which needs to run in elevated admin mode (right click $\rightarrow$ start as administrator).
 
-On the very first execution the script is provisioning a virtual machine based on ubuntu by calling \texttt{vagrant up} which may take some time. Consecutive calls will be much faster. A detailed description explaining the precise process is covered in section \ref{sec:exec-env-model-details}.
+On the very first execution the script is provisioning a virtual machine based on Ubuntu by calling \textit{vagrant up} which may take some time. Consecutive calls will be much faster. A detailed description explaining the precise process is covered in section \ref{sec:exec-env-model-details}.
 
 Once the execution is started it will run until it is stopped by pressing \textbf{ctrl + c} or by calling
 
@@ -58,7 +58,7 @@ from any other console window.
 \section{Quick Start Docker}
 \label{sec:quick-start-docker}
 
-The docker project at github\footnote{https://github.com/InterlaceProject/ASIMDockerEnvironment} is also based on virtualization like the vagrant environment but emphasizing \textit{Operating System} instead of \textit{Hardware virtualization}\footnote{https://www.docker.com/what-container\#comparing}.
+The docker project at GitHub\footnote{https://github.com/InterlaceProject/ASIMDockerEnvironment} is also based on virtualization like the vagrant environment but emphasizing \textit{Operating System} instead of \textit{Hardware virtualization}\cite{VirtualMachines2005}.
 
 \subsection{Prerequisites}
 
@@ -96,7 +96,7 @@ Like the vagrant environment a running execution may be stopped by pressing \tex
 \section{Execution Environment Stack}
 \label{sec:exec-env-stack}
 
-Independent of the used virtualization techniques a consistent base system is used. So both docker as well as vagrant are provisioning a Linux based operating system using an Ubuntu 16.04 LTS (Long Term Support) distribution.
+Independent of the used virtualization techniques a consistent base system is used. So both docker as well as vagrant are provisioning a Linux based operating system. In this case Ubuntu 16.04 LTS (Long Term Support) distribution is facilitated.
 That consistent, stable and reliable structure will be important later when considerations about provability as well testability come into place. That design provides always the same preconditions and everybody executing or testing against the specifications will receive the same results.
 
 \subsection{Software Stack}
@@ -138,7 +138,7 @@ is referring to the fact that on the host system the folder \textit{data} is use
 
 When the virtual machine is stopped the data directory on the host is kept and can be still manipulated or executed (of course only if the framework dependencies are installed on the host as well).
 
-For \textbf{Docker} we need to first clone all GitHub sources to the host machine and can only then share the files into the guest container by using the command line option "-v"
+For \textbf{Docker} it is needed to first clone all GitHub sources to the host machine and only then files can be shared into the guest container by using the command line option "-v"
 
 \begin{lstlisting}[language=bash]
 	docker run -v "$1/ASIMSpec:/home/ASIMSpec" \
@@ -155,14 +155,14 @@ The execution stack in figure \ref{fig:icef-intro-asim} shows where a ICEF speci
 
 Due to limitations of the ICEF framework it is currently not possible to cleanly shut down a running ICEF simulation with several running ASIM instances. Therefore both environments have to start and stop all services for every execution in order to grant a correct execution set-up.
 
-\subsubsection{Start Services Processes}: Both environments offer a script (\textit{execute(.sh)}) to be called from the host system and one from within the virtualized machine (\textit{executeASIMSpec.sh/executeOnGuest.sh}). Whereas the script on the virtualized system only differ in directory references the outside scripts are need to handle different things as one script is dealing with docker and the other with vagrant.
+\subsubsection{Start Services Processes}: Both environments offer a script (\textit{execute(.sh)}) to be called from the host system and one from within the virtualized machine (\textit{executeASIMSpec.sh/executeOnGuest.sh}). Whereas the script on the virtualized system only differ in directory references the outside scripts have to handle different things as one script is dealing with docker and the other with vagrant.
 
 In detail Docker can immediately start the servers and run the script inside the container whereas vagrant needs add an additional step if the virtual machine is not up and running yet. Thus vagrant
 
 \begin{enumerate}
 	\item is trying to start the server processes and submit the specifications
-	\item if the first step failed is checking for the virtual machine if it is running and if not it tries to restart the virtual machine
-	\item if the restart has been successful the first step will be retried.
+	\item if the first step failed the script is checking for the virtual machine, if it is running and if not it tries to (re-)start the virtual machine
+	\item when the restart has been successful the first step will be retried.
 \end{enumerate}
 
 When now focusing on the first step which is basically the same on both environments it can be discussed in detail how the process is continued. So on the guest system we are first running a so called \textit{CASIMA} which is short hand for coreASIM-Manager \ref{sec:icef-intro}. This manager takes care about ASIM states, scheduling and also acts as messaging backbone.
@@ -187,10 +187,9 @@ The last two parameters for the script are host as well as port where the manage
 \subsection{Development}
 \label{sec:development}
 
-For developing new simulations it is important to have a proper development environment. There are existing many IDE/Tool/Debuggers for Java and JavaScript which are used for Brapper, Manager or coreAS(I)M plugin development but there are only limited IDE choices for implementing AS(I)Ms.
+For developing new simulations it is important to have a proper development environment. There are existing many different IDE/Tool/Debuggers choices for Java and JavaScript which may be used for Brapper, Manager or coreAS(I)M plugin development. Nevertheless, there are only limited IDE choices for implementing AS(I)Ms.
 
-For the public Integrated Development Environment Eclipse, developers of the ICEF framework have adopted the coreASM plugin for supporting the additional language primitives. Thus for working with ASIM implementations of INTERLACE you ideally DO NOT download the coreASM package which is available at the market place of Eclipse. The adopted plugin working with the new language elements is provided by the ICEF framework but is needed to build and imported manually into Eclipse.
-
+For the well-known Integrated Development Environment Eclipse, developers of the ICEF framework have adopted the coreASM plugin for supporting the additional language primitives. Thus for working with ASIM implementations of INTERLACE you ideally DO NOT download the coreASM Plug-In package which is available at the marketplace of Eclipse. The adopted plugin working with the new language elements is provided by the ICEF framework directly but is needed to be build and imported manually into Eclipse.
 
 \textbf{Import/Install of the IDE Eclipse plugin for coreASIM}
 \begin{description}
@@ -204,20 +203,20 @@ For the public Integrated Development Environment Eclipse, developers of the ICE
 	
 	\item[Import Plugin as Project] Next the plugin needs to be imported to the workspace which can be done in Eclipse using the import wizard. To reach the wizard go to "File" $\rightarrow$ "Import...", search for "Existing Projects into Workspace" and click to get to "Import Project"-Window. Then click "Finish" to import the project.
 	
-	\item[Dry-Run Eclipse with coreASIM-Plug-In] This optional step can be done to check if the Plug-In is working correctly. For that it is necessary to right click the imported eclipse project and go to "Run As" $\rightarrow$ "Eclipse Application". Then a second Eclipse instance is started but this time a new tab should appear named "coreASIM" as well as when opening a file with extension \textit{casim} the ASIM definition should be syntax highlighted.
+	\item[Dry-Run Eclipse with coreASIM-Plug-In] This optional step can be done to check if the Plug-In is working correctly. For that it is possible to right click the imported eclipse project and go to "Run As" $\rightarrow$ "Eclipse Application". Then a second Eclipse instance is started but this time a new tab should appear named "coreASIM" as well as when opening a file with extension \textit{casim} the ASIM definition should be syntax highlighted.
 
-	\item[Enable the Plug-In] If the (optional) dry-run has been successful the export wizard will export the Plug-In into the running Eclipse installation by opening "File" $\rightarrow$  "Export" then choosing "Deployable Plug-ins and fragments" in the new Dialogue. The window which is opened next will offer to export fragment  \textit{org.coreasim.eclipse} by selecting the check box beside. Before clicking finish the combo box "Install into host" has to be chosen.
+	\item[Enable the Plug-In] If the (optional) dry-run has been successful the export wizard will export the Plug-In into the running Eclipse installation by opening "File" $\rightarrow$  "Export" then choosing "Deployable Plug-ins and fragments" in the new Dialogue. The window which is opened next will offer to export fragment  \textit{org.coreasim.eclipse} by selecting the check box beside. Before clicking "Finish" the combo box "Install into host" has to be chosen.
 	
 \end{description}
 
-When finishing these steps on restart Eclipse offers a new tab in the top menu bar called "CoreASIM".
+When finishing these steps Eclipse offers a new tab in the top menu bar called "CoreASIM" on restart.
 
 \textbf{Note on the installation}: When using the \textit{docker}-Environment you could skip the first step \textbf{Build Framework}, because all the necessary build steps are covered by the initial configuration script. Also a separate installation of the Eclipse Plug-In Development Environment (PDE) might omitted because it usually comes in a bundle with most standard J2EE installations of Eclipse.
 
 \textbf{Notes on the Docker environment}
 \label{sec_inner:note-docker}
 
-Normally the ASIM Specifications are started by calling \textit{execute} from the main directory which is starting a script which will run the services and sent the ICEF definition. When stopping the container it instantly goes back to his original state before execution. Only the shared directories ASIMSpec and icef keep changes.
+Normally the ASIM Specifications are started by calling \textit{execute} from the main directory. This is starting a script which will run the required services and then sent the ICEF definition. When stopping the container it instantly goes back to his original state before execution. Only the shared directories ASIMSpec and icef keep changes.
 
 If it is necessary or convenient, like if the host is missing development packages (e.g. maven, nodejs, ...) which are available inside the container, it is possible to work from within the container by calling
 
@@ -225,7 +224,7 @@ If it is necessary or convenient, like if the host is missing development packag
 	./execute /bin/bash
 \end{lstlisting}
 
-which starts the docker container, runs a bash shell, keeping the STDIN open and connect a pseudo TTY. In this way it is possible to work with that bash shell, similar to connecting to a machine over SSH.
+which starts the docker container, runs a bash shell, is keeping the STDIN open and connects a pseudo TTY. In this way it is possible to work with that bash shell, which may be seen like connecting to a remote shell over SSH.
 
 \section{ICEF - The Interaction Computing Execution Framework}
 \label{sec:icef-intro}
@@ -240,13 +239,13 @@ The interaction framework is wrapping the original coreASM framework in order to
 
 \textbf{Third} a central server called manager takes care handling distributed Brapper instances dealing with message and scheduling issues.
 
-Technology wise coreASIM changes the coreASM implementation in Java. Brappers are written in Java as well but the managers are coordinating the Brappers using nodejs and therefor written in JavaScript.
+Technology wise coreASIM changes the coreASM implementation in Java. Brappers are written in Java as well but the managers are coordinating the Brappers using nodejs and are therefor written in JavaScript.
 
 \subsection{Framework Stack}
 
 Next, the framework stack of ICEF in terms of the INTERLACE implementation is described more detailed. In figure \ref{fig:icef-intro-asim} the stack can be viewed in different levels of granularity.
 
-As a stable base for the INTERLACE execution environment stack a Linux based system, Ubuntu 16.04 LTS, has been chosen. A LTS (Long Term Support) version is important to be sure to have a reliable platform which is maintained by the distributor for long time. Ubuntu publishes those version every two years and promises a maintenance duration of five years\footnote{https://www.ubuntu.com/info/release-end-of-life}.
+As a stable base for the INTERLACE execution environment stack a Linux based system, Ubuntu 16.04 LTS, has been chosen. A LTS (Long Term Support) version is important to be sure to have a reliable platform which is maintained by the distributor for long time. Ubuntu publishes those versions every two years and promises a maintenance duration of five years\footnote{https://www.ubuntu.com/info/release-end-of-life}.
 
 After installation of the software described in \ref{sec:env-exec-stack-software-stack} and building the icef components the framework is ready. When the components are started it is possible to transmit a running definition, called ICEF JSON file.
 
@@ -307,7 +306,7 @@ The resulting engine was called coreASIM including the missing interaction featu
 	\item interpreter enhancements
 \end{itemize}
 
-As this document offers only an overview only the most important implementations are described here, namely the mailbox and the scheduling system. \textbf{The mailing system} can easily be used and can be described as follows:
+As this document provides an overview only on the coreASIM features, just the most important implementations are described here, namely the mailbox and the scheduling system. \textbf{The mailing system} can be easily used and will be described as follows:
 
 \begin{minipage}{1.0\textwidth}
 An ASIM $asim_1$ can send a message to another ASIM $asim_2$ by using the send message rule.\nopagebreak
@@ -324,7 +323,7 @@ Where the \textit{Element} can be of any element location used in ASIM language 
 	forall a in Agents do schedule a
 \end{lstlisting}
 
-Which tells the scheduler to run all agents in \textit{Agents}. If a in contrary a single agents should be selected based on a condition $cond$ met by agent $a$, the respective rule might look like this:
+Which tells the scheduler to run all agents in \textit{Agents}. If  in contrast a single agent should be selected based on a condition $cond$ met by an agent $a$, the respective rule might look like this:
 
 \begin{lstlisting}[language=bsl]
 	choose a in Agents with cond(a) do schedule a
@@ -391,11 +390,11 @@ This process tries to make development as well as instant executing easier in or
   \label{fig:docker-env-exec-process}
 \end{figure}
 
-Note on the service locations: In directory \textit{scripts} of figure \ref{fig:docker-env-file-struct} a file called \textit{asimrc} is listed and acting for configuring as well as execution as a central configuration file containing the main service locations on the containerized Ubuntu system.
+Note on the service locations: In directory \textit{scripts} of figure \ref{fig:docker-env-file-struct} a file called \textit{asimrc} is listed and acting for configuring as well as for execution as a central setup file containing the main service locations on the containerized Ubuntu system.
 
-\subsection{Container and Virtual Machine based environment}
+\subsection{Container and Virtual Machine based environments}
 
-In figure \ref{fig:docker-env-container-vs-vm} two virtualization techniques are shown. They have similar approaches of how to isolate and allocated resources. However, they function very differently because a container reaches virtualizsation over splitting an operating system and virtual machine are virtualizing hardware on which a whole operating system is running. 
+In figure \ref{fig:docker-env-container-vs-vm} two virtualization techniques are shown. They have similar approaches of how to isolate and allocated resources. However, they function very differently because a container reaches virtualizsation over splitting an operating system resources and virtual machine are virtualizing hardware on which a whole operating system is running.
 
 \begin{figure}[htbp]
   \centering
@@ -406,9 +405,9 @@ In figure \ref{fig:docker-env-container-vs-vm} two virtualization techniques are
 
 Consequences are that containers can be much smaller, more portable and in most of the cases also much faster because they are using the system resources more directly and not as wasteful as a virtual machine does.
 
-To be more specific \textbf{containers} are packaging there libraries and binaries together with application. Then each of the containers can run in parallel on the same machine sharing the OS kernel together with others each running in an isolated process in user space as if it would be a separate OS. Therefor containers have the ability to start instantly, because the operating system they are using is already up and running. Also, they are much smaller as they don't need to carry all the OS specific software parts.
+To be more specific \textbf{containers} are packaging their libraries and binaries together with and application. Then each of the containers can run in parallel on the same machine sharing the OS kernel together with others, each running in an isolated process in user space as if it would be a separate OS. Therefor containers have the ability to start instantly, because the operating system they are using is already up and running. Also, they are much smaller as they don't need to carry all the OS specific software parts.
 
-In contrast \textbf{virtualized machines} are running on an abstraction of the physical hardware which is present on the system. That means that a hypervisor doubles, triples, ... the hardware virtually and allows to install full versions of an operating system compatible with the current system. As each virtualization is a full copy of a OS images are much larger and boot times are most of the time much slower. Nevertheless, full operating system might have benefits in some cases over containerized systems.
+In contrast \textbf{virtualized machines} are running on an abstraction of the physical hardware which is present on the system. That means that a hypervisor doubles, triples, ... the hardware virtually and allows to install full versions of an operating system compatible with the current system. As each virtualization is a full copy of a OS, images are much larger and boot times are most of the time much slower. Nevertheless, full operating system might have benefits in some cases over containerized systems.
 
 Coming back to the Interlace environments those two approaches reflect the two approaches used for creating the environments. Vagrant is a controlling command line client for hypervisors (virtual machines) and docker is a command line client for a container based virtualization system with the same name.
 
