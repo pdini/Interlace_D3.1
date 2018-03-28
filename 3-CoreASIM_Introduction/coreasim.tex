@@ -8,7 +8,7 @@ Eduard Hirsch
 
 In this chapter an overview of the used technologies for running the INTERLACE Specification is given. At the beginning a quick start description is provided in order to jump right into the execution of the model.
 
-Further details how the Abstract State Interacting Machines (ASIM) specifications are functioning in the environment are discussed and why this is possible in a simple and stable manner.
+Further details on how the Abstract State Interacting Machines (ASIM) specifications are functioning in the environment are discussed and why this is possible in a simple and stable manner.
 
 There are two base environments available - one based on docker and one based on vagrant. The focus shifted from the vagrant environment which can be downloaded at GitHub\footnote{https://github.com/InterlaceProject/ASIMVagrantEnvironment} to a docker based version which is explained in section \ref{sec:quick-start-docker} and also available at GitHub\footnote{https://github.com/InterlaceProject/ASIMDockerEnvironment}. Nevertheless, for developer preferring vagrant, the setup will be still explained.
 
@@ -43,7 +43,7 @@ Once all software components are installed and the vagrant definitions are clone
 	execute.sh
 \end{lstlisting}
 
-from the main directory in order to let the INTERLACE specifications run. Note: when using Windows it is necessary to start that command within git-bash which needs to run in elevated admin mode (right click $\rightarrow$ start as administrator).
+from the main directory in order to let the INTERLACE specifications run. Note: when using Windows it is necessary to start that command within git-bash which needs to run in elevated admin mode (right click $\rightarrow$ start as administrator). That is necessary to handle symbolic links in git-bash.
 
 On the very first execution the script is provisioning a virtual machine based on Ubuntu by calling \textit{vagrant up} which may take some time. Consecutive calls will be much faster. A detailed description explaining the precise process is covered in section \ref{sec:exec-env-model-details}.
 
@@ -97,7 +97,7 @@ Like the vagrant environment a running execution may be stopped by pressing \tex
 \label{sec:exec-env-stack}
 
 Independent of the used virtualization techniques a consistent base system is used. So both docker as well as vagrant are provisioning a Linux based operating system. In this case Ubuntu 16.04 LTS (Long Term Support) distribution is facilitated.
-That consistent, stable and reliable structure will be important later when considerations about provability as well testability come into place. That design provides always the same preconditions and everybody executing or testing against the specifications will receive the same results.
+That consistent, stable and reliable structure will be important later when considerations about provability as well testability come into place. That design always provides the same preconditions and everybody executing or testing against the specifications will receive the same results.
 
 \subsection{Software Stack}
 \label{sec:env-exec-stack-software-stack}
@@ -105,13 +105,13 @@ That consistent, stable and reliable structure will be important later when cons
 The Ubuntu 16.04 LTS distribution is enhanced and updated according to the needs of an ASIM executing machine as well as to the needs of developers working with that virtual system. To be more specific the following components are installed during the provisioning process:
 
 \begin{itemize}
-	\item curl $\rightarrow$ Tool for querying REST resources (used for downloading package resources)
-	\item nodejs $\rightarrow$ JavaScript engine including the package manager npm (running the Manager Component of ICEF)
-	\item build-essential $\rightarrow$ Packages needed to compile a debian based package (used for building the project sources)
-	\item maven $\rightarrow$ Java build and packaging tool (used for building the project sources)
-	\item vim $\rightarrow$ Well known U/Linux editor (for development purposes)
-	\item git $\rightarrow$ Distributed Version Control System (downloading source repositories from GitHub)
-	\item Java 8 $\rightarrow$ Programming Language used for coreASIM base system implementation (running ASIM instances)
+	\item \textbf{curl} $\rightarrow$ Is a tool for querying REST resources and used for downloading package from various online repositories.
+	\item \textbf{nodejs} $\rightarrow$ Is a JavaScript runtime build on Chrome's V8 engine and is including the package manager npm. That bundle is necessary for installing and running the Manager component of ICEF.
+	\item \textbf{build-essential} $\rightarrow$ These packages are needed to compile a debian based package and provides help for building the project sources.
+	\item \textbf{maven} $\rightarrow$ Is a well-known Java build and packaging tool and used for building the ICEF framework as well as the coreASIM Eclispe Plug-In.
+	\item \textbf{vim} $\rightarrow$ Well known U/Linux editor which acts as helper for quick development or configuration issues inside of the environment.
+	\item \textbf{git} $\rightarrow$ Distributed Version Control System which helps downloading source repositories from GitHub.
+	\item \textbf{Java 8} $\rightarrow$ Programming Language used for coreASIM base system implementation, thus, also running ASIM instances.
 \end{itemize}
 
 \subsection{Provisioning Process}
@@ -121,10 +121,10 @@ The provisioning process can be separated into 3 steps which are executed when \
 \begin{enumerate}
 	\item Download ASIMSpec and ICEF from GitHub
 	\item Install of software packages mentioned in section \ref{sec:env-exec-stack-software-stack}
-	\item Build ICEF framework and prepare virtual machine for execution
+	\item Build ICEF framework and prepare a virtual machine for execution
 \end{enumerate}
 
-For development purposes the ASIMSpec as well as the ICEF framework are cloned into directories which are available from the host machine and the virtual guest machine. This is necessary because then it is possible to directly edit the source or debug from outside and execute the code from within the container. Consequently it is not necessary to copy the code into the container when changes where done.
+For development purposes the ASIMSpec as well as the ICEF framework are cloned into directories which are available from the host machine and the virtual guest machine. This is necessary because then it is possible to directly edit the source or debug from outside and execute the code from within the container. Consequently it is not necessary to copy the code into the container when changes are carried out.
 
 For \textbf{Vagrant} a shared folder is configured over the vagrant file shown here
 
@@ -134,7 +134,7 @@ For \textbf{Vagrant} a shared folder is configured over the vagrant file shown h
 	...
 \end{lstlisting}
 
-is referring to the fact that on the host system the folder \textit{data} is used and on the guest system a folder \textit{vagrant-data} is mounted. Those folder are shared and thus containing the same content. Additionally during provisioning a symbolic link in the home directory is created called project (\textit{/home/ubuntu/project}) which is linking the mounted root folder /vagrant-data.
+is referring to the fact that on the host system the folder \textit{data} is used and on the guest system a folder \textit{vagrant-data} is mounted. Those folders are shared and thus containing the same content. Additionally during provisioning a symbolic link in the home directory is created called project (\textit{/home/ubuntu/project}) which is linking the mounted root folder /vagrant-data.
 
 When the virtual machine is stopped the data directory on the host is kept and can be still manipulated or executed (of course only if the framework dependencies are installed on the host as well).
 
@@ -169,9 +169,9 @@ When now focusing on the first step which is basically the same on both environm
 
 Next a second service process is started. The service is a wrapper for the coreASM implementation and its name is Brapper (BIOMICS wrapper). This Brapper service executes enhanced ASM code named BSL that offers additional language primitives specifically designed during the BIOMICS project. Those features mainly include interaction features used to model biochemical systems, nevertheless, and actually because of that they are also suitable for decentralized and distributed computer system.
 
-When a Brapper is going to be started it needs to be register at a manager instance. As described in section \ref{sec:icef-intro} it is possible to start multiple Brappers. Once a simulation is submitted to the manager, the manager is distributing the different simulations including their ASIMs to different Brapper services for executing them there trying to spread the load equally.
+When a Brapper is going to be started it needs to be register at a manager instance. As described in section \ref{sec:icef-intro} it is possible to start multiple Brappers. Once a simulation is submitted to the manager, the manager is distributing the different simulations including their ASIMs to different Brapper services for executing them there while trying to spread the load equally.
 
-For the sake of simplicity the environment starts only one Brapper by default. In the final implementation it'll be possible to configure the number of Brappers used for execution.
+For the sake of simplicity the environments starts only one Brapper by default. In the final implementation it'll be possible to configure the number of Brappers used for execution.
 
 \subsubsection{Submit ICEF definition file}: Finally after the service processes are running it is possible to submit a specification file to the manager. This is done by the executing bash script which is calling a  nodejs client:
 
@@ -189,7 +189,7 @@ The last two parameters for the script are host as well as port where the manage
 
 For developing new simulations it is important to have a proper development environment. There are existing many different IDE/Tool/Debuggers choices for Java and JavaScript which may be used for Brapper, Manager or coreAS(I)M plugin development. Nevertheless, there are only limited IDE choices for implementing AS(I)Ms.
 
-For the well-known Integrated Development Environment Eclipse, developers of the ICEF framework have adopted the coreASM plugin for supporting the additional language primitives. Thus for working with ASIM implementations of INTERLACE you ideally DO NOT download the coreASM Plug-In package which is available at the marketplace of Eclipse. The adopted plugin working with the new language elements is provided by the ICEF framework directly but is needed to be build and imported manually into Eclipse.
+For the well-known Integrated Development Environment Eclipse, developers of the ICEF framework have adopted the coreASM Plug-In for supporting the additional language primitives. Thus for working with ASIM implementations of INTERLACE you ideally DO NOT download the coreASM Plug-In package which is available at the marketplace of Eclipse. The adopted plugin working with the new language elements is provided by the ICEF framework directly but is needed to be build and imported manually into Eclipse.
 
 \textbf{Import/Install of the IDE Eclipse plugin for coreASIM}
 \begin{description}
@@ -224,7 +224,7 @@ If it is necessary or convenient, like if the host is missing development packag
 	./execute /bin/bash
 \end{lstlisting}
 
-which starts the docker container, runs a bash shell, is keeping the STDIN open and connects a pseudo TTY. In this way it is possible to work with that bash shell, which may be seen like connecting to a remote shell over SSH.
+which starts the docker container, runs a bash shell instead of the starting script, is keeping the STDIN open and connects a pseudo TTY. In this way it is possible to work with the containers bash shell, which may be seen like connecting to a remote shell over SSH.
 
 \section{ICEF - The Interaction Computing Execution Framework}
 \label{sec:icef-intro}
@@ -249,8 +249,13 @@ As a stable base for the INTERLACE execution environment stack a Linux based sys
 
 After installation of the software described in \ref{sec:env-exec-stack-software-stack} and building the icef components the framework is ready. When the components are started it is possible to transmit a running definition, called ICEF JSON file.
 
-In listing \ref{lst:icef-json-spec} it is possible to see how the specification for the simulation is looking like. Side note: A definition for the client here is not given because the client which is sending credit, debit or other requests is spawned and destroyed on demand by the scheduler ASIM.
+In listing \ref{lst:icef-json-spec} it is possible to see how the specification for the simulation is looking like. An \textit{id} for the simulation is given as well as one scheduler and one asim. The \textit{schedulers} section normally only hosts one scheduler which is taking care about other active or suspended ASIM agents. The \textit{asims} attribute in the JSON file defines the actual ASIM instances running the simulation.
 
+Side note: A definition for the client here is not given because the client which is sending credit, debit or other requests is spawned and destroyed on demand by the scheduler-ASIM defined in \textit{casim/scheduler.casim}.
+
+Detailed description on parameters and options of the JSON ICEF specifications can be found in deliverable D5.2 \cite{BIOMICSD52} of the BIOMICS project.
+
+\begin{minipage}{1.0\textwidth}
 \begin{lstlisting}[language=json,firstnumber=1,caption={ICEF Json Specification for Interlace},captionpos=b,label=lst:icef-json-spec]
 {
    "id": "interlace", 
@@ -268,16 +273,15 @@ In listing \ref{lst:icef-json-spec} it is possible to see how the specification 
    ]
 }
 \end{lstlisting}
+\end{minipage}
 
-Detailed description on parameters and options of the JSON ICEF specifications can be found in deliverable D5.2 \cite{BIOMICSD52} of the BIOMICS project.
-
-The implementation idea here is to have a central server which is taking over the various requests from the clients. A scheduler will take care when and what is exactly running. As a second task the scheduler will also spawn new clients which send or receive information/inquiries to other components, but mainly to the server.
+The implementation idea here is to have a central server which is taking over the various requests from the clients. A scheduler will take care when and what is exactly running. As a second task the scheduler will, as mentioned before, also spawn new clients which send or receive information/inquiries to other components, but mainly to the server.
 
 \textbf{The Submission Process} of the \textit{run.icef} works the following way:
 
 \begin{description}
 	\item [Loading and parsing of the ICEF-File] is initializing the process. Using that specification file a node.js components transmits the structure to the manager server process which acts as the central managing and communication node.
-	\item [Manager Simulation] is started on the manger service process. Then the service is registering a new simulation and all components necessary for managing the different resources like messaging.
+	\item [Starting Simulation] on the manger service process. During that process the service is registering a new simulation and all components necessary for managing the different resources like messaging.
 	\item [Distribute ASIMs] When simulations are initialized requests are sent to one or more Brappers in order to start up the actual running instances of the ASIM-agent.
 	\item [Run ...] finally when all ASIM instances are running the simulation is successfully executing till stopped from outside or by a problem during execution.
 \end{description}
@@ -289,7 +293,7 @@ The implementation idea here is to have a central server which is taking over th
   \label{fig:icef-intro-asim}
 \end{figure}
 
-Figure \ref{fig:icef-intro-asim} illustrates on different level of detail which components and services are active and necessary to proved the previously described process running a ASIM simulation and in case of INTERLACE the model specifications.
+Figure \ref{fig:icef-intro-asim} illustrates on different level of detail which components and services are active and necessary to get the previously described processes to run a ASIM simulation and in case of INTERLACE the model specifications.
 
 \subsection{coreASIM}
 \label{sec:coreasim-details}
