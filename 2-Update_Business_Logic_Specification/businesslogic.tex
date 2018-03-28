@@ -45,7 +45,7 @@ In the following, first we provide a taxonomy of all the terms and concepts used
 
 \section{Permissioning Model Taxonomy}
 \subsection{Groups}
-The original Sardex system divided its users into 29 different types, called `groups'. This generated a great deal of complexity that is drastically reduced in the INTERLACE version of the platform. The new user type taxonomy involves only 9 groups, as shown in Table \ref{tab:groups}.
+The original Sardex system divided its users into 29 different types, called `groups'. This generated a great deal of complexity that is drastically reduced in the INTERLACE version of the platform. The new user type taxonomy involves only 9 groups, as shown in Table \ref{tab:groups}. The group that initiates a transaction is called the $fromGroup$, whereas the group that receives the transaction communication is the $toGroup$. The possible confusion created by debit transactions where the party receiving the funds is the $fromGroup$ is resolved at the level of accounts. See Section \ref{sec:intlevels}.
 
 %\setcounter{table}{0}
 \setlength{\tabcolsep}{10pt}
@@ -94,10 +94,11 @@ As shown in Figure \ref{fig:currchan}, the Sardex/INTERLACE platform supports tr
 \includegraphics[width=10cm]{Figures/Curr_Chan}
 \caption{\small\textbf{Currencies and channels supported by the platform}}
 \label{fig:currchan}
+\vspace{-0.5cm}
 \end{figure}
 
 \subsection{Accounts}
-As shown in Table \ref{tab:accounts}, the accounts implemented in the model reflect the current operations of the Sardex system and the needs of a wide range of business operations and interactions. Some of the account types, for example MIRROR, may be phased out as the high-level architecture of the family of Sardex circuits grows and different algorithms replace the current strict controls on the balance of payments between different circuits.
+As shown in Table \ref{tab:accounts}, the accounts implemented in the model reflect the current operations of the Sardex system and the needs of a wide range of business operations and interactions. Some of the account types, for example MIRROR, may be phased out as the high-level architecture of the family of Sardex circuits grows and different algorithms replace the current strict controls on the balance of payments between different circuits. Also an account can be referred to as $fromAcct$ or $toAcct$ depending on its role in the transaction. See Section \ref{sec:intlevels}.
 
 %\setcounter{table}{0}
 \setlength{\tabcolsep}{10pt}
@@ -137,6 +138,7 @@ Table \ref{tab:accountLimits} shows the account limit parameters that apply to t
 
 \setlength{\tabcolsep}{10pt}
 \begin{table}[htbp]
+\vspace{-0.5cm}
 \begin{centering}
 \small
 {
@@ -160,7 +162,7 @@ $highVolumeAlert$ & Buffer set by user: alert if $(capacity - saleVolume) < high
 }
 \caption{\small\textbf{Account limit parameters}}
 \label{tab:accountLimits}
-\vspace{-0.5cm}
+\vspace{-1cm}
 \end{centering}
 \end{table}
 
@@ -176,7 +178,7 @@ Operations = \{ Credit, Debit \}.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=15cm]{Figures/Account_Limits_CC}
+\includegraphics[width=16cm]{Figures/Account_Limits_CC}
 \caption{\small\textbf{Visualization of the $CC$ account limits}}
 \label{fig:accountLimitsCC}
 \end{figure}
@@ -184,20 +186,21 @@ Operations = \{ Credit, Debit \}.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=15cm]{Figures/Account_Limits_Prepaid}
+\includegraphics[width=16cm]{Figures/Account_Limits_Prepaid}
 \caption{\small\textbf{Visualization of the $Prepaid$ account limit}}
 \label{fig:accountLimitsPrepaid}
 \end{figure}
 \vspace{-0.5cm}
 
 \subsection{Interaction Levels}
+\label{sec:intlevels}
 The interactions between circuit participants can be described from different points of view that correlate loosely to a stack view of the system. As shown in Figure \ref{fig:stack}, it is helpful to identify qualitatively the different levels of such a stack, acknowledging that it is \emph{more} than a networking communication stack in terms of scope but \emph{less} than one in terms of precision. `A' and `B' refer to the Initiator and the Target of the transaction, which do not necessarily correspond to the Buyer and the Seller.
 
 Figure \ref{fig:stack} extends the two communication levels described in D2.1, but does so qualitatively. For the purposes of the implementation, we need a smaller set of levels but a more precise and specific vocabulary to identify the end-points of the transaction.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=10cm]{Figures/Stack}
+\includegraphics[width=16cm]{Figures/Stack}
 \caption{\small\textbf{Stack view of the INTERLACE communication, economic, and financial  interactions}}
 \label{fig:stack}
 \vspace{-0.5cm}
@@ -213,7 +216,7 @@ Figure \ref{fig:vocabulary} shows this additional information as concerns levels
 \end{figure}
 
 \subsection{Visibility}
-Figure \ref{fig:visibility} shows which groups ($toGroups$) are visible to which groups ($fromGroups$) by a `1' at the intersection of the $(row, column)$ corresponding to a choice of $(fromGroup, toGroup)$. For example, $company$ is visible to $employee$, meaning that $employee$ can do a search for $company$, but not vice versa. In this case $employee$ is not visible due to privacy legislation.
+Figure \ref{fig:visibility} shows which groups ($initGroups$) are visible to which groups ($destGroups$) by a `1' at the intersection of the $(row, column)$ corresponding to a choice of $(initGroup, destGroup)$. For example, $company$ is visible to $employee$, meaning that $employee$ can do a search for $company$, but not vice versa. In this case $employee$ is not visible due to privacy legislation.
 
 \begin{figure}[H]
 \centering
@@ -244,11 +247,11 @@ Use Case 2 also involves a second child transaction, a 2\% fee, in EUR, paid fro
 \begin{figure}[h]
 \centering
 \includegraphics[width=15cm]{Figures/B2C2}
-\caption{\small\textbf{B2C SRD transaction}}
+\caption{\small\textbf{SRD transactions for B2C, B2E, and B2B users}}
 \label{fig:B2C2}
 \end{figure}
 
-Figure \ref{fig:B2C2} shows the SRD transaction a $consumer$ can perform, i.e.\ the spending of the SRD accumulated as rewards, once they have registered and have become $consumer$\_$verified$.
+Figure \ref{fig:B2C2} shows the SRD transaction a $consumer$ can perform, i.e.\ the spending of the SRD accumulated as rewards, once they have registered and have become $consumer$\_$verified$. The figure also shows that Use Case 3 is relevant also to $employees$ (B2E) and that Use Case 4 is relevant to both B2E users and to non-$retail$ company users (B2B).
 
 \subsection{Initial Account State}
 Table \ref{tab:InitialAccountSets} shows the initial allocation of accounts to the different user groups. The allocation is `initial' because  depending on the history of a given user the number of its accounts could change. For legal reasons, as a general principle \emph{change} can only mean \emph{increase}. In other words, once a user has become the owner of an account it can never be taken away from them, even if its access to it is, for example, suspended due to misbehaviour. Another example is a $retail$ user who upgrades to $full$ and a year later changes its mind and goes back to $retail$. It will retain its DOMU account even if it won't be able to use it anymore. {\bf Note: Each user can have no more than one account of a given type.}
@@ -458,11 +461,11 @@ $MNGR$ 		& {\bf entityName}$^*$		&String	& Legal entity name \\
 }
 \label{tab:ProfileMetaData2}
 \end{centering}
-\vspace{-1cm}
+\vspace{-1.5cm}
 \end{table}
 
 \subsection{Transfer Types}
-As shown in Figure \ref{fig:transactabilitywkflow}, the first test for transactability involves so-called Transfer Types. Transfer Types are mathematical functions of the source groups ($fromGroups$) whose values are sets of target groups ($toGroups$). There is one different function for each combination of ordered pairs $(x, y)$, where $x \in \{ credit, debit \}$ and $y \in \{ SRD, EUR \}$, leading to four different functions.
+As shown in Figure \ref{fig:transactabilitywkflow}, the first test for transactability involves so-called Transfer Types. Transfer Types are mathematical functions of the {\bf source} groups ($fromGroups$) whose values are sets of {\bf destination} groups ($toGroups$). There is one different function for each combination of ordered pairs $(x, y)$, where $x \in \{ credit, debit \}$ and $y \in \{ SRD, EUR \}$, leading to four different functions.
 
 More formally,
 \begin{align}
@@ -477,12 +480,12 @@ Groups &= \{ welcome, retail, company, full, employee, on\text{\_}hold,  \nonumb
 		& \qquad\qquad\qquad\qquad\qquad\qquad\qquad
 			consumer, consumer\text{\_}verified, MNGR \}.
 \end{align}
-If, with an abuse of notation and shamelessly overloading the terminology, we define for convenience the following target groups as different ``transfer types''
+If, with an abuse of notation and overloading the terminology, we define for convenience the following sets of target groups ($toGroups$) as different ``transfer types''
 \begin{align*}
 TT_1 &= \{ retail \},		&& TT_2 = \{ retail, company \},		&& TT_3 = \{ company, employee \} \\
 TT_4 &= \{ company \},	&& TT_5 = \{ MNGR \},			&& TT_6 = \{ full \},
 \end{align*}
-we can now express the four functions as the following tables:
+we can now express the four functions as the following table:
 
 \setlength{\tabcolsep}{10pt}
 \setlength\extrarowheight{3pt}
@@ -492,8 +495,8 @@ we can now express the four functions as the following tables:
 {
 \begin{tabular}{ r | c | c | c | c }
 \hline
-\textbf{Group}	& $\bm{TT}^{\bm{Credit,SRD}}$ & $\bm{TT}^{\bm{Debit,SRD}}$ 
-			& $\bm{TT}^{\bm{Credit,EUR}}$ & $\bm{TT}^{\bm{Debit,EUR}}$\\
+\textbf{fromGroup}	& $\bm{TT}^{\bm{Credit,SRD}}$ & $\bm{TT}^{\bm{Debit,SRD}}$ 
+				& $\bm{TT}^{\bm{Credit,EUR}}$ & $\bm{TT}^{\bm{Debit,EUR}}$\\
 \Xhline{1.5pt}
 $welcome$	& $\emptyset$ 				& $\emptyset$	& $\emptyset$	& $\emptyset$	 \\[3pt]
 \hline
