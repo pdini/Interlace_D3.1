@@ -298,7 +298,7 @@ Figure \ref{fig:icef-intro-asim} illustrates on different level of detail which 
 \subsection{coreASIM}
 \label{sec:coreasim-details}
 
-The very core of the Interaction Computer Execution Framework (ICEF) is an engine which has been developed by different people at different universities \footnote{https://github.com/CoreASM/coreasm.core/wiki/About\-CoreASM} and implements a language called ASM. This language is based on Abstract State Machines \cite{BoergerStaerk2003} which is used as a method for high-level system engineering, design and analysis. This engine which is called coreASM got enhanced by the BIOMICS project in order to simulate computer interactions on a logic based programming language.
+The very core of the Interaction Computer Execution Framework (ICEF) is an engine which has been developed by different people at different universities \footnote{https://github.com/CoreASM/coreasm.core/wiki/About\-CoreASM} and implements a language called ASM. This language is based on Abstract State Machines \cite{BoergerStaerk2003} which is used as a methodology for high-level system engineering, design and analysis. This engine which is called coreASM got enhanced by the BIOMICS project in order to simulate computer interactions on a logic based programming language.
 
 The resulting engine was called coreASIM including the missing interaction features \cite{BIOMICSD42}\cite{BIOMICSD52} and replaces language ASM by the BIOMICS Specification Language (BSL). The changes from the original framework also comprise of:
 
@@ -321,7 +321,7 @@ An ASIM $asim_1$ can send a message to another ASIM $asim_2$ by using the send m
 Where the \textit{Element} can be of any element location used in ASIM language space. Even for example \textit{programm(self)}.
 \end{minipage}
 
-\textbf{The scheduler} has the ability to coordinate different local agents in a way that they act in a predictable and appropriate way. Like the coreASM scheduler coreASIM implements a mechanism controlling at a higher level. At the beginning of each running step, a scheduler takes the defined scheduling policy and is using it to determine a set of local agents which will be signaled to run their program. There are different BSL constructs to do so. Here are two examples:
+\textbf{The scheduler} has the ability to coordinate different local agents in a way that they act in a predictable and appropriate way. Like the coreASM scheduler coreASIM implements a controlling mechanism at a higher level. At the beginning of each running step, a scheduler takes the defined scheduling policy and is using it to determine a set of local agents which will be signaled to run their program. There are different BSL constructs to do so. Here are two examples:
 
 \begin{lstlisting}[language=bsl]
 	forall a in Agents do schedule a
