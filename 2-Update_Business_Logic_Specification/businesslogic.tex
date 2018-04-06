@@ -44,12 +44,22 @@ In the following, first we provide a taxonomy of all the terms and concepts used
 
 
 \section{Permissioning Model Taxonomy}
-\subsection{Groups}
-The original Sardex system divided its users into 29 different types, called `groups'. This generated a great deal of complexity that is drastically reduced in the INTERLACE version of the platform. The new user type taxonomy involves only 9 groups, as shown in Table \ref{tab:groups}. The group that initiates a transaction is called the $fromGroup$, whereas the group that receives the transaction communication is the $toGroup$. The possible confusion created by debit transactions where the party receiving the funds is the $fromGroup$ is resolved at the level of accounts. See Section \ref{sec:intlevels}.
+\subsection{Users and Groups}
+Users are organized by user types called `Groups'. Consistently with the Appendix, in mathematical notation a $Group$ is a set of $group$s, such that $group \in Group$. However, also an individual $group$ is a set, specifically it is a set of users of the same type. Therefore, the group $Retail$ is capitalized, whereas a single shop is a $retail$. In the original Sardex platform not much distinction is made between users and groups. However, in the current INTERLACE specification we do need to discriminate between them.
+
+\begin{quote}
+\vspace{-0.3cm}
+\small
+For example, when describing a Debit transaction use case, at the User level the Seller initiates the Debit transaction to draw funds from the Buyer's account. In this scenario, therefore, the Seller is the $fromUser$ and the Buyer is the $toUser$. However, at the Group level things are different. As part of the transactability tests to be described fully in later sections, to each group that initiates a transaction ($fromGroup$) is associated a set of groups that can be on the receiving end of that transaction. In the case of a Debit transaction, whereas the \emph{request} goes to the Buyer, the receiving end of the transaction is not the Buyer, it is the Seller. Therefore, in a Debit operation $fromGroup$ = Seller, and $toGroup$ = Seller too!
+\vspace{-0.3cm}
+\end{quote}
+
+The possible confusion created by debit transactions is resolved at the level of the accounts. See Section \ref{sec:intlevels}. The original Sardex system divided its users into 29 different groups. This generated a great deal of complexity that is drastically reduced in the INTERLACE version of the platform. The new user type taxonomy involves only 9 groups, as shown in Table \ref{tab:groups}.
 
 %\setcounter{table}{0}
 \setlength{\tabcolsep}{10pt}
 \begin{table}[h]
+\vspace{-0.3cm}
 \begin{centering}
 \small
 {
@@ -80,16 +90,16 @@ $MNGR$ & Manager of the circuit (e.g.\ Sardex S.p.A.) acting as $company$ rather
 \caption{\small\textbf{New user types (groups) for the INTERLACE platform}}
 \label{tab:groups}
 \end{centering}
+\vspace{-0.7cm}
 \end{table}
-\vspace{-0.5cm}
 
-$SysAdmin$ is not defined explicitly as a group, in this model, although technically it too is a user type. $SysAdmin$ has special privileges, some of which are discussed where relevant in what follows.
+$SysAdmin$ is not defined explicitly as a group, in this model, although technically it too is a user type. $SysAdmin$ has special privileges, some of which are discussed where relevant in what follows. We do not use lower-case for $MNGR$ and $SysAdmin$ because there is only one of each.
 
 \subsection{Currencies and Channels}
 As shown in Figure \ref{fig:currchan}, the Sardex/INTERLACE platform supports transactions in both Sardex credits (SRD) and Euros (EUR) over two kinds of channels. `Service' refers to transactions mediated either by a computer (web application) or a mobile phone (either a web application or a phone App). `POS' means `Point of Sale' and refers to the standard terminal used by retailers that accepts credit or debit cards, through which SRD transactions can be routed via an API. The figure also shows the four possible $\{ currency, channel \}$ combinations that we need to support in the definition and implementation of the permissioning tests discussed in the next sections.
 
-\vspace{-0.3cm}
 \begin{figure}[h]
+\vspace{-0.3cm}
 \centering
 \includegraphics[width=10cm]{Figures/Curr_Chan}
 \caption{\small\textbf{Currencies and channels supported by the platform}}
@@ -100,9 +110,9 @@ As shown in Figure \ref{fig:currchan}, the Sardex/INTERLACE platform supports tr
 \subsection{Accounts}
 As shown in Table \ref{tab:accounts}, the accounts implemented in the model reflect the current operations of the Sardex system and the needs of a wide range of business operations and interactions. Some of the account types, for example MIRROR, may be phased out as the high-level architecture of the family of Sardex circuits grows and different algorithms replace the current strict controls on the balance of payments between different circuits. Also an account can be referred to as $fromAcct$ or $toAcct$ depending on its role in the transaction. See Section \ref{sec:intlevels}.
 
-%\setcounter{table}{0}
 \setlength{\tabcolsep}{10pt}
 \begin{table}[htbp]
+\vspace{-0.3cm}
 \begin{centering}
 \small
 {
@@ -129,8 +139,8 @@ $Topup$ & Statistical EUR account used by $MNGR$ to recharge $retail$'s Prepaid 
 }
 \caption{\small\textbf{New user types (groups) for the INTERLACE platform}}
 \label{tab:accounts}
-\vspace{-0.5cm}
 \end{centering}
+\vspace{-0.3cm}
 \end{table}
 
 \subsection{Account Limits}
@@ -138,7 +148,7 @@ Table \ref{tab:accountLimits} shows the account limit parameters that apply to t
 
 \setlength{\tabcolsep}{10pt}
 \begin{table}[htbp]
-\vspace{-0.5cm}
+\vspace{-0.3cm}
 \begin{centering}
 \small
 {
@@ -162,51 +172,52 @@ $highVolumeAlert$ & Buffer set by user: alert if $(capacity - saleVolume) < high
 }
 \caption{\small\textbf{Account limit parameters}}
 \label{tab:accountLimits}
-\vspace{-1cm}
+\vspace{-0.3cm}
 \end{centering}
 \end{table}
 
-Figure \ref{fig:accountLimitsCC} shows a visualization of the account limits that apply to SRD accounts such as $CC$. The thick vertical green arrows highlight that the calculation of the sale volume is defined as \emph{the sum of all the sales performed in one year}. In this example, the sum of all the vertical green arrows is 50,000.
-
-Figure \ref{fig:accountLimitsPrepaid} is a visualization of the $Prepaid$ EUR account, which is recharged or topped up once in a while (\euro 400 in the figure) and slowly drawn down by B2C transaction fees (see B2C Use Case 2 in Figure \ref{fig:B2C1} below).
+Figure \ref{fig:accountLimitsCC} shows a visualization of the account limits that apply to SRD accounts such as $CC$. The thick vertical green arrows highlight that the calculation of the sale volume is defined as \emph{the sum of all the sales performed in one year}. In this example, the sum of all the vertical green arrows is 50,000. Figure \ref{fig:accountLimitsPrepaid} is a visualization of the $Prepaid$ EUR account, which is recharged or topped up once in a while (\euro 400 in the figure) and slowly drawn down by B2C transaction fees (see B2C Use Case 2 in Figure \ref{fig:B2C1} below).
 
 \subsection{Operations}
-As already specified in D2.1, transactions are effected through two operations: Credit and Debit:
+As already specified in D2.1, transactions are effected through two operations: $credit$ and $debit$:
 \begin{align}
-Operations = \{ Credit, Debit \}.
+Operation = \{ credit, debit \}.
 \end{align}
 
-\begin{figure}[H]
+\begin{figure}[h]
+\vspace{-0.5cm}
 \centering
-\includegraphics[width=16cm]{Figures/Account_Limits_CC}
+\includegraphics[width=15cm]{Figures/Account_Limits_CC}
 \caption{\small\textbf{Visualization of the $CC$ account limits}}
 \label{fig:accountLimitsCC}
+\vspace{-0.8cm}
 \end{figure}
-\vspace{-0.5cm}
+
 
 \begin{figure}[htbp]
+\vspace{-0.8cm}
 \centering
-\includegraphics[width=16cm]{Figures/Account_Limits_Prepaid}
+\includegraphics[width=15.6cm]{Figures/Account_Limits_Prepaid}
 \caption{\small\textbf{Visualization of the $Prepaid$ account limit}}
 \label{fig:accountLimitsPrepaid}
-\end{figure}
 \vspace{-0.5cm}
+\end{figure}
+
 
 \subsection{Interaction Levels}
 \label{sec:intlevels}
-The interactions between circuit participants can be described from different points of view that correlate loosely to a stack view of the system. As shown in Figure \ref{fig:stack}, it is helpful to identify qualitatively the different levels of such a stack, acknowledging that it is \emph{more} than a networking communication stack in terms of scope but \emph{less} than one in terms of precision. `A' and `B' refer to the Initiator and the Target of the transaction, which do not necessarily correspond to the Buyer and the Seller.
-
-Figure \ref{fig:stack} extends the two communication levels described in D2.1, but does so qualitatively. For the purposes of the implementation, we need a smaller set of levels but a more precise and specific vocabulary to identify the end-points of the transaction.
+The interactions between circuit participants can be described from different points of view that correlate loosely to a stack view of the system. As shown in Figure \ref{fig:stack}, it is helpful to identify qualitatively the different levels of such a stack, acknowledging that it is \emph{more} than a networking communication stack in terms of scope but \emph{less} than one in terms of precision. `A' and `B' refer to the Buyer and the Seller respectively. Figure \ref{fig:stack} extends the two communication levels described in D2.1, but does so qualitatively. For the purposes of the implementation, we need a smaller set of levels but a more precise and specific vocabulary to identify the end-points of the transaction.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=16cm]{Figures/Stack}
-\caption{\small\textbf{Stack view of the INTERLACE communication, economic, and financial  interactions}}
+\includegraphics[width=17cm]{Figures/Stack}
+\caption{\small\textbf{Stack view of the INTERLACE communication, economic, and financial  interactions}\\
+(Stack view of from where to where the different payloads are moved in interactions)}
 \label{fig:stack}
 \vspace{-0.5cm}
 \end{figure}
 
-Figure \ref{fig:vocabulary} shows this additional information as concerns levels 2, 3 and 4, which are labelled in the first column in the same way as in Figure \ref{fig:stack}, along with a great deal more information. In particular, this figure could be seen to integrate aspects of Figures \ref{fig:stack} and \ref{fig:transactabilitywkflow}, with the purpose of facilitating the conceptual understanding of the specification. `Groups' refer to user types, while the different types of `MetaData' relevant to transactions are shown in the approximate position where they are polled. For example, the $\%$ of SRD accepted by a given user over 1000-EUR transaction values is part of the Profile MetaData of the $company$ group but not the $consumer$\_$verified$ group's.
+Figure \ref{fig:vocabulary} shows this additional information as concerns levels 1-4, which are labelled in the first column in the same way as in Figure \ref{fig:stack}, along with some more information. In particular, this figure could be seen to integrate aspects of Figures \ref{fig:stack} and \ref{fig:transactabilitywkflow}, with the purpose of facilitating the conceptual understanding of the specification. The different types of `MetaData' relevant to transactions are shown in the approximate position where they are polled. For example, the $\%$ of SRD accepted by a given user over 1000-EUR transaction values is part of the Profile MetaData of the $Company$ group but not the $Consumer$\_$Verified$ group's.
 
 \begin{figure}[htbp]
 \centering
@@ -216,7 +227,7 @@ Figure \ref{fig:vocabulary} shows this additional information as concerns levels
 \end{figure}
 
 \subsection{Visibility}
-Figure \ref{fig:visibility} shows which groups ($initGroups$) are visible to which groups ($destGroups$) by a `1' at the intersection of the $(row, column)$ corresponding to a choice of $(initGroup, destGroup)$. For example, $company$ is visible to $employee$, meaning that $employee$ can do a search for $company$, but not vice versa. In this case $employee$ is not visible due to privacy legislation.
+Figure \ref{fig:visibility} shows which groups ($toGroup$) are visible to which groups ($fromGroup$) by a `1' at the intersection of the $(row, column)$ corresponding to a choice of $(fromGroup, toGroup)$. For example, $Company$ is visible to $Employee$, meaning that $Employee$ can do a search for $Company$, but not vice versa. In this case $Employee$ is not visible due to privacy legislation.
 
 \begin{figure}[H]
 \centering
@@ -226,14 +237,14 @@ Figure \ref{fig:visibility} shows which groups ($initGroups$) are visible to whi
 \vspace{-0.5cm}
 \end{figure}
 
-In general, transactability correlates to visibility. However, there is not a strict 1-1 relationship between them. For the example of a $company$ paying its own $employees$ as part of the B2E programme, $employee$ remains invisible to a search, but $company$ has the $username$ of the $employee$ and can perform a credit transaction to pay (part of) their salary.
+In general, transactability correlates to visibility. However, there is not a strict 1-1 relationship between them. For the example of a $company$ paying its own $employee$s as part of the B2E programme, $employee$ remains invisible to a search, but $company$ has the $username$ of the $employee$ and can perform a credit transaction to pay (part of) their salary.
 
 On the right of Figure \ref{fig:visibility} we show that some groups are always invisible $\{ F \}$ others are always visibile $\{ T \}$, and others could be either $\{T, F\}$. For example, a company could be put in the shadow state if it has reached its maximum positive credit limit.
 
 \subsection{B2C Operations}
 This report extends the use cases covered by D2.1 by adding also the Business to Consumer (B2C) use cases. B2C was developed to increase the number and volume of transactions, i.e.\ the size of the Sardex economy, by extending the ability to transact in SRD to people not otherwise connected to the circuit. The principle involves offering the opportunity to $retail$ers to reward their EUR customers with an SRD rebate.
 
-The amount of the reward is a percent, in SRD, of the amount in EUR paid by $consumer$ to $retail$, where the percent is set by $retail$ and it is an example of the $MetaData$ for this group. The reward is stored on a smart card that is offered to $consumer$ at the time of purchase. This is shown as a child transaction in B2C Use Case 2, Figure \ref{fig:B2C1}.
+The amount of the reward is a percent, in SRD, of the amount in EUR paid by a $consumer$ to a $retail$, where the percent is set by $retail$ and it is an example of the $MetaData$ for this group. The reward is stored on a smart card that is offered to $consumer$ at the time of purchase. This is shown as a child transaction in B2C Use Case 2, Figure \ref{fig:B2C1}.
 
 \begin{figure}[htbp]
 \centering
@@ -251,35 +262,37 @@ Use Case 2 also involves a second child transaction, a 2\% fee, in EUR, paid fro
 \label{fig:B2C2}
 \end{figure}
 
-Figure \ref{fig:B2C2} shows the SRD transaction a $consumer$ can perform, i.e.\ the spending of the SRD accumulated as rewards, once they have registered and have become $consumer$\_$verified$. The figure also shows that Use Case 3 is relevant also to $employees$ (B2E) and that Use Case 4 is relevant to both B2E users and to non-$retail$ company users (B2B).
+Figure \ref{fig:B2C2} shows the SRD transaction a $consumer$ can perform, i.e.\ the spending of the SRD accumulated as rewards, once they have registered and have become $consumer$\_$verified$. The figure also shows that Use Case 3 is relevant also to $employee$s (B2E) and that Use Case 4 is relevant to both B2E users and to non-$retail$ company users (B2B).
 
 \subsection{Initial Account State}
-Table \ref{tab:InitialAccountSets} shows the initial allocation of accounts to the different user groups. The allocation is `initial' because  depending on the history of a given user the number of its accounts could change. For legal reasons, as a general principle \emph{change} can only mean \emph{increase}. In other words, once a user has become the owner of an account it can never be taken away from them, even if its access to it is, for example, suspended due to misbehaviour. Another example is a $retail$ user who upgrades to $full$ and a year later changes its mind and goes back to $retail$. It will retain its DOMU account even if it won't be able to use it anymore. {\bf Note: Each user can have no more than one account of a given type.}
+Table \ref{tab:InitialAccountSets} shows the initial allocation of accounts to the different user groups. The allocation is `initial' because  depending on the history of a given user the number of its accounts could change. For legal reasons, as a general principle \emph{change} can only mean \emph{increase}. In other words, once a user has become the owner of an account it can never be taken away from them, even if, for example, its access to it is suspended due to misbehaviour. Another example is a $Retail$ user who upgrades to the $Full$ group and a year later changes its mind and goes back to $Retail$. It will retain its DOMU account even if it won't be able to use it anymore.
+
+{\bf Note: Each user can have no more than one account of a given type.}
 
 \begin{table}[h]
 \vspace{-0.5cm}
 \begin{centering}
-%\small
+\small
 {
 \begin{tabular}{ r | l  }
 \hline
 \textbf{Group}	& {\bf Initial Account Set} \\
 \Xhline{1.5pt}
-$welcome$	& $\{ \}$ \\
+$Welcome$	& $\{ \}$ \\
 \hline
-$retail$		& $\{ CC, Prepaid^*, Income \}$ \\
+$Retail$		& $\{ CC, Prepaid^*, Income \}$ \\
 \hline
-$company$	& $\{ CC, DOMU \}$ \\
+$Company$	& $\{ CC, DOMU \}$ \\
 \hline
-$full$		& $\{ CC, DOMU, Prepaid^*, Income \}$ \\
+$Full$		& $\{ CC, DOMU, Prepaid^*, Income \}$ \\
 \hline
-$employee$	& $\{ CC \}$ \\
+$Employee$	& $\{ CC \}$ \\
 \hline
-$on$\_$hold$	& $\{  \}$ \\
+$On$\_$Hold$	& $\{  \}$ \\
 \hline
-$consumer$	& $\{ CC, Bisoo^* \}$ \\
+$Consumer$	& $\{ CC, Bisoo^* \}$ \\
 \hline
-$consumer$\_$verified$ & $\{ CC, Bisoo^* \}$ \\
+$Consumer$\_$Verified$ & $\{ CC, Bisoo^* \}$ \\
 \hline
 $MNGR$ 		& $\{ CC, Topup^*, MIRROR \}$ \\
 \Xhline{1.5pt}
@@ -295,20 +308,24 @@ $MNGR$ 		& $\{ CC, Topup^*, MIRROR \}$ \\
 \subsection{Identity MetaData}
 Table \ref{tab:IdentityMetaData} collects the identity meta-data for all the groups. $MemberID$ is a unique identifier. $email$ and $phone$ are arrays to support multiple values of each. These values are set at registration and cannot be changed by the user.
 
+The meta-data variables are not capitalized because they are assumed to be singletons: for a given member, e.g.\ a $company$, there is only one $memberID$. However, since there are many $memberID$s, one for each member, we also say that $memberID \in MemberID$.
+
+Since there are cases where a user may have more than one meta-data variable, for example a company with more than one phone number, this is indicated in the Type column as an array, i.e.\ `String[ ]'.
+
 \begin{table}[H]
 \vspace{-0.5cm}
 \begin{centering}
-%\small
+\small
 {
 \begin{tabular}{ r | c | l | l }
 \hline
 \textbf{Group}	& {\bf Identity MetaData} & {\bf Type} & {\bf Description} \\
 \Xhline{1.5pt}
-$welcome$, $retail$, $company$,	& {\bf MemberID}			&Integer	& Unique member identifier \\
-$full$, $employee$, $on$\_$hold$,	& {\bf email}				&String[]	& e-mail address \\		
-$consumer$\_$verified$, $MNGR$	& {\bf phone}				&String[]	& phone number(s) \\
+$Welcome$, $Retail$, $Company$,	& {\bf memberID}			&Integer	& Unique member identifier \\
+$Full$, $Employee$, $On$\_$Hold$,	& {\bf email}				&String[]	& e-mail address \\		
+$Consumer$\_$Verified$, $MNGR$	& {\bf phone}				&String[]	& phone number(s) \\
 \hline
-$consumer$	& {\bf MemberID}	&Integer & Unique member identifier \\
+$Consumer$	& {\bf memberID}	&Integer & Unique member identifier \\
 \Xhline{1.5pt}
 \end{tabular}
 }
@@ -319,7 +336,7 @@ $consumer$	& {\bf MemberID}	&Integer & Unique member identifier \\
 \end{table}
 
 \subsection{Profile MetaData}
-Tables \ref{tab:ProfileMetaData1} and \ref{tab:ProfileMetaData2} show the meta-data, some of which the user can inspect and edit. For example, the user may wish to include his/her personal name in addition to the company name.
+Tables \ref{tab:ProfileMetaData1} and \ref{tab:ProfileMetaData2} show the profile meta-data, some of which the user can inspect and edit. For example, the user may wish to include his/her personal name in addition to the company name.
 
 \setlength{\tabcolsep}{10pt}
 \begin{table}[H]
@@ -332,7 +349,7 @@ Tables \ref{tab:ProfileMetaData1} and \ref{tab:ProfileMetaData2} show the meta-d
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$welcome$	& {\bf entityName}$^*$		&String	& Legal entity name \\
+$Welcome$	& {\bf entityName}$^*$		&String	& Legal entity name \\
 			& {\bf entityAddress}$^*$		&String	& Legal entity's street address \\
 			& {\bf gps}$^*$				&Double[]	& Legal entity's GPS coordinates \\			
 			& {\bf VAT}$^*$				&String	& Legal entity's VAT number \\
@@ -346,7 +363,7 @@ $welcome$	& {\bf entityName}$^*$		&String	& Legal entity name \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$retail$		& {\bf entityName}$^*$		&String	& Legal entity name \\
+$Retail$		& {\bf entityName}$^*$		&String	& Legal entity name \\
 			& {\bf entityAddress}$^*$		&String	& Legal entity's street address \\
 			& {\bf gps}$^*$				&Double[]	& Legal entity's GPS coordinates \\			
 			& {\bf capacity}				&Double	& Commitment to maximum yearly SRD volume \\
@@ -362,7 +379,7 @@ $retail$		& {\bf entityName}$^*$		&String	& Legal entity name \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$company$	& {\bf entityName}$^*$		&String	& Legal entity name \\
+$Company$	& {\bf entityName}$^*$		&String	& Legal entity name \\
 			& {\bf entityAddress}$^*$		&String	& Legal entity's street address \\
 			& {\bf gps}$^*$				&Double[]	& Legal entity's GPS coordinates \\
 			& {\bf VAT}$^*$				&String	& Legal entity's VAT number \\
@@ -378,7 +395,7 @@ $company$	& {\bf entityName}$^*$		&String	& Legal entity name \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$full$		& {\bf entityName}$^*$		&String	& Legal entity name \\
+$Full$		& {\bf entityName}$^*$		&String	& Legal entity name \\
 			& {\bf entityAddress}$^*$		&String	& Legal entity's street address \\
 			& {\bf gps}$^*$				&Double[]	& Legal entity's GPS coordinates \\
 			& {\bf VAT}$^*$				&String	& Legal entity's VAT number \\
@@ -396,13 +413,13 @@ $full$		& {\bf entityName}$^*$		&String	& Legal entity name \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$employee$	& {\bf firstName}$^*$			&String	& First name \\
+$Employee$	& {\bf firstName}$^*$			&String	& First name \\
 			& {\bf surName}$^*$			&String	& Surname \\
 			& {\bf employedBy}			&String	& Name of legal entity employed by \\
 \Xhline{1.5pt}
 \end{tabular}
 }
-\caption{\small\textbf{Profile MetaData for $welcome$ and $retail$, $company$, $full$, and $employee$ groups}\\
+\caption{\small\textbf{Profile MetaData for the $Welcome$, $Retail$, $Company$, $Full$, and $Employee$ groups}\\
 ($^*$Indicates fields that can be modified by the user)\\
 ($^{**}$Indicates fields that can be modified by the user but that are updated only at a fixed time interval)}
 \label{tab:ProfileMetaData1}
@@ -421,7 +438,7 @@ $employee$	& {\bf firstName}$^*$			&String	& First name \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$on$\_$hold$	& {\bf entityName}$^*$		&String	& Legal entity name \\
+$On$\_$Hold$	& {\bf entityName}$^*$		&String	& Legal entity name \\
 			& {\bf entityAddress}$^*$		&String	& Legal entity's street address \\
 			& {\bf gps}$^*$				&Double[]	& Legal entity's GPS coordinates \\
 			& {\bf VAT}$^*$				&String	& Legal entity's VAT number \\
@@ -436,11 +453,11 @@ $on$\_$hold$	& {\bf entityName}$^*$		&String	& Legal entity name \\
 			& {\bf firstName}$^*$			&String	& First name \\
 			& {\bf surName}$^*$			&String	& Surname \\
 \Xhline{1.5pt}
-$consumer$	& 	& &  \\
+$Consumer$	& 	& &  \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
-$consumer$\_$verified$ & {\bf firstName}$^*$	&String	& First name \\
+$Consumer$\_$Verified$ & {\bf firstName}$^*$	&String	& First name \\
 			& {\bf surName}$^*$			&String	& Surname \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
@@ -455,7 +472,7 @@ $MNGR$ 		& {\bf entityName}$^*$		&String	& Legal entity name \\
 \Xhline{1.5pt}
 \end{tabular}
 }
-\caption{\small\textbf{Profile MetaData for $on$\_$hold$, $consumer$, $consumer$\_$verified$, and $MNGR$ groups}\\
+\caption{\small\textbf{Profile MetaData for the $On$\_$Hold$, $Consumer$, $Consumer$\_$Verified$, and $MNGR$ groups}\\
 ($^*$Indicates fields that can be modified by the user)\\
 ($^{**}$Indicates fields that can be modified by the user but that are updated only at a fixed time interval)
 }
@@ -465,31 +482,26 @@ $MNGR$ 		& {\bf entityName}$^*$		&String	& Legal entity name \\
 \end{table}
 
 \subsection{Transfer Types}
-As shown in Figure \ref{fig:transactabilitywkflow}, the first test for transactability involves so-called Transfer Types. Transfer Types are mathematical functions of the {\bf source} groups ($fromGroups$) whose values are sets of {\bf destination} groups ($toGroups$). There is one different function for each combination of ordered pairs $(x, y)$, where $x \in \{ credit, debit \}$ and $y \in \{ SRD, EUR \}$, leading to four different functions.
-
-More formally,
+As shown in Figure \ref{fig:transactabilitywkflow}, the first test for transactability involves so-called Transfer Types. Transfer Types are mathematical functions of the {\bf source} groups ($fromGroup$s) whose values are sets of {\bf destination} groups ($toGroup$s). There is one different function for each combination of ordered pairs $(x, y)$, where $x \in \{ credit, debit \}$ and $y \in \{ SRD, EUR \}$, leading to four different functions. However, it is simpler and also easier to implement to express them as a single function of 3 parameters. Formally,
 \begin{align}
-TT^{Credit,SRD}\colon &Groups\ \rightarrow\ Groups \times Groups \times \cdots \times Groups \\
-TT^{Debit,SRD}\colon &Groups\ \rightarrow\ Groups \times Groups \times \cdots \times Groups \\
-TT^{Credit,EUR}\colon &Groups\ \rightarrow\ Groups \times Groups \times \cdots \times Groups \\
-TT^{Debit,EUR}\colon &Groups\ \rightarrow\ Groups \times Groups \times \cdots \times Groups,
+TT\colon &Operation \times Currency \times Group\ \rightarrow\ Powerset(Group),
 \end{align}
 where
 \begin{align}
-Groups &= \{ welcome, retail, company, full, employee, on\text{\_}hold,  \nonumber \\
+Group &= \{ Welcome, Retail, Company, Full, Employee, On\text{\_}Hold,  \nonumber \\
 		& \qquad\qquad\qquad\qquad\qquad\qquad\qquad
-			consumer, consumer\text{\_}verified, MNGR \}.
+			Consumer, Consumer\text{\_}Verified, MNGR \}.
 \end{align}
-If, with an abuse of notation and overloading the terminology, we define for convenience the following sets of target groups ($toGroups$) as different ``transfer types''
+With an abuse of notation and overloading the terminology we define for convenience the following sets of target groups ($toGroups$) as different ``transfer types'':
 \begin{align*}
-TT_1 &= \{ retail \},		&& TT_2 = \{ retail, company \},		&& TT_3 = \{ company, employee \} \\
-TT_4 &= \{ company \},	&& TT_5 = \{ MNGR \},			&& TT_6 = \{ full \},
+TT_1 &= \{ Retail \},		&& TT_2 = \{ Retail, Company \},	&& TT_3 = \{ Company, Employee \} \\
+TT_4 &= \{ Company \},	&& TT_5 = \{ MNGR \},			&& TT_6 = \{ Full \}.
 \end{align*}
-we can now express the four functions as the following table:
+Through currying, Table \ref{tab:TTs} then shows the TT function as four sub-functions.
 
 \setlength{\tabcolsep}{10pt}
 \setlength\extrarowheight{3pt}
-\begin{table}[h]
+\begin{table}[H]
 \begin{centering}
 \small
 {
@@ -498,23 +510,23 @@ we can now express the four functions as the following table:
 \textbf{fromGroup}	& $\bm{TT}^{\bm{Credit,SRD}}$ & $\bm{TT}^{\bm{Debit,SRD}}$ 
 				& $\bm{TT}^{\bm{Credit,EUR}}$ & $\bm{TT}^{\bm{Debit,EUR}}$\\
 \Xhline{1.5pt}
-$welcome$	& $\emptyset$ 				& $\emptyset$	& $\emptyset$	& $\emptyset$	 \\[3pt]
+$Welcome$	& $\emptyset$ 				& $\emptyset$	& $\emptyset$	& $\emptyset$	 \\[3pt]
 \hline
-$retail$		& $\emptyset$				& $TT_1$ 		& $\emptyset$	& $TT_1$	 \\[3pt]
+$Retail$		& $\emptyset$				& $TT_1$ 		& $\emptyset$	& $TT_1$	 \\[3pt]
 \hline
-$company$	& $TT_3 \cup TT_5 \cup TT_6$ & $TT_4$		& $\emptyset$	& $\emptyset$	 \\[3pt]
+$Company$	& $TT_3 \cup TT_5 \cup TT_6$ & $TT_4$		& $\emptyset$	& $\emptyset$	 \\[3pt]
 \hline
-$full$		& $TT_3 \cup TT_5 \cup TT_6$ & $TT_6$		& $\emptyset$	& $TT_6$	 \\[3pt]
+$Full$		& $TT_3 \cup TT_5 \cup TT_6$ & $TT_6$		& $\emptyset$	& $TT_6$	 \\[3pt]
 \hline
-$employee$	& $TT_2 \cup TT_6$ 		& $\emptyset$	&$\emptyset$ 	& $\emptyset$	 \\[3pt]
+$Employee$	& $TT_2 \cup TT_6$ 		& $\emptyset$	&$\emptyset$ 	& $\emptyset$	 \\[3pt]
 \hline
-$on$\_$hold$	& $\emptyset$				& $\emptyset$	& $\emptyset$	& $\emptyset$	 \\[3pt]
+$On$\_$Hold$	& $\emptyset$				& $\emptyset$	& $\emptyset$	& $\emptyset$	 \\[3pt]
 \hline
-$consumer$	& $\emptyset$				& $\emptyset$	& $\emptyset$	&$\emptyset$ 	 \\[3pt]
+$Consumer$	& $\emptyset$				& $\emptyset$	& $\emptyset$	&$\emptyset$ 	 \\[3pt]
 \hline
-$consumer$\_$verified$ & $TT_1 \cup TT_6$ 	& $\emptyset$	& $\emptyset$ 	& $\emptyset$	 \\[3pt]
+$Consumer$\_$Verified$ & $TT_1 \cup TT_6$ 	& $\emptyset$	& $\emptyset$ 	& $\emptyset$	 \\[3pt]
 \hline
-$MNGR$ 		& $TT_2 \cup TT_3 \cup TT_5 \cup TT_6$ & $TT_2 \cup TT_5 \cup TT_6$ & $\emptyset$ & $\emptyset$	 \\[3pt]
+$MNGR$ 		& $TT_2 \cup TT_3 \cup TT_5 \cup TT_6$ & $TT_5$ & $\emptyset$ & $\emptyset$	 \\[3pt]
 \Xhline{1.5pt}
 \end{tabular}
 }
@@ -580,6 +592,10 @@ The effect of the Transfer Types test together with the Account Connectivity tes
 \caption{\small\textbf{Group Transactability Function 4}}
 \label{fig:GTF4}
 \end{figure}
+
+
+\subsection{Group Transactability Functions}
+
 
 
 \subsection{Transaction MetaData}
