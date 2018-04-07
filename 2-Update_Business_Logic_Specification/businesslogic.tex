@@ -65,25 +65,25 @@ The possible confusion created by debit transactions is resolved at the level of
 {
 \begin{tabular}{ r | l  }
 \hline
-\textbf{Group}	& \textbf{Description} \\
+\textbf{Group}	& \textbf{Description of Element of Group} \\
 \Xhline{1.5pt}
-$welcome$ & User who has joined and signed the contract, but has not yet been cleared to start trading \\
+$Welcome$ & User who has joined and signed the contract, but has not yet been cleared to start trading \\
 \hline
-$retail$ & Retailer who can \emph{only} participate in B2C operations (not B2E and not B2B) \\
+$Retail$ & Retailer who can \emph{only} participate in B2C operations (not B2E and not B2B) \\
 \hline
-$company$ & Company, which could be a retailer, that can use B2E and B2B but \emph{not} B2C \\
+$Company$ & Company, which could be a retailer, that can use B2E and B2B but \emph{not} B2C \\
 \hline
-$full$ & Has all the functions of $retailer$ and of $company$ \\
+$Full$ & This group has all the functions of $Retail$ and of $Company$ \\
 \hline
-$employee$ & Employee of $company$ or of $full$ \\
+$Employee$ & Employee of a $company\in Company$ or of a $full \in Full$ \\
 \hline
-$on$\_$hold$ & User whose privileges have been suspended (for whateve reason) \\
+$On$\_$Hold$ & User whose privileges have been suspended (for whatever reason) \\
 \hline
-$consumer$ & Person not registered to the circuit who can only interact through B2C Use Case 2 \\
+$Consumer$ & Person not registered to the circuit who can only interact through B2C Use Case 2 \\
 \hline
-$consumer$\_$verified$ & $consumer$ who has registered and can now also purchase with SRD (B2C Use Case 3)  \\
+$Consumer$\_$Verified$ & $consumer$ who has registered and can now also purchase with SRD (B2C Use Case 3)  \\
 \hline
-$MNGR$ & Manager of the circuit (e.g.\ Sardex S.p.A.) acting as $company$ rather than $SysAdmin$ \\
+$MNGR$ & Manager of the circuit (e.g.\ Sardex S.p.A.) acting as a $company$ rather than $SysAdmin$ \\
 \Xhline{1.5pt}
 \end{tabular}
 }
@@ -210,7 +210,7 @@ The interactions between circuit participants can be described from different po
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=17cm]{Figures/Stack}
+\includegraphics[width=17.5cm]{Figures/Stack}
 \caption{\small\textbf{Stack view of the INTERLACE communication, economic, and financial  interactions}\\
 (Stack view of from where to where the different payloads are moved in interactions)}
 \label{fig:stack}
@@ -559,7 +559,47 @@ Figure \ref{fig:User_Acct_Connectivity} shows the account connectivity function 
 
 Figure \ref{fig:SysAdmin_Acct_Connectivity} shows a similar connectivity function for accounts that are controlled by $SysAdmin$. In this case, however, this function does not imply a transactability test since the permissions are hard-wired and SysAdmin does not need to test for transactability.
 
+\subsection{User Transactability Functions}
+\textbf{\small Note: this section has no bearing on the implementation, it is included to help interpret Figure \ref{fig:stack}.}
+
+Figures \ref{fig:UTF1}-\ref{fig:UTF4} show a visualization of the interactions relevant to Layer 1 of Figure \ref{fig:stack}, filtered by the Account Connectivity constraints.
+
+\begin{figure}[h]
+\vspace{-0.5cm}
+\centering
+\includegraphics[width=17.5cm]{Figures/UTF1}
+\caption{\small\textbf{User Transactability Function 1}}
+\label{fig:UTF1}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=17.5cm]{Figures/UTF2}
+\caption{\small\textbf{User Transactability Function 2}}
+\label{fig:UTF2}
+\end{figure}
+
+\begin{figure}[H]
+\vspace{-0.5cm}
+\centering
+\includegraphics[width=17.5cm]{Figures/UTF3}
+\caption{\small\textbf{User Transactability Function 3}}
+\label{fig:UTF3}
+%\vspace{-1cm}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=17.5cm]{Figures/UTF4}
+\caption{\small\textbf{User Transactability Function 4}}
+\label{fig:UTF4}
+\end{figure}
+
+
+
 \subsection{Group Transactability Functions}
+\textbf{\small Note: this section has no bearing on the implementation, it is included to help interpret Figure \ref{fig:stack}.}
+
 The effect of the Transfer Types test together with the Account Connectivity test results in what we call the Group Transactability Function (GTF). Since there are 4 combinations of currency and channel, there are 4 different GTFs. There is no need to use them as an additional test, since they do not add anything new to Tests 1 and 2 of Figure \ref{fig:transactabilitywkflow}. However, it is still useful to include them here as another visualization of these first two tests of the Permissioning workflow, see Figures \ref{fig:GTF1}-\ref{fig:GTF4}.
 
 \begin{figure}[h]
@@ -594,7 +634,7 @@ The effect of the Transfer Types test together with the Account Connectivity tes
 \end{figure}
 
 
-\subsection{Group Transactability Functions}
+
 
 
 
@@ -617,8 +657,8 @@ Tables \ref{tab:AccountMetaData1} and \ref{tab:AccountMetaData2} are also organi
 \Xhline{1.5pt}
 			 & \emph{(Obligatory MetaData)}& & \\
 \cline{2-2}
-$CC$		& {\bf AccountID}			&Integer	& Unique account identifier \\
-			& {\bf MemberID}			&String	& ProfileID of account owner \\
+$CC$		& {\bf accountID}			&Integer	& Unique account identifier \\
+			& {\bf memberID}			&String	& ProfileID of account owner \\
 			& {\bf unit}					&String	& Account currency \\
 			& {\bf balance}				&Double	& Account balance (positive or negative) \\
 			& {\bf creditLimit}			&Double	& Credit limit (positive number) \\
@@ -635,8 +675,8 @@ $CC$		& {\bf AccountID}			&Integer	& Unique account identifier \\
 \Xhline{1.5pt}
 			 & \emph{(Obligatory MetaData)}& & \\
 \cline{2-2}
-$DOMU$		& {\bf AccountID}			&Integer	& Unique account identifier \\
-			& {\bf MemberID}			&String	& ProfileID of account owner \\
+$DOMU$		& {\bf accountID}			&Integer	& Unique account identifier \\
+			& {\bf memberID}			&String	& ProfileID of account owner \\
 			& {\bf unit}					&String	& Account currency \\
 			& {\bf balance}				&Double	& Account balance (positive or negative) \\
 			& {\bf creditLimit}			&Double	& Credit limit (positive number) \\
@@ -645,8 +685,8 @@ $DOMU$		& {\bf AccountID}			&Integer	& Unique account identifier \\
 \Xhline{1.5pt}
 			 & \emph{(Obligatory MetaData)}& & \\
 \cline{2-2}
-$MIRROR$ 	& {\bf AccountID}			&Integer	& Unique account identifier \\
-			& {\bf MemberID}			&String	& ProfileID of account owner \\
+$MIRROR$ 	& {\bf accountID}			&Integer	& Unique account identifier \\
+			& {\bf memberID}			&String	& ProfileID of account owner \\
 			& {\bf unit}					&String	& Account currency \\
 			& {\bf balance}				&Double	& Account balance (positive or negative) \\
 			& {\bf creditLimit}			&Double	& Credit limit (positive number) \\
@@ -661,8 +701,8 @@ $MIRROR$ 	& {\bf AccountID}			&Integer	& Unique account identifier \\
 			& {\bf highBalanceAlert$^*$}		&Double	& Alert if $(upperLimit - balance) < highBalanceAlert$ buffer \\
 			& {\bf highVolumeAlert$^*$}		&String	& Alert if $(capacity - saleVolume) < highVolumeAlert$ buffer \\
 \Xhline{1.5pt}
-$Income$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
-			& {\bf MemberID}			&String	& ProfileID of account owner \\
+$Income$ 		& {\bf accountID}			&Integer	& Unique account identifier \\
+			& {\bf memberID}			&String	& ProfileID of account owner \\
 			& {\bf unit}					&String	& Account currency \\
 			& {\bf balance}				&Double	& Account balance (positive or negative) \\
 \Xhline{1.5pt}
@@ -684,8 +724,8 @@ $Income$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
 \Xhline{1.5pt}
 			 & \emph{(Obligatory MetaData)}& & \\
 \cline{2-2}
-$Prepaid$ 	& {\bf AccountID}			&Integer	& Unique account identifier \\
-			& {\bf MemberID}			&String	& ProfileID of account owner \\
+$Prepaid$ 	& {\bf accountID}			&Integer	& Unique account identifier \\
+			& {\bf memberID}			&String	& ProfileID of account owner \\
 			& {\bf unit}					&String	& Account currency \\
 			& {\bf balance}				&Double	& Account balance (positive or zero) \\
 			& {\bf creditLimit}			&Double	& Credit limit {\bf (Value can only be 0!)} \\
@@ -694,12 +734,12 @@ $Prepaid$ 	& {\bf AccountID}			&Integer	& Unique account identifier \\
 \cline{2-2}
 			& {\bf lowBalanceAlert$^*$}		&Double	& Alert if $(creditLimit + balance) < lowBalanceAlert$ buffer \\
 \Xhline{1.5pt}
-$Bisoo$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
-			& {\bf MemberID}			&String	& ProfileID of account owner \\
+$Bisoo$ 		& {\bf accountID}			&Integer	& Unique account identifier \\
+			& {\bf memberID}			&String	& ProfileID of account owner \\
 			& {\bf unit}					&String	& Account currency \\
 \Xhline{1.5pt}
-$Topup$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
-			& {\bf MemberID}			&String	& ProfileID of account owner \\
+$Topup$ 		& {\bf accountID}			&Integer	& Unique account identifier \\
+			& {\bf memberID}			&String	& ProfileID of account owner \\
 			& {\bf unit}					&String	& Account currency \\
 \Xhline{1.5pt}
 \end{tabular}
@@ -711,7 +751,7 @@ $Topup$ 		& {\bf AccountID}			&Integer	& Unique account identifier \\
 \end{table}
 
 \section{Account Limit Tests}
-The account limit tests are fairly obvious by looking at Figures \ref{fig:accountLimitsCC} and \ref{fig:accountLimitsPrepaid}. The important thing is that they need to be enforced \emph{before} a transaction is completed. If one of the tests fails the transaction is not executed and the user must be alerted.
+The account limit tests are specified abstractly in D2.1. In the context the description of this chapter, which is closer to the implementation, they are fairly obvious by looking at Figures \ref{fig:accountLimitsCC} and \ref{fig:accountLimitsPrepaid}. The important thing is that they need to be enforced \emph{before} a transaction is completed. If one of the tests fails the transaction is not executed and the user must be alerted.
 
 The alerts, on the other hand, can be issued \emph{after} a transaction that came close to a limit but did not cross it, if the resulting balance or sale volume exceeds the buffer limits.
 
