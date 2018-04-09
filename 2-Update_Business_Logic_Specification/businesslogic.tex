@@ -282,7 +282,7 @@ $Welcome$	& $\{ \}$ \\
 \hline
 $Retail$		& $\{ CC, Prepaid^*, Income \}$ \\
 \hline
-$Company$	& $\{ CC, DOMU \}$ \\
+$Company$	& $\{ CC, DOMU, Prepaid^* \}$ \\
 \hline
 $Full$		& $\{ CC, DOMU, Prepaid^*, Income \}$ \\
 \hline
@@ -304,13 +304,13 @@ $MNGR$ 		& $\{ CC, Topup^*, MIRROR \}$ \\
 \vspace{-1cm}
 \end{table}
 
+The Prepaid account shown for $Company$ does not relate to B2C operations but to inter-circuit trade, which also involves a euroFee.
+
 \section{Transactability Workflow}
 \subsection{Identity MetaData}
 Table \ref{tab:IdentityMetaData} collects the identity meta-data for all the groups. $MemberID$ is a unique identifier. $email$ and $phone$ are arrays to support multiple values of each. These values are set at registration and cannot be changed by the user.
 
-The meta-data variables are not capitalized because they are assumed to be singletons: for a given member, e.g.\ a $company$, there is only one $memberID$. However, since there are many $memberID$s, one for each member, we also say that $memberID \in MemberID$.
-
-Since there are cases where a user may have more than one meta-data variable, for example a company with more than one phone number, this is indicated in the Type column as an array, i.e.\ `String[ ]'.
+The meta-data variables are not capitalized because they are assumed to be singletons: for a given member, e.g.\ a $company$, there is only one $memberID$. However, since there are many $memberID$s, one for each member, we could also say that $memberID \in MemberID$. Since there are cases where a user may have more than one meta-data variable, for example a company with more than one phone number, this is indicated in the Type column as an array, i.e.\ `String[ ]'.
 
 \begin{table}[H]
 \vspace{-0.5cm}
@@ -530,7 +530,7 @@ $MNGR$ 		& $TT_2 \cup TT_3 \cup TT_5 \cup TT_6$ & $TT_5$ & $\emptyset$ & $\empty
 \Xhline{1.5pt}
 \end{tabular}
 }
-\caption{\small\textbf{The four Transfer Types functions}}
+\caption{\small\textbf{The Transfer Types function expressed as 4 separate sub-functions through currying}}
 \label{tab:TTs}
 \end{centering}
 \vspace{-0.5cm}
