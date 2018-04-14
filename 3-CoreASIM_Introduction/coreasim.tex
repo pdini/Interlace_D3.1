@@ -93,7 +93,7 @@ The Ubuntu 16.04 LTS distribution is enhanced and updated according to the needs
 \begin{itemize}
 	\item \textbf{curl} $\rightarrow$ Is a tool for querying REST resources and used for downloading packages from various online repositories.
 	\item \textbf{nodejs} $\rightarrow$ Is a JavaScript runtime environment built on Chrome's V8 engine and includes the package manager npm. This bundle is necessary for installing and running the Manager component of ICEF.
-	\item \textbf{build-essential} $\rightarrow$ These packages are needed to compile a debian-based package and provide help for building \textcolor{red}{(compiling, etc)} the project sources.
+	\item \textbf{build-essential} $\rightarrow$ These packages are needed to compile a debian-based package and provide help for building (compiling, packaging, etc) the project sources.
 	\item \textbf{maven} $\rightarrow$ Is a well-known Java build and packaging tool and used for building the ICEF framework as well as the coreASIM Eclipse plugin.
 	\item \textbf{vim} $\rightarrow$ Well-known U/Linux editor which acts as helper for quick development or configuration issues inside the environment.
 	\item \textbf{git} $\rightarrow$ Distributed Version-Control System which helps downloade source repositories from GitHub.
@@ -129,9 +129,7 @@ For \textbf{docker}, first all GitHub sources need to be cloned to the host mach
 	           --name active_asim -it asim /$2
 \end{lstlisting}
 
-This line is part of the script \textit{scripts/runDocker.sh}. \$1 here stands for the local directory of the environment and \$2 is normally defaulted to the main execution script started inside the docker container. It is important to note that the \textit{ASIMSpec} folder of the host machine is shared into \textit{/home/ASIMSpec} of the docker container and the \textit{icef} directory is shared into \textit{/home/icef}.
-
-\textcolor{red}{In the above paragraph you use `shared into' three times. I am not sure what you mean exactly. Normally something is shared \emph{with} something or someone, not \emph{into}. However, you might mean something more complicated, like a two-step process: for example, something is moved into a folder, and then it is also made shareable. Even in such a case, however, saying \emph{who} or \emph{what} the object is shareable with would help.}
+This line is part of the script \textit{scripts/runDocker.sh}. \$1 here stands for the local directory of the environment and \$2 is normally defaulted to the main execution script started inside the docker container. It is important to note that the \textit{ASIMSpec} folder of the host machine is mounted into\footnote{"mounted into" referrers to the fact that a local folder from a local host computer is available inside of virtualized docker system and accessible there as a mounted directory.} \textit{/home/ASIMSpec} of the docker container and the \textit{icef} directory is mounted into \textit{/home/icef}.
 
 \subsection{Execution}
 \label{sec:env-exec-stack-exe}
