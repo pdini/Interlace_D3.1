@@ -129,7 +129,7 @@ For \textbf{docker}, first all GitHub sources need to be cloned to the host mach
 	           --name active_asim -it asim /$2
 \end{lstlisting}
 
-This line is part of the script \textit{scripts/runDocker.sh}. \$1 here stands for the local directory of the environment and \$2 is normally defaulted to the main execution script started inside the docker container. It is important to note that the \textit{ASIMSpec} folder of the host machine is mounted into\footnote{"mounted into" referrers to the fact that a local folder from a local host computer is available inside of virtualized docker system and accessible there as a mounted directory.} \textit{/home/ASIMSpec} of the docker container and the \textit{icef} directory is mounted into \textit{/home/icef}.
+This line is part of the script \textit{scripts/runDocker.sh}. \$1 here stands for the local directory of the environment and \$2 is normally defaulted to the main execution script started inside the docker container. It is important to note that the \textit{ASIMSpec} folder of the host machine is mounted into\footnote{"Mounted into" refers to the fact that a local folder from a local host computer is available inside of virtualized docker system and accessible there as a mounted directory.} \textit{/home/ASIMSpec} of the docker container and the \textit{icef} directory is mounted into \textit{/home/icef}.
 
 \subsection{Execution}
 \label{sec:env-exec-stack-exe}
@@ -209,25 +209,24 @@ which starts the docker container, runs a bash shell instead of the starting scr
 
 \section{ICEF - The Interaction Computing Execution Framework}
 \label{sec:icef-intro}
-
 The interaction framework wraps the original coreASM framework in order to extend it and give it the capabilities to support concurrent and distributed computation. It was developed in a project called BIOMICS and financed by the European Commission.\footnote{\url{http://biomicsproject.eu/}}
 
 \textbf{This wrapping took place on three levels:}
 \begin{quote}
-\vspace{-1.5cm}
+%\vspace{-1.5cm}
 \small
 \textbf{First}, the interpreter coreASM had to be extended supporting additional language primitives as well as communications features. Here BSL replaces ASM as a new language having a new interpreter coreASIM.
 
+\smallskip
 \textbf{Second}, a space was created where the now so-called Abstract State Interaction Machines (ASIMs) take over and are able to execute in parallel. This environment is called Brapper (short for BIOMICS Wrapper).
 
+\smallskip
 \textbf{Third}, a central server called manager takes care of handling distributed Brapper instances, dealing with message and scheduling issues.
-\vspace{-1cm}
+%\vspace{-1cm}
 \end{quote}
-
 In terms of technology, the development of coreASIM involved making changes to the Java coreASM implementation. Brappers are written in Java as well but the managers coordinate the Brappers using nodejs and are therefore written in JavaScript.
 
 \subsection{Framework Stack}
-
 We now describe in more detail the aspects of the ICEF framework stack that concern the INTERLACE implementation. Figure \ref{fig:icef-intro-asim} shows the stack at different levels of granularity.
 
 As a stable base for the INTERLACE execution environment stack we chose a Linux-based system, Ubuntu 16.04 LTS. A LTS (Long-Term Support) version is important to ensure thta we have a reliable platform that is maintained by the distributor for a long time. Ubuntu publishes LTS versions every two years and promises a maintenance duration of five years.\footnote{\url{https://www.ubuntu.com/info/release-end-of-life}}
@@ -240,8 +239,10 @@ Side note: A definition for the client here is not given because the client whic
 
 Detailed descriptions of parameters and options of the JSON ICEF specifications can be found in Deliverable D5.2 \cite{BIOMICSD52} of the BIOMICS project.
 
-\begin{minipage}{1.0\textwidth}
-\begin{lstlisting}[language=json,firstnumber=1,caption={ICEF JSON Specification for INTERLACE},captionpos=b,label=lst:icef-json-spec]
+\begin{center}
+\begin{minipage}{0.8\textwidth}
+\small
+\begin{lstlisting}[language=json,firstnumber=1,caption={\bf\small ICEF JSON Specification for INTERLACE},captionpos=b,label=lst:icef-json-spec]
 {
    "id": "interlace", 
    "schedulers": [
@@ -259,6 +260,7 @@ Detailed descriptions of parameters and options of the JSON ICEF specifications 
 }
 \end{lstlisting}
 \end{minipage}
+\end{center}
 
 The implementation idea here is to have a central server which takes over the various requests from the clients. A scheduler will take care of what exactly is running, and when. As a second task the scheduler will, as mentioned before, also spawn new clients which send or receive information/requests to other components, but mainly to the server.
 
