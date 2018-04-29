@@ -640,9 +640,6 @@ The effect of the Transfer Types test together with the Account Connectivity tes
 
 
 
-
-
-
 \subsection{Transaction MetaData}
 
 The transaction meta-data consists of only 1 memo message that is to be implemented as part of the transaction. It is not obligatory, i.e.\ the initiator of the transaction can leave it blank. The length is to be determined at the time of implementation but the assumption is that it is ``long enough'' to support a reasonable description of the transaction.
@@ -668,9 +665,9 @@ $CC$		& {\bf accountID}			&Integer	& Unique account identifier \\
 			& {\bf balance}				&Double	& Account balance (positive or negative) \\
 			& {\bf creditLimit}			&Double	& Credit limit (positive number) \\
 			& {\bf creditLimitDate}		&DateTime & Date at which credit limit was set \\
-			& {\bf availableBalance}		&Double	& $balance + creditLimit$ (positive number) \\
+			& {\bf availableBalance}		&Double	& $balance + creditLimit$ (non-negative number) \\
 			& {\bf upperLimit}			&Double	& Upper balance limit (positive number) \\
-			& {\bf availableCapacity}		&Double	& $capacity - saleVolume$ (positive number) \\
+			& {\bf availableCapacity}		&Double	& $capacity - saleVolume$ (non-negative number) \\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
@@ -686,7 +683,7 @@ $DOMU$		& {\bf accountID}			&Integer	& Unique account identifier \\
 			& {\bf balance}				&Double	& Account balance (positive or negative) \\
 			& {\bf creditLimit}			&Double	& Credit limit (positive number) \\
 			& {\bf creditLimitDate}		&DateTime & Date at which credit limit was set \\
-			& {\bf availableBalance}		&Double	& $balance + creditLimit$ (positive number) \\
+			& {\bf availableBalance}		&Double	& $balance + creditLimit$ (non-negative number) \\
 \Xhline{1.5pt}
 			 & \emph{(Obligatory MetaData)}& & \\
 \cline{2-2}
@@ -696,9 +693,9 @@ $MIRROR$ 	& {\bf accountID}			&Integer	& Unique account identifier \\
 			& {\bf balance}				&Double	& Account balance (positive or negative) \\
 			& {\bf creditLimit}			&Double	& Credit limit (positive number) \\
 			& {\bf creditLimitDate}		&DateTime & Date at which credit limit was set \\
-			& {\bf availableBalance}		&Double	& $balance + creditLimit$ (positive number) \\
+			& {\bf availableBalance}		&Double	& $balance + creditLimit$ (non-negative number) \\
 			& {\bf upperLimit}			&Double	& Upper balance limit (positive number) \\
-			& {\bf availableCapacity}		&Double	& $capacity - saleVolume$ (positive number) \\
+			& {\bf availableCapacity}		&Double	& $capacity - saleVolume$ (non-negative number) \\
 \cline{2-2}
 			 & \emph{(Optional MetaData)}& & \\
 \cline{2-2}
