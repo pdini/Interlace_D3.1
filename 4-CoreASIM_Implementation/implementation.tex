@@ -3,7 +3,49 @@
 
 \vspace{-1cm}
 \begin{center}
-Eduard Hirsch and Maria Luisa Mulas
+Eduard Hirsch
 \end{center}
 
-\todo{sections structure, text}
+This chapter is taking a look at the ASIM implementation of the Interlace Project which have been done according to the specifications of D2.1 as well as the refinement specifications of the requirements.
+
+In the previous chapter \ref{ch:CoreAsimIntro} the basis for an environment and code execution has been discussed. Further it will be described here how that environment has been utilized. The following detailed implementation design will show what issues and difficulties had to been taken into account.
+
+
+\section{Introduction}
+\label{sec:impl_intro}
+
+The requirements specifications are the basis for the implementation of an executable ASIM model. That model can be found on GitHub \footnote{https://github.com/InterlaceProject/ASIMSpec} will act as a foundation and test/verification template for further business implementations.
+
+This main part of that document is now focusing on the way the ASIM model actually was implemented and how the missing functional parts of the back-end are realized which is mainly about simulating a simple ledger.
+
+\section{Agents}
+
+The implementation base is founded on several ASIM-agents which are programmed to act independent and communicate with each other by the base messaging system provided by the ICEF infrastructure.
+
+There a slight differences between them and they can be therefore categorized into two groups:
+
+\begin{itemize}
+	\item full agents
+	\item dynamic agents
+\end{itemize}
+
+\textit{Full agents} are started right away from the beginning. They are processing request or are handling other duties over the environment lifetime. \textit{Dynamic agents} are created during a specific phase of a test and destroyed after that test has been completed.
+
+\section{temp}
+
+brainstorm
+  icef description
+    server, scheduler (test list), initdata
+    Clients: CreditRequestClient, DebitAcknoledgeClient, DebitRequestClient
+  tests  
+  message structure send
+  message passing
+  logging
+  dynamic clients
+  state management (client \& server)
+  init data
+  include load enhancements, incl. duplicate variable definition problem  
+  function conversion/translation
+  temp table structure
+  backend simulation
+  
