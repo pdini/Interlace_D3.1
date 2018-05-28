@@ -22,14 +22,46 @@ This main part of that document is now focusing on the way the ASIM model actual
 
 The implementation base is founded on several ASIM-agents which are programmed to act independent and communicate with each other by the base messaging system provided by the ICEF infrastructure.
 
-There a slight differences between them and they can be therefore categorized into two groups:
+There are small differences between the ASIM-agents and they can be therefore categorized into the following three groups:
 
 \begin{itemize}
 	\item full agents
 	\item dynamic agents
+	\item non-functional agents
 \end{itemize}
 
-\textit{Full agents} are started right away from the beginning. They are processing request or are handling other duties over the environment lifetime. \textit{Dynamic agents} are created during a specific phase of a test and destroyed after that test has been completed.
+\textit{Full agents} are started right away from the beginning. They are processing request or are handling other duties over the environment lifetime. \textit{Dynamic agents} are created during a specific phase of a test and destroyed after that test has been completed. \textit{Non-functional agents} are never started directly and are facilitated for integration into another agent. They are hosting initialization code or helper functions in order to compensate for the missing modularization feature of the ASIM-BSL language.
+
+To get more familiar with the actual ASIM realization an extract of available agents is listed in table \ref{tab:model-agents}. Those may act as a template for extending the scenario for additional use cases or tests. They are covering the core payment functionality, thus a credit as well as a debit operation.
+
+\begin{table}[H]
+\begin{centering}
+\small
+{
+\begin{tabular}{ r | p{9cm} | l }
+\hline
+\textbf{Agent}	& Function & Type \\
+\Xhline{1.5pt}
+$scheduler$				& Scheduling, creating and destroying dynamic agenst & full\\[3pt]
+\hline
+$server$				& Server which talks to the dynamic clients in order to handle payment and ledger specific requests & full\\[3pt]
+\hline
+$CreditRequestClient$	& Handles a test credit request & dynamic\\[3pt]
+\hline
+$DebitRequestClient$	& Initiating a test debit request & dynamic\\[3pt]
+\hline
+$DebitAcknoledgeClient$	& Confirming a test debit request & dynamic\\[3pt]
+\hline
+$initdata$				& Fake database and back-end initalization code to be included into the Server agent & non-functional\\[3pt]
+\Xhline{1.5pt}
+\end{tabular}
+}
+\caption{\small\textbf{Agent list and the respective functionality}}
+\label{tab:model-agents}
+\end{centering}
+\vspace{-0.5cm}
+\end{table}
+
 
 \section{temp}
 
@@ -49,3 +81,4 @@ brainstorm
   temp table structure
   backend simulation
   
+missing modularization feature
