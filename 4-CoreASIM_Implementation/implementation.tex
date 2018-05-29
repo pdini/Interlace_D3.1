@@ -95,15 +95,100 @@ The whole process starts with the main ICEF definition file in the ASIMSpec dire
 \end{minipage}
 \end{center}
 
-When looking closer at the icef definition one can see that there are couple of agents defined inside of an include array. All agents in that array will be added to the main file. That means that CreditRequestClient, DebitRequestClient and DebitAcknowledgeClient are added to the scheduler and initdata is added to server agents.
+When looking closer at the icef definition one can see that there are couple of agents defined inside of a json-array with an attribute called \textit{include}. All agents in that array will be added to the main file. That means that CreditRequestClient, DebitRequestClient and DebitAcknowledgeClient are added to the scheduler and initdata is added to server agent.
 
-\textbf{Important Note:} The include syntax is used to append code from a different file to an agent but comes with strings attached. See \ref{subsec:include} for further details.
+\textbf{Important note:} The include syntax is used to append code from a different file to an agent but comes with strings attached. See \ref{sec:impl-include} for further details.
 
-Consequently the loading module will assemble two ASIMs - a scheduler and a server. That assembled JSON String is sent to the manger which is initializing the simulation environment and distributing the clients over the brappers.
+Consequently the loading module will assemble no more than two ASIMs - a scheduler and a server. That assembled JSON String is sent to the manger which is initializing the simulation environment and distributing the clients over the available brappers.
 
+\subsection{Main Agents Tasks}
+\label{subsec:impl-agent-tasks}
 
-\subsection{Include Syntax}
-\label{subsec:include}
+As mentioned in the beginning of that section two main agents, scheduler and server, are the core of the running environment. Once started both instantly start working. The server listens for messages on the communication channel in order to process potential request and the scheduler is initializing the first test and starting clients which should be active during that particular test. When a client has been initialized it will carry out its assigned duties which will be to assemble a request to the server and handle the resulting query-response traffic. Of course the request types are of different types depending on the current test and the type of the client. When the client is done it is sending a message to the scheduler which will terminate the client.
+
+\subsubsection{The scheduler}\ as quickly introduced before is responsible for spawning new clients which are taking over different tasks. To do so the scheduler is defining various things in advance. First the current tests need to be identified which has been done by creating a universe as well as two location:
+
+\begin{lstlisting}[language=bsl]
+	universe TEST_STATE = { TEST_CREDIT, TEST_DEBIT }
+	controlled currentTest: TEST_STATE
+	controlled nextTest: TEST_STATE -> TEST_STATE
+\end{lstlisting}
+
+The universe \textit{TEST\_STATE} defines the available test list. \textit{currentTest} is set from the the universe \textit{TEST\_STATE} and is defining the currently executed test. Finally \textit{nextTest} is a function which takes as parameter the current test as type \textit{TEST\_STATE} and gives you as result the next test of the queue which is of the same type. To initialized the predefined locations the following command are executed:
+
+\begin{lstlisting}[language=bsl]
+	currentTest := START
+	nextTest(START) := TEST_CREDIT
+	nextTest(TEST_CREDIT) := TEST_DEBIT
+\end{lstlisting}
+
+Now it is possible during the execution of the schedulers main program to transition from one test to the next by
+
+\begin{lstlisting}[language=bsl]
+	currentTest := nextTest(currentTest)
+\end{lstlisting}
+
+applying the current test to the nextTest function. That can be done as long as the return value of the function is \textit{undef} implying that no other test is left.
+
+For the \textit{current test} a functional location is applied which returns a list of client agent for a given test state which can be defined as follows:
+
+\begin{lstlisting}[language=bsl]
+	controlled nextClient: TEST_STATE -> LIST
+\end{lstlisting}
+
+That \textit{nextClient} function needs to be setted up during the initialization phase of the agent as well
+
+\begin{lstlisting}[language=bsl]
+	nextClient(TEST_CREDIT) := [ CreditRequestClient ]
+	nextClient(TEST_DEBIT)  := [ DebitAcknowledgeClient, DebitRequestClient ]
+\end{lstlisting}
+
+showing that we have one client for a credit request test and two clients for a debit request. Also important to remember is that rules for a client agent are initially defined in a separate file but as noted already included into the scheduler later by just appending the code. Thus each tested client is absolutely required to have unique names for the \textit{initialization}, the \textit{program} and the \textit{policy} rule \textbf{over all} included files!
+
+Next the missing parts are added up to get the full picture on how the clients are started. In particular in which way the base rules for a client are defined and how they are finally instantiated and handled during runtime.
+
+\begin{center}
+\begin{minipage}{0.8\textwidth}
+\small
+\begin{lstlisting}[language=bsl_lst,caption={\bf\small Scheduler core functionality},label={lst:impl-sched-core} ]
+	//definition of functional location for getting
+	//a function reference for a client name
+	controlled initBy: CLIENT -> FUNCTION
+	controlled withProg: CLIENT -> FUNCTION
+	controlled andPol: CLIENT -> FUNCTION
+	
+	rule Start = {
+		...
+		//Setup CreditRequestClient rules
+		initBy(CreditRequestClient) := InitCreditRequestClient
+		withProg(CreditRequestClient) := ProgramCreditRequestClient
+		andPol(CreditRequestClient) := SkipCreditRequestClient
+		...
+	}
+	
+	rule Program = {
+		...
+		//Client rules are defined in clientTemplate script
+		if currentTest != undef then seq			
+			forall createClient in nextClient(currentTest) do
+				createASIM createClient
+					initializedBy initBy(createClient)
+					withProgram withProg(createClient)
+					andPolicy andPol(createClient)
+					in activeList(createClient)
+					
+			activeClients := | nextClient(currentTest) |
+		endseq
+		...
+	}
+\end{lstlisting}
+\end{minipage}
+\end{center}
+
+\subsubsection{The server}
+
+\section{Modularization and Include Syntax}
+\label{sec:impl-include}
 
 For the Interlace specification the ICEF framework has been extended to support an "include" syntax inside of the ICEF JSON files in order to import sources to an agent. This has been added in order to compensate for the "Modularity" module of ASM which stops working in ASIM because of its distributed nature.
 
@@ -119,7 +204,7 @@ Nevertheless, it is an approach for handling the code separation in order to avo
 
 For being able to use \textbf{Eclipse} and the ASIM eclipse hinting/error detection provided by the plugin another quick fix has been introduced. So if you'd add a dynamic or non-function agent it will be appended at some point to a parent agent. Thus definitions like "CoreASIM asimname" would occur twice inside of that final agent. For the interpreter to work correctly it is consequently necessary to have only one header defining the name of an agent and to remove that header definition inside of the included files. But when you are removing the header definition Eclipse is not able any more to provide correct syntax highlighting, hinting or error detection.
 
-Thus you now have the possibility to mark a section which will be removed during the agent assembling. The beginning of such a section is marked with "\textcolor{eclipseComment}{/*includeskip begin*/}" and the end with "\textcolor{eclipseComment}{/*includeskip end*/}". When using those markers they need to be placed exactly as described - no additional white-spaces (space, tab, return, ...) or different casing. Listing \ref{lst:includeskip} is showing a short example.
+Thus you now have the possibility to mark a section which will be removed during the agent assembling. The beginning of such a section is marked with \textcolor{eclipseComment}{/*includeskip begin*/} and the end with \textcolor{eclipseComment}{/*includeskip end*/}. When using those markers they need to be placed exactly as described - no additional white-spaces (space, tab, return, ...) or different casing. Listing \ref{lst:includeskip} is showing a short example.
 
 Inside of the skipped section there may be many different things placed as shown in the example in order to work seamlessly with the Eclipse hinting. So you could also place names of locations or universes. The reason putting them there is to avoid a warning by the Eclipse plugin that the variable/location has not been defined yet. So in order to check correct spelling and avoid the problems cause by those only getting obvious at interpretation time.
 
@@ -146,26 +231,50 @@ rule somerule = {
 \end{minipage}
 \end{center}
 
+\section{Communication and Message passing}
+\label{sec:impl-com-msg}
 
+message structure send
+message passing
 
-\section{temp}
+\section{Logging}
+\label{sec:impl-log}
 
-brainstorm
-  icef description
-    server, scheduler (test list), initdata
-    Clients: CreditRequestClient, DebitAcknoledgeClient, DebitRequestClient
-  tests  
-  message structure send
-  message passing
-  logging
-  dynamic clients
-  state management (client \& server)
-  init data
-  include load enhancements, incl. duplicate variable definition problem  
-  function conversion/translation
-  temp table structure
-  backend simulation
-  transition to distribution
-  
-missing modularization feature
+server logger
+
+\section{Dynamic Clients}
+\label{sec:impl-dyn-clients}
+
+dynamic clients
 how are agents created, used, destroyed ... example
+
+\section{State Management}
+\label{sec:impl-states}
+
+state management (client \& server)
+
+\section{Simple Test Scenario}
+\label{sec:impl-test}
+
+explain test cases and scenarios
+
+\section{Database and Agent Initialization}
+\label{sec:impl-db-init}
+
+init data
+temp table structure
+backend simulation
+
+\section{Additional Login Layer}
+\label{sec:impl-login-layer}
+
+\section{Issues}
+\label{sec:impl-issues}
+
+function conversion/translation, bugs??
+
+
+ 
+  
+  
+

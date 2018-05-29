@@ -312,12 +312,11 @@ Where the \textit{Element} can be any of the element locations used in the ASIM 
 
 \textbf{The scheduler} has the ability to coordinate different local agents to ensure that they act in a predictable and appropriate way. Like the coreASM scheduler, coreASIM implements a controlling mechanism at a higher level. At the beginning of each running step, a scheduler takes the defined scheduling policy and uses it to determine a set of local agents which will be signalled to run their program. There are different BSL constructs to do so.
 \begin{quote}
-\small
 Here are two examples:
 \begin{lstlisting}[language=bsl]
 	forall a in Agents do schedule a
 \end{lstlisting}
-This tells the scheduler to run all agents in \textit{Agents}. If, by contrast, a single agent should be selected based on a condition $cond$ met by an agent $a$, the corresponding rule might look like this:
+Tells the scheduler to run all agents in \textit{Agents}. If, by contrast, a single agent should be selected based on a condition $cond$ met by an agent $a$, the corresponding rule might look like this:
 \begin{lstlisting}[language=bsl]
 	choose a in Agents with cond(a) do schedule a
 \end{lstlisting}
