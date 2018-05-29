@@ -9,17 +9,21 @@
     % list of keywords
   	morekeywords={
     	if,
-	    while,
-    	or,
+	    while,    	
     	send,
-    	to,
-    	with,
+    	or, and, to, in, do, with,
+		CoreASIM,
+		policy,
+		use,
+		init,
+		rule,
+		scheduling,
     	subject,
     	forall,
     	choose,
-    	in,
-    	do,
-    	schedule
+		derived,
+    	schedule,
+    	skip
   	},
   	sensitive=true, % keywords are not case-sensitive
   	morecomment=[l]{//}, % l is for line comment
@@ -38,9 +42,48 @@
   keepspaces=true, % does not ignore spaces to fit width, convert tabs to spaces
   showstringspaces=false, % lets spaces in strings appear as real spaces
   breaklines=true, % wrap lines if they don't fit
-  %numbers=left, % show line numbers at the left
-  %numberstyle=\tiny\ttfamily, % style of the line numbers
   commentstyle=\color{eclipseComment}, % style of comments
   keywordstyle=\color{eclipseKeywords}, % style of keywords
   stringstyle=\color{eclipseStrings}, % style of strings
+}
+
+\lstdefinelanguage{bsl_lst}{
+    % list of keywords
+  	morekeywords={
+    	if,
+	    while,    	
+    	send,
+    	or, and, to, in, do, with,
+		CoreASIM,
+		policy,
+		use,
+		init,
+		rule,
+		scheduling,
+    	subject,
+    	forall,
+    	choose,
+		derived,
+    	schedule,
+    	skip
+  	},
+  	sensitive=true, % keywords are not case-sensitive
+  	morecomment=[l]{//}, % l is for line comment
+  	morecomment=[s]{/*}{*/}, % s is for start and end delimiter
+  	morestring=[b]", % defines that strings are enclosed in double quotes
+  	frame=lines,
+  	basicstyle=\normalfont\ttfamily, % Global Code Style
+	basicstyle=\normalfont\ttfamily, % Global Code Style
+    captionpos=b, % Position of the Caption (t for top, b for bottom)
+    extendedchars=true, % Allows 256 instead of 128 ASCII characters
+    tabsize=2, % number of spaces indented when discovering a tab 
+    columns=fixed, % make all characters equal width
+    keepspaces=true, % does not ignore spaces to fit width, convert tabs to spaces
+    showstringspaces=false, % lets spaces in strings appear as real spaces
+    breaklines=true, % wrap lines if they don't fit
+    numbers=left, % show line numbers at the left
+    numberstyle=\tiny\ttfamily, % style of the line numbers
+    commentstyle=\color{eclipseComment}, % style of comments
+    keywordstyle=\color{eclipseKeywords}, % style of keywords
+    stringstyle=\color{eclipseStrings}, % style of strings
 }

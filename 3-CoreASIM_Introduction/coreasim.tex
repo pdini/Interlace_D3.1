@@ -233,7 +233,7 @@ As a stable base for the INTERLACE execution environment stack we chose a Linux-
 
 After installation of the software described in Section \ref{sec:env-exec-stack-software-stack} and after building the ICEF components, the framework is ready. When the components are started it is possible to transmit a running definition, called ICEF JSON file.
 
-Listing \ref{lst:icef-json-spec} shows what the specification for the simulation looks like. An \textit{id} for the simulation is given, along with one scheduler and one ASIM. The \textit{schedulers} section normally only hosts one scheduler which takes care of other active or suspended ASIM agents. The \textit{asims} attribute in the JSON file defines the actual ASIM instances running the simulation.
+Listing \ref{lst:icef-json-spec} shows what the specification for a simulation may look like. An \textit{id} for the simulation is given, along with one scheduler and one ASIM. The \textit{schedulers} section normally only hosts one scheduler which takes care of other active or suspended ASIM agents. The \textit{asims} attribute in the JSON file defines the actual ASIM instances running the simulation.
 
 Side note: A definition for the client here is not given because the client which is sending credit, debit or other requests is spawned and destroyed on demand by the Scheduler ASIM defined in \textit{casim/scheduler.casim}.
 
@@ -242,21 +242,17 @@ Detailed descriptions of parameters and options of the JSON ICEF specifications 
 \begin{center}
 \begin{minipage}{0.8\textwidth}
 \small
-\begin{lstlisting}[language=json,firstnumber=1,caption={\bf\small ICEF JSON Specification for INTERLACE},captionpos=b,label=lst:icef-json-spec]
+\begin{lstlisting}[language=json,firstnumber=1,caption={\bf\small Example ICEF JSON Specification},captionpos=b,label=lst:icef-json-spec]
 {
-   "id": "interlace", 
-   "schedulers": [
-       {
-	   "file": "casim/scheduler.casim",
-	   "start": true
-       }
-   ], 
-   "asims": [       
-       {
-           "file": "casim/server.casim",
-           "start": true
-       }
-   ]
+    "id": "interlace", 
+    "schedulers": [{
+        "file": "casim/scheduler.casim",
+        "start": true
+    }], 
+    "asims": [{
+        "file": "casim/server.casim",
+        "start": true
+    }]
 }
 \end{lstlisting}
 \end{minipage}

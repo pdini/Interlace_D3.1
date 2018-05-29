@@ -22,7 +22,7 @@ This main part of that document is now focusing on the way the ASIM model actual
 
 The implementation base is founded on several ASIM-agents which are programmed to act independent and communicate with each other by the base messaging system provided by the ICEF infrastructure.
 
-There are small differences between the ASIM-agents and they can be therefore categorized into the following three groups:
+There are small differences between the available ASIM-agents and they can be, base on their purpose, categorized into the following three groups:
 
 \begin{itemize}
 	\item full agents
@@ -32,7 +32,7 @@ There are small differences between the ASIM-agents and they can be therefore ca
 
 \textit{Full agents} are started right away from the beginning. They are processing request or are handling other duties over the environment lifetime. \textit{Dynamic agents} are created during a specific phase of a test and destroyed after that test has been completed. \textit{Non-functional agents} are never started directly and are facilitated for integration into another agent. They are hosting initialization code or helper functions in order to compensate for the missing modularization feature of the ASIM-BSL language.
 
-To get more familiar with the actual ASIM realization an extract of available agents is listed in table \ref{tab:model-agents}. Those may act as a template for extending the scenario for additional use cases or tests. They are covering the core payment functionality, thus a credit as well as a debit operation.
+To get more familiar with the actual ASIM realization an extract of available agents is listed in table \ref{tab:model-agents}. Those may act as a template for extending the scenario applying additional use cases or tests. They are covering the core payment functionality, thus a credit as well as a debit operations.
 
 \begin{table}[H]
 \begin{centering}
@@ -42,7 +42,7 @@ To get more familiar with the actual ASIM realization an extract of available ag
 \hline
 \textbf{Agent}	& Function & Type \\
 \Xhline{1.5pt}
-$scheduler$				& Scheduling, creating and destroying dynamic agenst & full\\[3pt]
+$scheduler$				& Scheduling, creating and destroying dynamic agents & full\\[3pt]
 \hline
 $server$				& Server which talks to the dynamic clients in order to handle payment and ledger specific requests & full\\[3pt]
 \hline
@@ -52,15 +52,100 @@ $DebitRequestClient$	& Initiating a test debit request & dynamic\\[3pt]
 \hline
 $DebitAcknoledgeClient$	& Confirming a test debit request & dynamic\\[3pt]
 \hline
-$initdata$				& Fake database and back-end initalization code to be included into the Server agent & non-functional\\[3pt]
+$initdata$				& Fake database and back-end initalization code to be included into the \textit{server} agent & non-functional\\[3pt]
 \Xhline{1.5pt}
 \end{tabular}
 }
-\caption{\small\textbf{Agent list and the respective functionality}}
+\caption{\small\textbf{Agent list and their respective functionality}}
 \label{tab:model-agents}
 \end{centering}
 \vspace{-0.5cm}
 \end{table}
+
+\section{Execution}
+
+As mentioned in chapter \ref{ch:CoreAsimIntro} the specifications are executed using the ICEF framework. There is has been covered how a JSON ICEF file can be loaded and started. Now details are given how that process is working in depth particular for Interlace specification.
+
+The whole process starts with the main ICEF definition file in the ASIMSpec directory called run.icef by definition and is shown in Listing \ref{lst:interlace-json-spec}. It is illustrating how the different types of agents are included into the simulation. To explain further all agents are located in the directories \textit{casim} together with \textit{casim/clients}. Agent file names are the same as described in table \ref{tab:model-agents} including the suffix ".casim". \textit{casim} contains all full plus their non-functional agents which are joined later on. \textit{casim/clients} hosts all the relevant clients talking to a server. Currently there is one client for a credit request and two clients for a debit request.
+
+\begin{center}
+\begin{minipage}{0.8\textwidth}
+\small
+\begin{lstlisting}[language=json,firstnumber=1,caption={\bf\small ICEF JSON Specification for INTERLACE},captionpos=b,label=lst:interlace-json-spec]
+{
+    "id": "interlace", 
+    "schedulers": [{
+        "file": "casim/scheduler.casim",
+        "include": [
+            "casim/clients/CreditRequestClient.casim",
+            "casim/clients/DebitRequestClient.casim",
+            "casim/clients/DebitAcknowledgeClient.casim"
+        ],
+        "start": "true"
+    }],
+    "asims": [{
+        "file": "casim/server.casim",
+        "include": [
+            "casim/initdata.casim"
+        ],
+        "start": "true"
+    }]
+}
+\end{lstlisting}
+\end{minipage}
+\end{center}
+
+When looking closer at the icef definition one can see that there are couple of agents defined inside of an include array. All agents in that array will be added to the main file. That means that CreditRequestClient, DebitRequestClient and DebitAcknowledgeClient are added to the scheduler and initdata is added to server agents.
+
+\textbf{Important Note:} The include syntax is used to append code from a different file to an agent but comes with strings attached. See \ref{subsec:include} for further details.
+
+Consequently the loading module will assemble two ASIMs - a scheduler and a server. That assembled JSON String is sent to the manger which is initializing the simulation environment and distributing the clients over the brappers.
+
+
+\subsection{Include Syntax}
+\label{subsec:include}
+
+For the Interlace specification the ICEF framework has been extended to support an "include" syntax inside of the ICEF JSON files in order to import sources to an agent. This has been added in order to compensate for the "Modularity" module of ASM which stops working in ASIM because of its distributed nature.
+
+However, it is important to know that the include statement needs to be used with caution, because one need to be aware that it is nothing more but appending the content of the included file to the main agent file. Thus
+
+\begin{itemize}
+	\item Line numbers are different to the original files
+	\item For a compilation problem it might be necessary to take a look at all files, main as well as included ones
+	\item Naming needs to be consistent throughout all files. E.g. Eclipse will not notify a developer whether a name for a rule, location, ... has been used twice.
+\end{itemize}
+
+Nevertheless, it is an approach for handling the code separation in order to avoid a single and extremely long file which would be difficult to maintain and work with.
+
+For being able to use \textbf{Eclipse} and the ASIM eclipse hinting/error detection provided by the plugin another quick fix has been introduced. So if you'd add a dynamic or non-function agent it will be appended at some point to a parent agent. Thus definitions like "CoreASIM asimname" would occur twice inside of that final agent. For the interpreter to work correctly it is consequently necessary to have only one header defining the name of an agent and to remove that header definition inside of the included files. But when you are removing the header definition Eclipse is not able any more to provide correct syntax highlighting, hinting or error detection.
+
+Thus you now have the possibility to mark a section which will be removed during the agent assembling. The beginning of such a section is marked with "\textcolor{eclipseComment}{/*includeskip begin*/}" and the end with "\textcolor{eclipseComment}{/*includeskip end*/}". When using those markers they need to be placed exactly as described - no additional white-spaces (space, tab, return, ...) or different casing. Listing \ref{lst:includeskip} is showing a short example.
+
+Inside of the skipped section there may be many different things placed as shown in the example in order to work seamlessly with the Eclipse hinting. So you could also place names of locations or universes. The reason putting them there is to avoid a warning by the Eclipse plugin that the variable/location has not been defined yet. So in order to check correct spelling and avoid the problems cause by those only getting obvious at interpretation time.
+
+\begin{center}
+\begin{minipage}{0.8\textwidth}
+%\small
+\begin{lstlisting}[language=bsl_lst,caption={\bf\small includeskip usage},label=lst:includeskip]
+/*includeskip begin*/
+//this part will be removed
+CoreASIM Company
+
+use Standard 
+init dummy
+rule dummy = skip
+scheduling NoPolicy
+policy NoPolicy = skip
+/*includeskip end*/
+
+//this rule is included to main agent
+rule somerule = {
+	...
+}
+\end{lstlisting}
+\end{minipage}
+\end{center}
+
 
 
 \section{temp}
@@ -80,5 +165,7 @@ brainstorm
   function conversion/translation
   temp table structure
   backend simulation
+  transition to distribution
   
 missing modularization feature
+how are agents created, used, destroyed ... example
