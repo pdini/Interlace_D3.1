@@ -145,7 +145,7 @@ That \textit{nextClient} function needs to be setted up during the initializatio
 
 showing that we have one client for a credit request test and two clients for a debit request. Also important to remember is that rules for a client agent are initially defined in a separate file but as noted already included into the scheduler later by just appending the code. Thus each tested client is absolutely required to have unique names for the \textit{initialization}, the \textit{program} and the \textit{policy} rule \textbf{over all} included files!
 
-Next the missing parts are added up to get the full picture on how the clients are started. In particular in which way the base rules for a client are defined and how they are finally instantiated and handled during runtime.
+Next the missing parts are added up to get the full picture on how the clients are started. In particular in which way the base rules for a dynamic client are defined and how they are finally instantiated and handled during runtime. Listing \ref{lst:impl-sched-core} is illustrating the management of the different clients.
 
 \begin{center}
 \begin{minipage}{0.8\textwidth}
@@ -184,6 +184,16 @@ Next the missing parts are added up to get the full picture on how the clients a
 \end{lstlisting}
 \end{minipage}
 \end{center}
+
+In that listing we can identify three parts. \textbf{First} the definition of three functions which are taking a $CLIENT$ as parameter and returning a $FUNCTION$ can be observed, namely $initBy$, $withProg$ and $andPol$. That $FUNCTION$ return type can be any rule we have defined inside of the scheduler or inside of the dynamic clients which are included to the scheduler. \textbf{Second} for client $CreditRquestClient$ those three function values are set. So for example it is possible to apply $initBy(CreditRequestClient) := InitCreditRequestClient$ and afterwards to call function $InitCreditRequestClient$ by using  $initBy(CreditRequestClient)()$. \textbf{At last} during the iterative execution of the $Program$ rule the actual starting of the client is process. If a valid test has been selected $nextClient(currentTest)$ provides a list of clients valid during that particular test. The $forall$ loop is walking through that list and using the respective iteration to instantiate the chosen client. This instantiation is done by calling $createASIM$ command and passing the start up rule ($initializedBy$), the main program rule ($withProgram$) and the scheduling policy ($andPolicy$).
+
+In line 27 of listing \ref{lst:impl-sched-core} the count of active clients is stored. That count is reduced by one when a "Done" message has been received by a dynamic client. Also the client is shut down by calling
+
+\begin{lstlisting}[language=bsl]
+	destroyASIM clientName
+\end{lstlisting}
+
+After the $activeClients$ count has been reduced to $0$ again all clients have terminated and the next test can be covered.
 
 \subsubsection{The server}
 
