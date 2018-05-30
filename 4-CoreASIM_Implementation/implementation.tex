@@ -195,11 +195,11 @@ In line 27 of listing \ref{lst:impl-sched-core} the count of active clients is s
 
 After the $activeClients$ count has been reduced to $0$ again all clients have terminated and the next test can be covered. To conclude it is possible to say that $activeClients$ count is used as a structure similar to semaphores which is taking care that no new clients are issued as long as it has a value bigger than $0$ and the scheduler is therefore in something similar to a paused state. Certainly, is it not really paused but in a "busy wait loop".
 
-\subsubsection{The server}\ agent acts a the main component which is implementing most of the specified requirements, which is for the moment credit and debit operations. The server is started right away when CASIMA has received and processed the JSON file for the simulation.
+\subsubsection{The server}\ agent is acting as the main component which is implementing most of the specified requirements, which is for the moment credit and debit operations. The server is started right away when CASIMA has received and processed the JSON file for the simulation.
 
-When the init-rule called $Start$ is executed the $Ledger$ and $PendingTransaction$ are initialized as empty maps, an OTP lifetime is set as well as the $Logger$ is setted up. The logger offers several logging levels. Details can be found in section \ref{sec:impl-log}. Also a rule called InitData() is executed at start-up. It is important to know that the Eclipse Plug-in is showing that rule as Problem/Error because it is not defined in the server.casim file and thus not recognizable for it. Nevertheless, that rule is placed correctly and will work fine, because it is defined in the non-functional agent $initdata$. That $initdata$ content is, due to the include inside of the run.icef, appended to the server.casim before it is sent to manger.
+When the init-rule called $Start$ is executed the $Ledger$ and $PendingTransaction$ are initialized as empty maps, an OTP lifetime is set as well as the $Logger$ is setted up. The logger offers several logging levels and details about it can be found in section \ref{sec:impl-log}. Also a rule called $InitData()$ is executed at start-up. It is important to know that the Eclipse Plug-in is showing that this rule is having a Problem/Error because it is not defined in the server.casim file and thus not recognizable for it. Nevertheless, that rule is placed correctly and will work fine, because it is defined in the non-functional agent $initdata$. The content of $initdata$ is, due to the $include$ statement inside of the run.icef, appended to the server.casim before it is sent to the CASIMA manger.
 
-As a consequence the rest of the initialization is consolidated inside that rule. To be more specific the following locations are prepared for later usage:
+Rule $initData$ in the $initdata$ client is consolidating the rest of the initialization inside. To be more specific the following locations are prepared for later usage when it is called:
 
 \begin{itemize}
 	\item $sessionData$ ... simulates session information
@@ -209,6 +209,36 @@ As a consequence the rest of the initialization is consolidated inside that rule
 	\item $TT$ ... transfer type translation table
 	\item $accountConnectivity$ ... transferability between accounts
 \end{itemize}
+
+After the start-up phase has been finished the server is going into listening mode when the main program $DispatchMessages$ is called iteratively. In there all relevant messages received by the server are taken care of. In listing \ref{lst:impl-msg-dispatch} the dispatch process of server can be viewed in detail. All inbox messages of the current engine tick are fetched using the $inboxOf$ in addition to the $forall$ statement. The message reference $m$ as named in the loop is used to retrieve subject, message and sender of the current post box entry $m$.
+
+Messages which are not recognized having an accurate message type are discarded. The message type is defined by the message subject and is compared to one of the predefined entries in the universe definition $MESSAGE\_REQUESTS$. For real world use it is essential to introduce some kind of additional message signing to ensure by whom the message has been sent.
+
+\begin{center}
+\begin{minipage}{0.8\textwidth}
+\small
+\begin{lstlisting}[language=bsl_lst,caption={\bf\small Server message dispatching},label={lst:impl-msg-dispatch} ]
+rule DispatchMessages = {
+	forall m in inboxOf(self) do seq
+		//fetch message information
+		msubject := getMessageSubject(m)
+		msgIn := getMessageContent(m)
+		member := getMessageSender(m)
+		
+		//dispatch messages
+		if msgIn != undef and member != undef then
+			case msubject of
+				toString(CreditReviewReq): HandleCreditPreviewReq(msgIn, member)
+				toString(CreditPerformReq): HandleCreditPerformReq(msgIn, member)
+				toString(DebitPreviewReq): HandleDebitPreviewReq(msgIn, member)
+				toString(DebitPerformReq): HandleDebitPerformReq(msgIn, member)
+				toString(DebitAckCompletion): HandleDebitAckCompletion(msgIn, member)
+			endcase
+	endseq //end forall
+}
+\end{lstlisting}
+\end{minipage}
+\end{center}
 
 \section{Modularization and Include Syntax}
 \label{sec:impl-include}
@@ -236,14 +266,14 @@ Inside of the skipped section there may be many different things placed as shown
 %\small
 \begin{lstlisting}[language=bsl_lst,caption={\bf\small includeskip usage},label=lst:includeskip]
 /*includeskip begin*/
-//this part will be removed
-CoreASIM Company
+	//this part will be removed
+	CoreASIM Company
 
-use Standard 
-init dummy
-rule dummy = skip
-scheduling NoPolicy
-policy NoPolicy = skip
+	use Standard 
+	init dummy
+	rule dummy = skip
+	scheduling NoPolicy
+	policy NoPolicy = skip
 /*includeskip end*/
 
 //this rule is included to main agent
@@ -257,8 +287,13 @@ rule somerule = {
 \section{Communication and Message passing}
 \label{sec:impl-com-msg}
 
-message structure send
-message passing
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=1.0\textwidth]{Figures/creditreviewrequest}
+  \caption{\bf\small credit request message protocol}
+  \label{fig:impl-msg-crc}
+\end{figure}
 
 \section{Logging}
 \label{sec:impl-log}

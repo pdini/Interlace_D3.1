@@ -9,7 +9,7 @@
     % list of keywords
   	morekeywords={
 		universe, controlled,     	
-    	if,
+    	if, then, endif,
 	    while,    	
     	send,
     	or, and, to, in, do, with,
@@ -24,6 +24,7 @@
     	choose,
 		derived,
     	skip, undef,
+    	case, endcase, 
     	seq, endseq, par, endpar, block, endblock, next,
     	createASIM, destroyASIM, initializedBy, withProgram, andPolicy,
   	},
@@ -52,8 +53,8 @@
 \lstdefinelanguage{bsl_lst}{
     % list of keywords
   	morekeywords={
-    	universe, controlled,     	
-    	if,
+		universe, controlled,     	
+    	if, then, endif,
 	    while,    	
     	send,
     	or, and, to, in, do, with,
@@ -68,8 +69,9 @@
     	choose,
 		derived,
     	skip, undef,
+    	case, endcase, of,
     	seq, endseq, par, endpar, block, endblock, next,
-	  	createASIM, destroyASIM, initializedBy, withProgram, andPolicy,
+    	createASIM, destroyASIM, initializedBy, withProgram, andPolicy,
   	},
   	sensitive=true, % keywords are not case-sensitive
   	morecomment=[l]{//}, % l is for line comment
