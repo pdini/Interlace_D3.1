@@ -32,7 +32,7 @@ There are small differences between the available ASIM-agents and they can be, b
 
 \textit{Full agents} are started right away from the beginning. They are processing request or are handling other duties over the environment lifetime. \textit{Dynamic agents} are created during a specific phase of a test and destroyed after that test has been completed. \textit{Non-functional agents} are never started directly and are facilitated for integration into another agent. They are hosting initialization code or helper functions in order to compensate for the missing modularization feature of the ASIM-BSL language.
 
-To get more familiar with the actual ASIM realization an extract of available agents is listed in table \ref{tab:model-agents}. Those may act as a template for extending the scenario applying additional use cases or tests. They are covering the core payment functionality, thus a credit as well as a debit operations.
+To get more familiar with the actual ASIM realization an extract of available agents is listed in table \ref{tab:model-agents}. Those may act as a template for extending the scenario applying additional use cases or tests. They are covering the core payment functionality, thus credit as well as debit operations.
 
 \begin{table}[H]
 \begin{centering}
@@ -193,16 +193,29 @@ In line 27 of listing \ref{lst:impl-sched-core} the count of active clients is s
 	destroyASIM clientName
 \end{lstlisting}
 
-After the $activeClients$ count has been reduced to $0$ again all clients have terminated and the next test can be covered.
+After the $activeClients$ count has been reduced to $0$ again all clients have terminated and the next test can be covered. To conclude it is possible to say that $activeClients$ count is used as a structure similar to semaphores which is taking care that no new clients are issued as long as it has a value bigger than $0$ and the scheduler is therefore in something similar to a paused state. Certainly, is it not really paused but in a "busy wait loop".
 
-\subsubsection{The server}
+\subsubsection{The server}\ agent acts a the main component which is implementing most of the specified requirements, which is for the moment credit and debit operations. The server is started right away when CASIMA has received and processed the JSON file for the simulation.
+
+When the init-rule called $Start$ is executed the $Ledger$ and $PendingTransaction$ are initialized as empty maps, an OTP lifetime is set as well as the $Logger$ is setted up. The logger offers several logging levels. Details can be found in section \ref{sec:impl-log}. Also a rule called InitData() is executed at start-up. It is important to know that the Eclipse Plug-in is showing that rule as Problem/Error because it is not defined in the server.casim file and thus not recognizable for it. Nevertheless, that rule is placed correctly and will work fine, because it is defined in the non-functional agent $initdata$. That $initdata$ content is, due to the include inside of the run.icef, appended to the server.casim before it is sent to manger.
+
+As a consequence the rest of the initialization is consolidated inside that rule. To be more specific the following locations are prepared for later usage:
+
+\begin{itemize}
+	\item $sessionData$ ... simulates session information
+	\item $profileTable$ ... contains user profiles
+	\item $accountTable$ ... user accounts
+	\item $userGroupTable$ ... specifying users group membership
+	\item $TT$ ... transfer type translation table
+	\item $accountConnectivity$ ... transferability between accounts
+\end{itemize}
 
 \section{Modularization and Include Syntax}
 \label{sec:impl-include}
 
 For the Interlace specification the ICEF framework has been extended to support an "include" syntax inside of the ICEF JSON files in order to import sources to an agent. This has been added in order to compensate for the "Modularity" module of ASM which stops working in ASIM because of its distributed nature.
 
-However, it is important to know that the include statement needs to be used with caution, because one need to be aware that it is nothing more but appending the content of the included file to the main agent file. Thus
+However, it is important to know that the include statement needs to be used with caution, because one need to be aware that it is nothing more but appending the content of the included file to the main agent file. This appending raises the following issues:
 
 \begin{itemize}
 	\item Line numbers are different to the original files
@@ -279,6 +292,11 @@ backend simulation
 \label{sec:impl-login-layer}
 
 active login how handled
+
+\section{Important Rule}
+\label{sec:impl-rules}
+
+explain helper rules not defined in requirements nor in other sections
 
 \section{Issues}
 \label{sec:impl-issues}
