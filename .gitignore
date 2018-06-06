@@ -12,3 +12,4 @@ main.pdf
 *.out
 *.fls
 *.fdb_latexmk
+*.~vsdx
