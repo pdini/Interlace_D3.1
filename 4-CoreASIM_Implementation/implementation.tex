@@ -109,7 +109,7 @@ As mentioned in the beginning of that section two main agents, scheduler and ser
 \subsubsection{The scheduler}\ as quickly introduced before is responsible for spawning new clients which are taking over different tasks. To do so the scheduler is defining various things in advance. First the current tests need to be identified which has been done by creating a universe as well as two location:
 
 \begin{lstlisting}[language=bsl]
-	universe TEST_STATE = { TEST_CREDIT, TEST_DEBIT }
+	universe TEST_STATE = { START, TEST_CREDIT, TEST_DEBIT }
 	controlled currentTest: TEST_STATE
 	controlled nextTest: TEST_STATE -> TEST_STATE
 \end{lstlisting}
@@ -287,18 +287,59 @@ rule somerule = {
 \section{Communication and Message passing}
 \label{sec:impl-com-msg}
 
+As mentioned in chapter \ref{ch:CoreAsimIntro} section \ref{sec:coreasim-details} communication in the ICEF framework is based on message passing. Thus each agent has the possibility to send messages to a named agent as well as receive message from any other. Those can be picked up at the agent specific mailbox using the designated functions provided by the communication Plug-in.
+
+All agents work independent, do not share state between each other and only are aware of their own status. Consequently, they have to rely on that mailing system to share information. This is an important fact because in a real-world scenario clients are also working independent from each other. In order to support that independence ASIM agents are applying that distributed design pattern.
+
+Messages from one client to another are not encrypted. Thus it is important to realized that security needs to be taken into account separately and is currently not part of the implemented model but very important when planning a business-ready product.
+
+\subsection{Message Types}
+
+At the moment there are several message part of debit and credit request. Table \ref{tab:impl-msg-types} is giving an overview which messages are in use for handling transfer operations. The messages are listed in the order of occurrence.
+
+\begin{table}[H]
+\begin{centering}
+\small
+{
+\begin{tabular}{ r | p{7cm} | p{3.1cm} }
+\hline
+\textbf{Message Name} & Used For & Attached Parameters \\
+\Xhline{1.5pt}
+
+CreditPreviewReq & first check of credit request & transfer parameters \\[3pt]
+\hline
+ProceedMessage & answer from server that the CreditPreviewReq has been successful & transfer parameters \\[3pt]
+\hline
+DoNotProceedMessage & answer from server that the CreditPreviewReq has NOT  been successful & error text, transfer parameters \\[3pt]
+\hline
+CreditPerformReq & request to actually perform a credit request & transfer parameters \\[3pt]
+\hline
+NoPermitted & answer from server that the CreditPerformReq has NOT  been successful & error text, transfer parameters \\[3pt]
+\hline
+TransferPerformedSuccessful & answer from server that the CreditPerformReq has been successful and the transfer has been recorded and confirmed & transfer parameters \\[3pt]
+\hline
+Done & Message to Scheduler the client simulation is done and can be terminated & none \\[3pt]
+
+\Xhline{1.5pt}
+\end{tabular}
+}
+\caption{\small\textbf{Message types overview}}
+\label{tab:impl-msg-types}
+\end{centering}
+\vspace{-0.5cm}
+\end{table}
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=1.0\textwidth]{Figures/creditrequest}
-  \caption{\bf\small credit request message protocol}
+  \caption{\bf\small Credit request message protocol}
   \label{fig:impl-msg-crc}
 \end{figure}
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=1.0\textwidth]{Figures/debitrequest}
-  \caption{\bf\small TODO: debit message protocol}
+  \caption{\bf\small Debit request message protocol}
   \label{fig:impl-msg-drc}
 \end{figure}
 
@@ -346,9 +387,3 @@ explain helper rules not defined in requirements nor in other sections
 function conversion/translation, bugs?? brief, reference to correction
 
 what is implemented, what is missing, centralized architecture
-
-
- 
-  
-  
-
