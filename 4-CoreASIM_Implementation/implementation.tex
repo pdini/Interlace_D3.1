@@ -295,7 +295,7 @@ Messages from one client to another are not encrypted. Thus it is important to r
 
 \subsection{Message Types}
 
-At the moment there are several message part of debit and credit request. Table \ref{tab:impl-msg-types} is giving an overview which messages are in use for handling transfer operations. The messages are listed in the order of occurrence.
+At the moment there are several message types part of debit and credit requests. Table \ref{tab:impl-msg-types} is giving an overview which messages are in use for handling transfer operations. The messages are listed in the order of occurrence. Bold messages are operation (debit, credit) agnostic but vary based on their transfer parameters.
 
 \begin{table}[H]
 \begin{centering}
@@ -308,15 +308,15 @@ At the moment there are several message part of debit and credit request. Table 
 
 CreditPreviewReq & first check of credit request & transfer parameters \\[3pt]
 \hline
-ProceedMessage & answer from server that the CreditPreviewReq has been successful & transfer parameters \\[3pt]
+\textbf{ProceedMessage} & answer from server that the CreditPreviewReq has been successful & transfer parameters \\[3pt]
 \hline
-DoNotProceedMessage & answer from server that the CreditPreviewReq has NOT  been successful & error text, transfer parameters \\[3pt]
+\textbf{DoNotProceedMessage} & answer from server that the CreditPreviewReq has NOT  been successful & error text, transfer parameters \\[3pt]
 \hline
 CreditPerformReq & request to actually perform a credit request & transfer parameters \\[3pt]
 \hline
-NoPermitted & answer from server that the CreditPerformReq has NOT  been successful & error text, transfer parameters \\[3pt]
+\textbf{NoPermitted} & answer from server that the CreditPerformReq has NOT  been successful & error text, transfer parameters \\[3pt]
 \hline
-TransferPerformedSuccessful & answer from server that the CreditPerformReq has been successful and the transfer has been recorded and confirmed & transfer parameters \\[3pt]
+\textbf{TransferPerformedSuccessful}\ & answer from server that the CreditPerformReq has been successful and the transfer has been recorded and confirmed & transfer parameters \\[3pt]
 \hline
 Done & Message to Scheduler the client simulation is done and can be terminated & none \\[3pt]
 
