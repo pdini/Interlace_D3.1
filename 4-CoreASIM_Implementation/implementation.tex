@@ -284,7 +284,12 @@ rule somerule = {
 \end{minipage}
 \end{center}
 
-\section{Communication and Message passing}
+\section{Dynamic Clients}
+\label{sec:impl-dyn-clients}
+
+This section will elaborate about the dynamic client features and functionalities. It is explained how they are used as well as how they process the information and create the various request. Further, details about the message types is given in detail.
+
+\subsection{Communication and Message passing}
 \label{sec:impl-com-msg}
 
 As mentioned in chapter \ref{ch:CoreAsimIntro} section \ref{sec:coreasim-details} communication in the ICEF framework is based on message passing. Thus each agent has the possibility to send messages to a named agent as well as receive message from any other. Those can be picked up at the agent specific mailbox using the designated functions provided by the communication Plug-in.
@@ -294,8 +299,43 @@ All agents work independent, do not share state between each other and only are 
 Messages from one client to another are not encrypted. Thus it is important to realized that security needs to be taken into account separately and is currently not part of the implemented model but very important when planning a business-ready product.
 
 \subsection{Message Types}
+\label{subsec:impl-msg-types}
 
-At the moment there are several message types part of debit and credit requests. Table \ref{tab:impl-msg-types} is giving an overview which messages are in use for handling transfer operations. The messages are listed in the order of occurrence. Bold messages are operation (debit, credit) agnostic but vary based on their transfer parameters.
+At the moment there are several message types part of debit and credit requests. Table \ref{tab:impl-transfer-types} is giving an overview which messages are in use for handling transfer operations. The messages are listed in the order of occurrence, however, the precise overall communication sequence is shown in figure \ref{fig:impl-msg-crc} and figure \ref{fig:impl-msg-drc}. Finally, the listed message types in table \ref{tab:impl-msg-generic-types} are operation (debit, credit) agnostic but vary based on their transfer parameters.
+
+\begin{table}[H]
+\begin{centering}
+\small
+{
+\begin{tabular}{ r | p{7cm} | p{4cm} }
+\hline
+\textbf{Message Name} & Used For & Attached Parameters \\
+\Xhline{1.5pt}
+
+CreditPreviewReq & first check of \textbf{credit} request & CRP$^{*}$ \\[3pt]
+\hline
+CreditPerformReq & request to actually perform a \textbf{credit} request & CRP$^{*}$ \\[3pt]
+\Xhline{1.5pt}
+DebitPreviewReq & first check of \textbf{debit} request & DRP$^{**}$ \\[3pt]
+\hline
+DebitPerformReq & request to actually perform a \textbf{debit} request & DRP$^{**}$ \\[3pt]
+\hline
+ConfirmationReq & asking debitor for permission to perform that \textbf{debit}-transfer & DRP$^{**}$, OTP$^{***}$ \\[3pt]
+\hline
+DebitAckMsg & debitor gives permission to perform that \textbf{debit}-transfer & DRP$^{**, 1}$, OTP$^{***}$ \\[3pt]
+
+\Xhline{1.5pt}
+\end{tabular}
+}
+\caption{\small\textbf{Credit/Debit message types overview}\\
+($^{*}$Credit Request Parameters: from-account, to-account, amount, meta-data, channel, member)\\
+($^{**}$Debit Request Parameters:  creditor, debtor, amount, meta-data, channel)\\
+($^{***}$One Time Pad, $^1$optional)}
+\label{tab:impl-transfer-types}
+\end{centering}
+\vspace{-0.5cm}
+\end{table}
+
 
 \begin{table}[H]
 \begin{centering}
@@ -306,28 +346,47 @@ At the moment there are several message types part of debit and credit requests.
 \textbf{Message Name} & Used For & Attached Parameters \\
 \Xhline{1.5pt}
 
-CreditPreviewReq & first check of credit request & transfer parameters \\[3pt]
+ProceedMessage & answer from server that the CreditPreviewReq has been successful & CRP$^{*}$/DRP$^{**}$\\[3pt]
 \hline
-\textbf{ProceedMessage} & answer from server that the CreditPreviewReq has been successful & transfer parameters \\[3pt]
+DoNotProceedMessage & answer from server that the CreditPreviewReq has NOT  been successful & error-text, CRP$^{*}$/DRP$^{**}$\\[3pt]
 \hline
-\textbf{DoNotProceedMessage} & answer from server that the CreditPreviewReq has NOT  been successful & error text, transfer parameters \\[3pt]
+NoPermitted & answer from server that the CreditPerformReq has NOT  been successful & error-text, CRP$^{*}$/DRP$^{**}$ \\[3pt]
 \hline
-CreditPerformReq & request to actually perform a credit request & transfer parameters \\[3pt]
-\hline
-\textbf{NoPermitted} & answer from server that the CreditPerformReq has NOT  been successful & error text, transfer parameters \\[3pt]
-\hline
-\textbf{TransferPerformedSuccessful}\ & answer from server that the CreditPerformReq has been successful and the transfer has been recorded and confirmed & transfer parameters \\[3pt]
+TransferPerformedSuccessful\ & answer from server that the CreditPerformReq has been successful and the transfer has been recorded and confirmed & success-message, CRP$^{*}$/DRP$^{**}$ \\[3pt]
 \hline
 Done & Message to Scheduler the client simulation is done and can be terminated & none \\[3pt]
 
 \Xhline{1.5pt}
 \end{tabular}
 }
-\caption{\small\textbf{Message types overview}}
-\label{tab:impl-msg-types}
+\caption{\small\textbf{Operation agnostic message types overview}\\
+($^{*}$Credit Request Parameters: from-account, to-account, amount, meta-data, channel, member)\\
+($^{**}$Debit Request Parameters:  creditor, debtor, amount, meta-data, channel)}
+\label{tab:impl-msg-generic-types}
 \end{centering}
 \vspace{-0.5cm}
 \end{table}
+
+Lets take a look at a possible implementation of a credit review request to a running server:
+
+\begin{lstlisting}[language=bsl]
+	CreditReviewReq := "CreditReviewReq"
+	CREDITREQUEST := {
+					"from" -> "accId1",
+					"to" -> "accId2",
+					"channel" -> "Service",
+					"amount"  -> 2000,
+					"metadata" -> {"message", "some transfer"}
+				}
+	send CREDITREQUEST  to "server" with subject CreditReviewReq
+\end{lstlisting}
+
+When taking a look at the last line it can be observed that the $send$ command is taking $CREDITREQUEST$ location for the message content and location $CreditReviewReq$  is used defining the message subject.
+The different types of messages are now by definition classified using the name of the subject. In the above script ... TODO
+
+
+\subsection{Client Features and Functionalities}
+\label{subsec:impl-client-features}
 
 \begin{figure}[htbp]
   \centering
@@ -343,16 +402,12 @@ Done & Message to Scheduler the client simulation is done and can be terminated 
   \label{fig:impl-msg-drc}
 \end{figure}
 
+
+%%%%%%%%%%TODO%%%%%%%%%
 \section{Logging}
 \label{sec:impl-log}
 
 server logger
-
-\section{Dynamic Clients}
-\label{sec:impl-dyn-clients}
-
-dynamic clients
-how are agents created, used, destroyed ... example
 
 \section{State Management}
 \label{sec:impl-states}
@@ -386,4 +441,4 @@ explain helper rules not defined in requirements nor in other sections
 
 function conversion/translation, bugs?? brief, reference to correction
 
-what is implemented, what is missing, centralized architecture
+what is implemented, what is missing, centralized architecture (message passing??)
