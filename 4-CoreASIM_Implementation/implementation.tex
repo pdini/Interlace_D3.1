@@ -367,9 +367,16 @@ Done & Message to Scheduler the client simulation is done and can be terminated 
 \vspace{-0.5cm}
 \end{table}
 
-Lets take a look at a possible implementation of a credit review request to a running server:
+Lets review the implementation of a credit review request to a running agent called "server" in listing \ref{lst:impl-msg-send}. When taking a closer look at line 9 it can be observed that the $send$ command is setting a location named $CREDITREQUEST$ for the message content and one called $CreditReviewReq$ is used for defining the message subject.
 
-\begin{lstlisting}[language=bsl]
+$CREDITREQUEST$ is of type map, which is used in BSL/ASM language as a set of key/value-pairs. That map carries the information required for that message type, implying that for the credit transfer example in listing \ref{lst:impl-msg-send} the parameters are chosen accordingly (see CRP in table \ref{tab:impl-transfer-types}).
+
+The actual message type is determined by the subject. As mentioned $CreditReviewReq$ content is used for defining the subject. At client level, unfortunately, it is not possible to predefine a universe containing the $CreditReviewReq$ like done in the head section of the server. The reason is that the $createASIM$ command used in the scheduler for spawning dynamic clients does not allow to include a header section, just an init rule, the main program and finally the scheduling policy. The consequence is that the used message types for clients are locations of type $STRING$ which are created in the init rule and setted up as locations having same name like their values. See line 1 in listing \ref{lst:impl-msg-send}.
+
+\begin{center}
+\begin{minipage}{0.8\textwidth}
+\small
+\begin{lstlisting}[language=bsl_lst,caption={\bf\small send message},label={lst:impl-msg-send} ]
 	CreditReviewReq := "CreditReviewReq"
 	CREDITREQUEST := {
 					"from" -> "accId1",
@@ -380,10 +387,10 @@ Lets take a look at a possible implementation of a credit review request to a ru
 				}
 	send CREDITREQUEST  to "server" with subject CreditReviewReq
 \end{lstlisting}
+\end{minipage}
+\end{center}
 
-When taking a look at the last line it can be observed that the $send$ command is taking $CREDITREQUEST$ location for the message content and location $CreditReviewReq$  is used defining the message subject.
-The different types of messages are now by definition classified using the name of the subject. In the above script ... TODO
-
+Concluding further the subject containing the message type is always converted to $STRING$ type in order to stay consistent. The server, which is using a universe definition, is converting its enumerative representation of message types to $STRING$ by calling $toString(CreditReviewReq)$ when sticking to the example of credit review request.
 
 \subsection{Client Features and Functionalities}
 \label{subsec:impl-client-features}
