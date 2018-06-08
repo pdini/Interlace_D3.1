@@ -407,9 +407,9 @@ The reason for naming locations exactly after their content is based on a progra
 
 For Interlace, and of course for any other software project, it is important to test its correctness. This document will not talk about those tests but covers details on how clients are prepared to support a testing environment. These clients will be later facilitated to act like user devices performing a specific action or transfer.
 
-That clients are called dynamic due to their limited lifespan and are as of section \ref{sec:impl-agents} not intended to be started right with the start of the Interlace simulation but rather in terms of an on-demand need. Thus, their lifespan is meant to be limited to the duration of fulfilling a specific task.
+That clients are called "dynamic" due to their limited lifespan and are as of section \ref{sec:impl-agents} not intended to be started right with the begin of the Interlace simulation but rather in terms of an on-demand need. Thus, their lifespan is meant to be restricted to the duration of their specific task.
 
-To perform those tasks similar to a user-device-action an additional layer has been introduced which was not part of the requirements definitions. That layer explained in detail in section \ref{sec:impl-login-layer} adds a pseudo login possibility and holds session similar information for each created client by the scheduler. Thus in terms of network-topology the name of an ASIM is defined as the address of a device and the (member-)name of a user can be looked up a session table.
+To perform those tasks similar to a user-device-action an additional layer has been introduced which was not part of the requirements definitions. That layer explained in detail in section \ref{sec:impl-login-layer} adds a pseudo-login possibility and holds session-similar information for each created client by the scheduler. Thus in terms of network-topology the name of an ASIM is defined as the address of a device and the (member-)name of a user can be looked up inside a session table.
 
 \begin{figure}[htbp]
   \centering
@@ -418,6 +418,14 @@ To perform those tasks similar to a user-device-action an additional layer has b
   \label{fig:impl-msg-crc}
 \end{figure}
 
+When following the sequence diagram in \ref{fig:impl-msg-crc} it is necessary to keep in mind that these messages are send from a $CreditRequestClient$ but initiated and owned by a member which is logged in and registered in the session data lookup table. For the server agent process it is important know which member is currently sending that transfer in order to perform various checks and store valid transfers. Certainly, same applies for the $DebitRequestClient$ and the $DebitAcknowledgeClient$ of figure \ref{fig:impl-msg-drc}.
+
+\textbf{Dynamic Request Clients} start off when being created by the $scheduler$ agent and don't send or receive any request beforehand. According to a typical state machine the clients manage their own states and acting along them. CRC\footnote{Credit Request Client} and DRC \footnote{Debit Request Client} are using four main states which are explained in detail in \ref{subsec:impl-states}.
+
+The message sequence from client to server is specified in \ref{fig:impl-msg-crc} for the CRC-client and in \ref{fig:impl-msg-drc} for the DRC-client. When investigating those two figures it is standing out that the message sequence looks very similar, only the names vary by their prefix (debit versus credit). However, what might not be obvious here is that the request parameters are quite different.
+
+Another main difference between credit and debit message sequence is though, that a debit request needs $ConfirmationReq$ as well as $DebitAckMsg$. This is necessary because a initiating creditor (seller) needs to have the transaction confirmed by the debtor (buyer) to be sure having a valid transaction which is crediting the payment to the sellers own account.
+
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=1.0\textwidth]{Figures/debitrequest}
@@ -425,6 +433,30 @@ To perform those tasks similar to a user-device-action an additional layer has b
   \label{fig:impl-msg-drc}
 \end{figure}
 
+The sequence diagrams denote optional flows using option boxes. These boxes are having a unique numbered name. An option $OPT$ at the first level has a number (choice $1$ or $2$) as well as an abbreviated name ($DnPM$, $PM$). Sub-options in the second level are alphabetically numbered and also followed by an abbreviated name. Squared brackets underneath the option name indicate the current option choice.
+
+ASIMs currently do not have the possibility to sleep for some time or until an event has occurred. Nevertheless, agents are able to reduce the executed command in the current tick to a minimum achieving a similar result. Inside of the sequence diagrams activated clients are shown by the vertical fully colored bars. Non-active phases are indicated by the vertical dashed lines.
+
+The emulated users in the figures are pictured on top of the clients to show that request are send by particular member.
+
+Scheduler and server are agents which can be seen as autonomous processes in the simulation. The scheduler mainly acts as an orchestration tool for testing purposes and will be removed for actually deployed applications whereas the server agent needs to exist in a real-world scenario. Maybe not as a process running on a centralized server structure but when taking a real distributed scenario into account it'll be implemented using some kind of smart contract running inside of the virtual machine in a blockchain-environment.
+
+\subsection{State Management}
+\label{subsec:impl-states}
+
+TODO...
+
+\begin{itemize}
+	\item SEND: only sending message
+	\item RECEIVE: receive and directly respond to messages
+	\item TERMINATE: end execution; send "Done" message
+	\item DONE: everything is done; ready to be terminated
+\end{itemize}
+
+In the above list the states are briefly explained. Once $DONE$-state is reached, even if not stopped yet by the scheduler, the client won't do anything useful any more.
+
+The DAC\footnote{Debit Acknowledge Client} uses the same states except for the $SEND$-state because it only needs to receive and confirm a transfer by using the given one time pad.
+state management (client \& server)
 
 %%%%%%%%%%TODO%%%%%%%%%
 \section{Logging}
@@ -432,10 +464,6 @@ To perform those tasks similar to a user-device-action an additional layer has b
 
 server logger
 
-\section{State Management}
-\label{sec:impl-states}
-
-state management (client \& server)
 
 \section{Simple Test Scenario}
 \label{sec:impl-test}
