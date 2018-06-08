@@ -19,6 +19,7 @@ The requirements specifications are the basis for the implementation of an execu
 This main part of that document is now focusing on the way the ASIM model actually was implemented and how the missing functional parts of the back-end are realized which is mainly about simulating a simple ledger.
 
 \section{Agents}
+\label{sec:impl-agents}
 
 The implementation base is founded on several ASIM-agents which are programmed to act independent and communicate with each other by the base messaging system provided by the ICEF infrastructure.
 
@@ -390,10 +391,27 @@ The actual message type is determined by the subject. As mentioned $CreditReview
 \end{minipage}
 \end{center}
 
-Concluding further the subject containing the message type is always converted to $STRING$ type in order to stay consistent. The server, which is using a universe definition, is converting its enumerative representation of message types to $STRING$ by calling $toString(CreditReviewReq)$ when sticking to the example of credit review request.
+Concluding further the subject containing the message type is always converted to $STRING$ type in order to stay consistent. Also server agent, which is using a universe definition, is converting its enumerative representation of message types to $STRING$ by calling $toString(CreditReviewReq)$ when sticking to the example of credit review request.
+
+The reason for naming locations exactly after their content is based on a programmers principle which says that strings which are static and never change should be represented by a fix variable term or in ASM/BSL language terms as a predefined location. That best-practices principle has the following benefits:
+
+\begin{itemize}
+	\item Typing errors can be immediately found because an IDE\footnote{Integrated development environment} usually shows them as unknown or undefined. Whereas a misspelled text might be only found during runtime.
+	\item Known variables/locations can be facilitated during syntax completion and therefore simplify and speed up the implementation process.
+	\item It is easyer to find states which still need to be taken care of on other places.
+	\item Usage of specific types might be restricted under certain conditions.
+\end{itemize}
 
 \subsection{Client Features and Functionalities}
 \label{subsec:impl-client-features}
+
+For Interlace, and of course for any other software project, it is important to test its correctness. This document will not talk about those tests but covers details on how clients are prepared to support a testing environment. These clients will be later facilitated to act like user devices performing a specific action or transfer.
+
+That clients are called dynamic due to their limited lifespan and are as of section \ref{sec:impl-agents} not intended to be started right with the start of the Interlace simulation but rather in terms of an on-demand need. Thus, their lifespan is meant to be limited to the duration of fulfilling a specific task.
+
+To perform those tasks similar to a user-device-action an additional layer has been introduced which was not part of the requirements definitions. That layer explained in detail in section \ref{sec:impl-login-layer} adds a pseudo login possibility and holds session similar information for each created client by the scheduler. Thus in terms of network-topology the name of an ASIM is defined as the address of a device and the (member-)name of a user can be looked up a session table.
+
+
 
 \begin{figure}[htbp]
   \centering
