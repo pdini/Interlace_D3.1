@@ -439,12 +439,12 @@ ASIMs currently do not have the possibility to sleep for some time or until an e
 
 The emulated users in the figures are pictured on top of the clients to show that request are send by particular member.
 
-Scheduler and server are agents which can be seen as autonomous processes in the simulation. The scheduler mainly acts as an orchestration tool for testing purposes and will be removed for actually deployed applications whereas the server agent needs to exist in a real-world scenario. Maybe not as a process running on a centralized server structure but when taking a real distributed scenario into account it'll be implemented using some kind of smart contract running inside of the virtual machine in a blockchain-environment.
+Scheduler and server are agents which can be seen as autonomous processes in the simulation. The scheduler mainly acts as an orchestration tool for testing purposes and will be removed for actually deployed applications whereas the server agent needs to exist in a real-world scenario. Maybe not as a process running on a centralized server structure but when taking a real distributed scenario into account it'll be implemented using some kind of smart contract running inside of a virtual machine in a blockchain-environment.
 
 \subsection{State Management}
 \label{subsec:impl-states}
 
-TODO...
+\subsubsection{Client States}\ are managed over four predefined pseudo-static locations which are as following
 
 \begin{itemize}
 	\item SEND: only sending message
@@ -453,10 +453,19 @@ TODO...
 	\item DONE: everything is done; ready to be terminated
 \end{itemize}
 
-In the above list the states are briefly explained. Once $DONE$-state is reached, even if not stopped yet by the scheduler, the client won't do anything useful any more.
+$SEND$ might be used if a sequence of messages will be sent were no replay message is needed or just to submit an initial message at start-up before going right into the $RECEIVE$-mode.
 
-The DAC\footnote{Debit Acknowledge Client} uses the same states except for the $SEND$-state because it only needs to receive and confirm a transfer by using the given one time pad.
-state management (client \& server)
+$RECEIVE$ waits for the messages and act accordingly. When a message has been received and it is necessary to send a response it is done right in $RECEIVE$-mode without changing to $SEND$-mode.
+
+$SEND$ and $RECEIVE$ state could be set alternately but when state $TERMINATE$ is applied the process of shutting down the agent has been started. Once $DONE$-state is reached, even if not stopped yet by the scheduler, the client won't do anything useful any more.
+
+The DAC\footnote{Debit Acknowledge Client} uses the same states except for the $SEND$-state because it only needs to receive and confirm a transfer by using the given one time pad. The DAC is an example that not all of the states need to covered by a client which might be of interest when creating new clients.
+
+\subsubsection{Server \& Scheduler States}\ are not particular part of that section about the dynamic clients, nevertheless, a brief explanation of their states is given.
+
+\textbf{The server} does not have any particular mode or state management yet. It is just waiting for messages and when receiving one it will be directly processed.
+
+\textbf{The scheduler} mainly has its test states and is transitioning from one test to another till there are no tests left. For each test the scheduler has two stages. First in a starting phase all clients are started and counted. Then the scheduler in its second phase waits for as many $DONE$-messages like clients have been issued. Finally the scheduler goes to the next test and starts that two-phase process again.
 
 %%%%%%%%%%TODO%%%%%%%%%
 \section{Logging}
