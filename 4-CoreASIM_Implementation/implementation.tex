@@ -393,7 +393,7 @@ The actual message type is determined by the subject. As mentioned $CreditReview
 
 Concluding further the subject containing the message type is always converted to $STRING$ type in order to stay consistent. Also server agent, which is using a universe definition, is converting its enumerative representation of message types to $STRING$ by calling $toString(CreditReviewReq)$ when sticking to the example of credit review request.
 
-The reason for naming locations exactly after their content is based on a programmers principle which says that strings which are static and never change should be represented by a fix variable term or in ASM/BSL language terms as a predefined location. That best-practices principle has the following benefits:
+The reason for naming locations exactly after their content is based on a programmers principle which says that strings which are static and never change should be represented by an unchangeable variable name or in ASM/BSL language terms as a predefined location. That best-practices principle has the following benefits:
 
 \begin{itemize}
 	\item Typing errors can be immediately found because an IDE\footnote{Integrated development environment} usually shows them as unknown or undefined. Whereas a misspelled text might be only found during runtime.
@@ -461,18 +461,53 @@ $SEND$ and $RECEIVE$ state could be set alternately but when state $TERMINATE$ i
 
 The DAC\footnote{Debit Acknowledge Client} uses the same states except for the $SEND$-state because it only needs to receive and confirm a transfer by using the given one time pad. The DAC is an example that not all of the states need to covered by a client which might be of interest when creating new clients.
 
-\subsubsection{Server \& Scheduler States}\ are not particular part of that section about the dynamic clients, nevertheless, a brief explanation of their states is given.
+\subsubsection{Server \& Scheduler States}\ are not particular part of that section which is mainly about the dynamic clients, nevertheless, a brief explanation of their states is given here to keep them together.
 
 \textbf{The server} does not have any particular mode or state management yet. It is just waiting for messages and when receiving one it will be directly processed.
 
-\textbf{The scheduler} mainly has its test states and is transitioning from one test to another till there are no tests left. For each test the scheduler has two stages. First in a starting phase all clients are started and counted. Then the scheduler in its second phase waits for as many $DONE$-messages like clients have been issued. Finally the scheduler goes to the next test and starts that two-phase process again.
+\textbf{The scheduler} mainly has its test states as mentioned in  subsection \ref{subsec:impl-agent-tasks} and is transitioning from one test to another till there are no tests left. For each test the scheduler has two stages.
+
+\textbf{First} in a starting phase all clients of that particular test are started and counted. Clients which should be part of one test state need to be defined as a dynamic client and appended to the scheduler by using the $include$-statement in the $run.icef$ definition.
+
+Then the scheduler in its \textbf{second} phase waits for as many $DONE$-messages like clients have been issued. Finally, when the client count is zero, the scheduler goes to the next test and starts that two-phase process again.
 
 %%%%%%%%%%TODO%%%%%%%%%
 \section{Logging}
 \label{sec:impl-log}
 
-server logger
+The server agent needs to place many different status messages of different importance. In order to manage their occurrence a simple logger has been added. The logger introduces five log levels:
 
+\begin{enumerate}
+	\item FATAL
+	\item ERROR
+	\item WARN
+	\item INFO
+	\item DEBUG
+\end{enumerate}
+
+Those levels denote different severities which can be applied to the logger and defines the maximum severity of a message presented to the executing user. To explain further $FATAL$ messages should be printed always whereas $DEBUG$ messages are only of interest for developers who need very detailed information of the current state.
+
+Consequently, the maximum log level can be given at agent start-up inside of the $init$ rule. The rule used to define the level is explained here
+
+\begin{lstlisting}[language=bsl]
+	//rule header
+	rule initCustomLogger(set_log_level) = ...
+	...
+	//init logger call
+	initCustomLogger(DEBUG)
+\end{lstlisting}
+
+When initialized the logger can be used at any place by calling the $do\_log$-rule which is taking two parameters. The first is the actual the message printed to the output and the second parameter is describing the importance of that message by using one of the five mentioned severity levels. The listing beneath shows first how to log a message with severity $INFO$ and the second call illustrates a $FATAL$ error message output.
+	
+\begin{lstlisting}[language=bsl]
+	// A "INFO"-level message
+	do_log("Transfer has been performed successful", INFO)
+	...
+	// A "FATAL"-level error message
+	do_log("List 'Leger' in unknown state", FATAL)
+\end{lstlisting}
+
+Currently the logger implementation can only be applied meaningful inside of the server itself, because the implementation is also hosted by the server agent definition file $server.casim$ directly. Certainly, it would be possible to put the logger into a different file but the $include$ statement of the $run.icef$ is not supported by the Eclipse Plug-in. Consequently, if the logger implementation would be separated out into an additional file all occurrences of $do\_log$ calls would be marked as erroneous (although they are not) and would then turn the coding-assistance-tools inside of Eclipse into an unusable environment.
 
 \section{Simple Test Scenario}
 \label{sec:impl-test}
