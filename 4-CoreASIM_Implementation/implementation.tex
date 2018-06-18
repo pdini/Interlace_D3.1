@@ -641,12 +641,20 @@ A pending transaction awaiting a correct OTP from a debtor are added to location
 	Insert(transfer, creditor, PendingTransactions) Ledger)
 \end{lstlisting}
 
-After a transaction got confirmed by a valid OTP it is moved, as mentioned, to the actual ledger. Inside of the the $PendingTransactions$ map that transactions receives state $TRANSACTION_PERFORMED$ but will not be deleted.
+After a transaction got confirmed by a valid OTP it is moved, as mentioned, to the actual ledger. Inside of the the $PendingTransactions$ map that transactions receives state $TRANSACTION\_PERFORMED$ but will not be deleted.
 
 \subsection{Additional Login Layer}
 \label{subsec:impl-login-layer}
 
 active login how handled
+
+\begin{lstlisting}[language=bsl]
+	sessionData := {
+		"CreditRequestClient@CreditRequestClient" -> "mbrId1",
+		"DebitAcknowledgeClient@DebitAcknowledgeClient" -> "mbrId4",
+		"DebitRequestClient@DebitRequestClient" -> "mbrId2"
+	}
+\end{lstlisting}
 
 \section{Important Rules}
 \label{sec:impl-rules}
