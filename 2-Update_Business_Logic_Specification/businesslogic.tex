@@ -480,6 +480,7 @@ $MNGR$ 		& {\bf entityName}$^*$		&String	& Legal entity name \\
 \end{table}
 
 \subsection{Transfer Types}
+\label{subsec:perm-trans-types}
 As shown in Figure \ref{fig:transactabilitywkflow}, the first test for transactability involves so-called Transfer Types. Transfer Types are mathematical functions of the {\bf source} groups ($fromGroup$s) whose values are sets of {\bf destination} groups ($toGroup$s). There is one different function for each combination of ordered pairs $(x, y)$, where $x \in \{ credit, debit \}$ and $y \in \{ SRD, EUR \}$, leading to four different functions. However, it is simpler and also easier to implement to express them as a single function of 3 parameters. Formally,
 \begin{align}
 TT\colon &Operation \times Currency \times Group\ \rightarrow\ Powerset(Group),
@@ -539,6 +540,7 @@ $MNGR$ 		& $TT_3 \cup TT_5 \cup TT_6$ & $TT_5$ & $\emptyset$ & $\emptyset$	 \\[3
 
 
 \subsection{Account Connectivity}
+\label{subsec:perm-acc-con}
 Figure \ref{fig:User_Acct_Connectivity} shows the account connectivity function used for Test 2 in Figure \ref{fig:transactabilitywkflow}. As for Visibility, a `1' indicates that the Source and Destination accounts are connected and funds can be transferred from one to the other.
 
 \begin{figure}[h]

@@ -513,7 +513,7 @@ Currently the logger implementation can only be applied meaningful inside of the
 \section{Test Scenario}
 \label{sec:impl-test}
 
-This deliverable is not covering the test management for the ICEF implementation of Interlace. However, in order to check if a base workflow of a requirement is working in its most simple form a strategy has been followed which has been partly explained already by other sections of chapter \ref{ch:CoreAsimImplementation}. Te scope of this section will be therefore to put those parts together and extend the missing bits.
+This deliverable is not covering the test management for the ICEF implementation of Interlace. However, in order to check if a base workflow of a requirement is working in its most simple form a strategy has been followed which has been partly explained already by other sections of chapter \ref{ch:CoreAsimImplementation}. The scope of this section will be therefore to put those parts together and extend the missing bits.
 
 \subsection{Separation of Concerns}
 
@@ -535,15 +535,113 @@ In \ref{subsec:impl-agent-tasks} the main agents are explained which are a $sche
 
 The $scheduler$ mostly contains testing routines but partly also routines handling necessary client implementations which are not covered by the requirements. The test routines are responsible for starting and destroying clients. As a short reminder, the $scheduler$ is able to do so because it also contains all the client code. Further, listing \ref{lst:impl-msg-send} shows the sending of a test credit request issued by the $CreditRequestClient$. This message is processed by a challenge-respond sequence between the server and the client imitating a transaction.
 
-Finally, a correct execution is currently only shown by a client which outputs a transfer-performed message when done. In case of an error the client would provide a message indicating the cause.
+Concluding, a correct execution is currently only shown by a client which outputs a transfer-performed message when done. In case of an error the client would provide a message indicating the cause.
 
 \subsection{Simulation Environment}
 \label{subsec:impl-sim-env}
 
-init data
-temp table structure
-backend simulation
-Database and Agent Initialization
+The simulation environment created for enabling the core server parts to be executed and later be validated has an active and a passive part. The so called active part takes care about storing a transaction into the ledger and the passive part contains various pre-prepared locations which are needed to satisfy the different requirement constraints.
+
+\subsubsection{Locations: }\ Beginning with the passive part the following locations have been defined inside of the non-functional client $initdata$ shown in listing \ref{lst:impl-sim-setup-locs}.
+
+\begin{center}
+\begin{minipage}{0.8\textwidth}
+\small
+\begin{lstlisting}[language=bsl_lst,caption={\bf\small Simulation Environment Locations},label={lst:impl-sim-setup-locs} ]
+controlled TT: OPERATION * UNIT * USER_TYPE_GROUP -> SET
+controlled AccT: OPERATION * UNIT * ACCOUNT_TYPES -> SET
+
+controlled profileTable: MEMBER_ID -> MAP
+controlled accountTable: ACCOUNT_ID -> MAP
+controlled userGroupTable: MEMBER_ID -> USER_TYPE_GROUP
+controlled sessionData: MAP
+\end{lstlisting}
+\end{minipage}
+\end{center}
+
+The two most important are the functional locations $TT$ and $AccT$. They are corresponding to the transfer type matching described in \ref{subsec:perm-trans-types} and the account connectivity mentioned in \ref{subsec:perm-acc-con} respectively.
+
+$TT$ got predefined precisely in the requirement definitions and is described as a functional mapping
+
+\begin{asm}
+TT: Operation \times Currency \times Group \rightarrow \{G \mid G \subseteq Group\}
+\end{asm}
+
+So we can define for an Credit-Operation in Sardex (SRD) an $Employee$ is allowed to perform a transaction with a member of the circuit which is part of one of the groups $Company$, $Retail$ or $Full$:
+
+\begin{asm}
+TT^{Credit,SRD}(Employee) =\{Company,Retail,Full\}
+\end{asm}
+
+When translating this discrete functional mapping to BSL the outcome is looking like this
+
+\begin{lstlisting}[language=bsl]
+	TT("credit", "SRD", "employee") := {"company", "retail", "full"}
+\end{lstlisting}
+
+The account connectivity function $AccT$ is taking operation, currency and account type as parameters and is then mapping them to a group of account types
+
+\begin{asm}
+AccT: Operation \times Currency \times AccountType \rightarrow \{AccT \mid Acct \subseteq AccountType\}
+\end{asm}
+
+When replacing the parameters by actual values the following may be written down 
+
+\begin{asm}
+\begin{array}{ll}
+AccT^{Credit,SRD}(X) =\{ CC , Domu ,Mirror \} & \IF X \in CC
+\end{array}
+\end{asm}
+
+which then can be transformed again into the "implemented" form and is represented like this inside of the $initdata$ agent
+
+\begin{lstlisting}[language=bsl]
+	AccT("credit", "SRD", "CC") := {"CC", "DOMU", "MIRROR"}
+\end{lstlisting}
+
+The other location listed in listing \ref{subsec:perm-trans-types} are accommodating important information for groups, members, sessions as well as accounts. Except for the $userGroupTable$ which is just mapping a user to its current operational group all functions implementing a result type of $MAP$. A $MAP$ is similar to a simple set with the difference that each entry of a $MAP$ is a key-value pair.
+
+\begin{center}
+\begin{minipage}{0.8\textwidth}
+\small
+\begin{lstlisting}[language=bsl_lst,caption={\bf\small $MAP$ example showing a profile table entry},label={lst:impl-sim-maps} ]
+	//init profile data
+	profileTable("mbrId1") := {
+		"lowBalanceAlert" -> 700,
+		"highBalanceAlert" -> 1000,		
+		"highVolumeAlert" -> 10000,
+		"capacity" -> 100000,
+		"saleVolume" -> 50000,
+		"accounts" -> ["accId1", "accId4"]
+	}
+\end{lstlisting}
+\end{minipage}
+\end{center}
+
+Listing \ref{lst:impl-sim-maps} shows a typical definition of such a map which may be compared to a hash map used in various different other programming languages. Those values are accessed based on different pre-defined rules which are explained in section \ref{sec:impl-rules}.
+
+\subsubsection{Ledger: }\ The ledger but also the pending transactions are initialized as empty maps
+
+\begin{lstlisting}[language=bsl]
+	Ledger := {->}
+	PendingTransactions := {->}
+\end{lstlisting}
+
+and when a transaction is matching the required constraints it is appended to that ledger map. For unconfirmed debit requests an second map called $PendingTransactions$ has been added which contains valid transactions which have not yet been confirmed by the debtor yet.
+
+After the various checks which vary a little based to the type of operation have been successful the transaction is appended using the following command 
+
+\begin{lstlisting}[language=bsl]
+	Append(Transaction(transfer, client, "debit", now), Ledger)
+\end{lstlisting}
+
+A pending transaction awaiting a correct OTP from a debtor are added to location $PendingTransactions$ like this
+
+\begin{lstlisting}[language=bsl]
+	Insert(transfer, creditor, PendingTransactions) Ledger)
+\end{lstlisting}
+
+After a transaction got confirmed by a valid OTP it is moved, as mentioned, to the actual ledger. Inside of the the $PendingTransactions$ map that transactions receives state $TRANSACTION_PERFORMED$ but will not be deleted.
 
 \subsection{Additional Login Layer}
 \label{subsec:impl-login-layer}
