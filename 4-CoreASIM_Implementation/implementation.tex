@@ -509,24 +509,48 @@ When initialized the logger can be used at any place by calling the $do\_log$-ru
 
 Currently the logger implementation can only be applied meaningful inside of the server itself, because the implementation is also hosted by the server agent definition file $server.casim$ directly. Certainly, it would be possible to put the logger into a different file but the $include$ statement of the $run.icef$ is not supported by the Eclipse Plug-in. Consequently, if the logger implementation would be separated out into an additional file all occurrences of $do\_log$ calls would be marked as erroneous (although they are not) and would then turn the coding-assistance-tools inside of Eclipse into an unusable environment.
 
-\section{Simple Test Scenario}
+
+\section{Test Scenario}
 \label{sec:impl-test}
 
-explain test cases and scenarios
+This deliverable is not covering the test management for the ICEF implementation of Interlace. However, in order to check if a base workflow of a requirement is working in its most simple form a strategy has been followed which has been partly explained already by other sections of chapter \ref{ch:CoreAsimImplementation}. Te scope of this section will be therefore to put those parts together and extend the missing bits.
 
-\section{Database and Agent Initialization}
-\label{sec:impl-db-init}
+\subsection{Separation of Concerns}
+
+When looking at the environment from a testing perspective there are three parts which can be distinguished. 
+
+\begin{enumerate}
+	\item Actual system requirements implementations
+	\item Testing routines
+	\item Simulation environment
+\end{enumerate}
+
+The "actual system requirement implementations" mentioned first cover parts which are needed for a possible real-world system. Without those the system would not be able to function and can be seen as the core part of the application which is entitled to be tested.
+
+Second, code parts have been implemented which are only there for performing and validating a test of a particular scenario use case. Currently those scenarios are credit and debit operation requests sent from virtual clients.
+
+Last, parts of the system had to be implemented prototypical and in their most basic form in order to receive a very simple executable version which can accommodate the test scenarios. Those parts were not included by the requirements definitions nor by the refinements. These parts comprise implementation details not relevant to the requirements as well as the main ledger implementation.
+
+In \ref{subsec:impl-agent-tasks} the main agents are explained which are a $scheduler$ and a $server$. Those two, when assembled for execution, are containing all implementations. The $server$ covers the actual system requirement realizations and as well simulation environment code. To be more specific the $server$ is dispatching message request explained in \ref{lst:impl-msg-dispatch} and is performing read actions to virtual profile, account, etc. information together with pushing transactions to a primitive ledger shown in \ref{subsec:impl-sim-env}.
+
+The $scheduler$ mostly contains testing routines but partly also routines handling necessary client implementations which are not covered by the requirements. The test routines are responsible for starting and destroying clients. As a short reminder, the $scheduler$ is able to do so because it also contains all the client code. Further, listing \ref{lst:impl-msg-send} shows the sending of a test credit request issued by the $CreditRequestClient$. This message is processed by a challenge-respond sequence between the server and the client imitating a transaction.
+
+Finally, a correct execution is currently only shown by a client which outputs a transfer-performed message when done. In case of an error the client would provide a message indicating the cause.
+
+\subsection{Simulation Environment}
+\label{subsec:impl-sim-env}
 
 init data
 temp table structure
 backend simulation
+Database and Agent Initialization
 
-\section{Additional Login Layer}
-\label{sec:impl-login-layer}
+\subsection{Additional Login Layer}
+\label{subsec:impl-login-layer}
 
 active login how handled
 
-\section{Important Rule}
+\section{Important Rules}
 \label{sec:impl-rules}
 
 explain helper rules not defined in requirements nor in other sections
