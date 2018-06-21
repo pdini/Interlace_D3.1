@@ -646,7 +646,9 @@ After a transaction got confirmed by a valid OTP it is moved, as mentioned, to t
 \subsection{Additional Login Layer}
 \label{subsec:impl-login-layer}
 
-active login how handled
+The requirements definitions do not define how authentication is handled on the system. Agents in ICEF have predefined names which cannot be changes during runtime. In order to act flexible and reuse agents a login layer has been introduced. Thus agents who are actively communicating with the server need to be registered inside of the $sessionData$ location which is initialized in the $initdata$ function.
+
+Agents on the current prototypical implementation do not login by themselves by providing a user name and password but by placing its address together with a valid member id inside of $sessionData$-MAP as shown here
 
 \begin{lstlisting}[language=bsl]
 	sessionData := {
@@ -656,10 +658,30 @@ active login how handled
 	}
 \end{lstlisting}
 
-\section{Important Rules}
+The address of an agent is defined by "<name>@<name>", thus concatenating its own name with an "@"-symbol. The address is taken during message processing to determine that f.e. agent "CreditRequestClient" messages are sent by user "mbrId1" when looking at the above $sessionData$ set-up.
+
+The member-id is representing an alpha-numerical string assigned after first registration. For the Interlace implementation this means that an entry also needs to exist in location $profileTable$ as well as in $userGroupTable$, which means that the user has been properly registered and is known to the system. If a valid transaction should be placed an entry inside of location $accountTable$ for that user should be added to assign and work with an actual account.
+
+During runtime two derived functions are used to read the information of $sessionData$. As shown beneath a member-id of an "active" user can be determined by calling $activeLogin$. To check if a member is currently logged-in may be found out by obtaining the result of $activeClient$.
+
+\begin{lstlisting}[language=bsl]
+	//get member id by providing a client name using session information
+	derived activeLogin(client_address) = ...
+	//usage
+	login_mbrId := activeLogin("CreditRequestClient@CreditRequestClient")
+	
+	//get client name by providing member id using session information
+	derived activeClient(login_mbrId) = ...
+	//usage
+	client_address := activeClient("mbrId1")
+\end{lstlisting}
+
+One restriction needs to be mentioned though. A client address only can have one member being logged-in at one time and vice versa.
+
+\section{Important Rules and Locations}
 \label{sec:impl-rules}
 
-explain helper rules not defined in requirements nor in other sections
+Now the emphasis is put on explaining rule and locations we were not explained in detail or mentioned at all. 
 
 \section{Issues}
 \label{sec:impl-issues}
