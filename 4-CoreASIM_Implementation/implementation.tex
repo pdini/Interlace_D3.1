@@ -683,6 +683,24 @@ One restriction needs to be mentioned though. A client address only can have one
 
 Next the emphasis is put on explaining rules and locations not discussed in detail or not mentioned at all in this document yet. All rules and locations in this section can be located inside of file $server.casim$ or $initdata.casim$ which is added to the server part due to the $include$-statement inside of run.icef.
 
+In BSL-code you need to use the $choose$-keyword to read content inside a map which make code difficult to read in some cases. To simplify that access, a derived function $v$ got introduced for working with $MAP$-type locations:
+
+\begin{lstlisting}[language=bsl,mathescape=true]
+	$\Rightarrow$ derived v(amap, key)
+\end{lstlisting}
+
+The parameter $amap$ can be any $MAP$-type location and the $key$ refers to the entry of interest. Consequently, the corresponding $value$ can be read by passing an existing $key$ like illustrated in the following example
+
+\begin{lstlisting}[language=bsl,mathescape=true]
+	mymap := {
+		"thekey" => "assignedvalue",
+		"another" => "somevalue"		
+	}
+	valueofkey := v(mymap, "thekey")
+\end{lstlisting}
+
+Concluding further, if the map or the key is undefined, also the result will be.
+
 \section{Issues}
 \label{sec:impl-issues}
 
