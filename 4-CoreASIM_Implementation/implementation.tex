@@ -701,7 +701,80 @@ The parameter $amap$ can be any $MAP$-type location and the $key$ refers to the 
 
 Concluding further, if the map or the key is undefined, also the result will be.
 
-\section{Issues}
+The ICEF-framwork uses a Plug-in called "CommunicationPlugin" to establish a simple communication system. As mentioned in previous section a method called $send$ is used to transfer a message. However, the server implementation usually does not call that method directly but rather a rule with the same name starting with an upper-case letter. That $Send$ rule takes as first parameter a message which contains a list of two strings. Those two strings are the message content itself as well as the message subject. In order to abstract the message type from the user a derived rule called $AssembleMessage$ is provided for creating such a message. The second parameter is the recipient agent name, not a member with a particular id:
+
+\begin{lstlisting}[language=bsl,mathescape=true]
+	$\Rightarrow$ derived AssembleMessage(msg, sub)	
+	$\Rightarrow$ rule Send(msg, agent)
+\end{lstlisting}
+
+When passing a message before sending, other parts of the implementation may use $messageContent$ and $messageSubject$ functions on the assembled message to get back the content and the subject respectively. Also $Send$ uses those two function to read content and subject for the actual sending process.
+In case of error or success specific messages are created. $IncorrectOtpFor$ is one example which is used inside the $server$ implementation to create an appropriate error message based on particular related arguments:
+
+\begin{lstlisting}[language=bsl,mathescape=true]
+	$\Rightarrow$ derived messageContent(msg)
+	$\Rightarrow$ derived messageSubject(msg)
+	$\Rightarrow$ derived IncorrectOtpFor(otp, amount, creditor)
+\end{lstlisting}
+
+Continuing further on OTPs there are three important functions to mention on top of the requirement definitions. $RandomHex$ is generating a random hex-decimal number. Next $HexString$ calls $RandomHex$ $n$ times where $n$ equals the first parameter $length$ resulting in a hex-decimal string. That hex-decimal generation is used for creating one time passwords (OTPs) as well as transaction ids for appending unique transactions to the ledger.
+
+\begin{lstlisting}[language=bsl,mathescape=true]
+	$\Rightarrow$ derived RandomHex
+	$\Rightarrow$ derived HexString(len)
+	$\Rightarrow$ derived OneTimePassword(strength)
+\end{lstlisting}
+
+Transactions are transferred using a $MAP$. A credit transfer is shown next:
+
+\begin{lstlisting}[language=bsl,mathescape=true]
+	$\Rightarrow$ CREDITREQUEST := {
+			"from" -> "accId1",
+			"to" -> "accId2",
+			"channel" -> "Service",
+			"amount"  -> 2000,
+			"metadata" -> {"message", "some transfer"}
+	  }	
+\end{lstlisting}
+
+For all attributes used inside those transfer-request-maps derived functions have been created. One function and its usage is shown here:
+
+\begin{lstlisting}[language=bsl,mathescape=true]
+	$\Rightarrow$ derived fromAcc(transfer)
+	// example
+	fA := fromAcc(CREDITREQUEST)
+	fA = "accId1" //is true
+\end{lstlisting}
+
+Next the focus is put on the ledger and the preliminary storage for pending transactions. Both are maps storing transactions. The difference is that $PendingTransactions$ are using OTP-key to map to a transaction whereas a finally persisted transaction is mapped using an transaction-id-key. One time pads are created by $OneTimePassword$ and transaction ids are created by calling $NewTransactionID$.
+
+\begin{lstlisting}[language=bsl,mathescape=true]
+	$\Rightarrow$ controlled location Ledger
+	$\Rightarrow$ controlled location PendingTransactions
+\end{lstlisting}
+
+\begin{lstlisting}[language=bsl,mathescape=true]
+	$\Rightarrow$ rule Append(trans, ledger)
+	$\Rightarrow$ rule Insert(transfer, creditor, pendingTransactions)
+	$\Rightarrow$ derived NewTransactionID(len)
+	$\Rightarrow$ derived Transaction(transfer, mbr, operation, date)
+\end{lstlisting}
+
+Finally a rule is described which is part of the requirements but used in a different way. The requirements are using three functions called $FinalDebitAccountLimitsCheck$, $DebitAccountLimitsCheck$, $CreditAccountLimitsCheck$. Those function are basically similar and used in a consolidated way for the ICEF-implementation. $PrevieCheck$ implements that check and needs the member id $mbr$, the from account $fromA$, the to account $toA$, a from group $fromGroupId$, a $toGroupId$ and as last parameter the operation $operation$ as string. The operation string can be either "credit" or "debit". This code example is showing the rule but also how it is used in the current set-up:
+
+\begin{lstlisting}[language=bsl,mathescape=true]
+	$\Rightarrow$ rule PreviewCheck(mbr, fromA, toA, fromGrpId, toGrpId, operation)
+	//example: do check the transfer if it is ok
+	error <- PreviewCheck(
+		activeLogin(client),
+		fromAcc(transfer),
+		toAcc(transfer),
+		groupOf(ownerOf(fromAcc(transfer))),
+		groupOf(ownerOf(toAcc(transfer))),
+		"credit")
+\end{lstlisting}
+
+\section{Fallacies and Pitfalls}
 \label{sec:impl-issues}
 
 testing, seq-block vs par-block, 
