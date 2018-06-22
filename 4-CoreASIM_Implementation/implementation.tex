@@ -746,12 +746,18 @@ For all attributes used inside those transfer-request-maps derived functions hav
 	fA = "accId1" //is true
 \end{lstlisting}
 
-Next the focus is put on the ledger and the preliminary storage for pending transactions. Both are maps storing transactions. The difference is that $PendingTransactions$ are using OTP-key to map to a transaction whereas a finally persisted transaction is mapped using an transaction-id-key. One time pads are created by $OneTimePassword$ and transaction ids are created by calling $NewTransactionID$.
+Next the focus is put on the ledger and the preliminary storage for pending transactions. Both are maps storing transactions. The difference is that $PendingTransactions$ are using an OTP-key to map to a transaction whereas a finally persisted transaction is mapped using an transaction-id-key. One time pads are created by $OneTimePassword$ and transaction ids are created by calling $NewTransactionID$.
 
 \begin{lstlisting}[language=bsl,mathescape=true]
-	$\Rightarrow$ controlled location Ledger
-	$\Rightarrow$ controlled location PendingTransactions
+	$\Rightarrow$ controlled Ledger: MAP
+	$\Rightarrow$ controlled PendingTransactions: MAP
 \end{lstlisting}
+
+Rule $Insert$ is adding a transaction which is awaiting confirmation to a map which needs to be the last parameter. The $server$ stores all those unconfirmed request inside of map PendingTransactions as indicated above.
+
+After a valid and existing OTP has been sent for a transfer inside of $PendingTransactions$ the transfer needs to undergo some more checks, but when passed, it is appended to the Ledger by executing rule $Append$.
+
+$Insert$ and $Append$ are listed here together with $Transactions$ and $NewTransactionID$:
 
 \begin{lstlisting}[language=bsl,mathescape=true]
 	$\Rightarrow$ rule Append(trans, ledger)
@@ -766,19 +772,34 @@ Finally a rule is described which is part of the requirements but used in a diff
 	$\Rightarrow$ rule PreviewCheck(mbr, fromA, toA, fromGrpId, toGrpId, operation)
 	//example: do check the transfer if it is ok
 	error <- PreviewCheck(
-		activeLogin(client),
-		fromAcc(transfer),
-		toAcc(transfer),
-		groupOf(ownerOf(fromAcc(transfer))),
-		groupOf(ownerOf(toAcc(transfer))),
-		"credit")
+		activeLogin(client), //read mbr from message client-address
+		fromAcc(transfer), //read from account of transfer
+		toAcc(transfer), //read to-account of transfer
+		groupOf(ownerOf(fromAcc(transfer))), //get group of from-account owner
+		groupOf(ownerOf(toAcc(transfer))), //get group of to-account owner
+		"credit" //Operation as string
 \end{lstlisting}
 
-\section{Fallacies and Pitfalls}
+The result of $PreviewCheck$ is either $undef$ in case all checks are successful or are containing a message text indicating the problem.
+
+\section{Review}
 \label{sec:impl-issues}
 
-testing, seq-block vs par-block, 
+When working with the ICEF-framework some thing need to be noted. Currently, the ICEF-framework is an academic tool and not ready for professional usage. Some efforts need to be applied in order to achieve a fully integratable system for a software design process or even a continuous integration process.
 
-function conversion/translation, bugs?? brief, reference to correction
+\subsection{Issues}
 
-what is implemented, what is missing, centralized architecture (message passing??)
+Next some of the issues are listed the development team had been confronted with:
+
+\begin{description}
+	\item[unknown line numbers] When transmitting a file to the ICEF manager JavaScript code loads that file preparing it for being sent over the network in form of JSON. That process together with the added preliminary $include$-syntax are causing that error message do not contain appropriate line numbers when errors occur. Thus in case of any failure the problem is sometime very hard to locate.
+	\item[parallel blocks] ASM code and consequently also BSL code allows to write so-called parallel blocks. Those blocks start with $par$, end with $endpar$ and contain code which is executed in parallel - at least theoretical. The important thing to know here is that the order of execution is not guaranteed. This can lead and actually leaded during development to unpredictable behaviour and needs to be used with caution!
+	\item[bugs] As the ICEF framework is still in an alpha version state couple of bugs occurred which could be fixed. However, there are further iterations needed to make the framework stable.
+	\item[testing] Testing approaches still need to be investigated, because at the moment only the text output of a simulation can be checked if the system is running correct. This will be part of the upcoming research.
+	\item[modules] The solution of how modules or how other code snippets are integrated comes with strings attached like the inaccurate line numbers and duplicate name spaces. Thus a re-factoring for later use is highly recommended.
+	\item[From document based to executable] When a system behaviour has been written down in form of an ASM specification it is necessary to note that a direct translation to ASM/BSL code is not always possible. One reason is that the functions and rules are not consistently available for coreAS(I)M as well as lot of code for "getting it to run" needs to be worked out.
+\end{description}
+
+\subsection{Current Status}
+
+The requirements for credit and debit operations have been implemented and are ready for being tested. ... TODO ...
