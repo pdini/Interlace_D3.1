@@ -789,17 +789,22 @@ When working with the ICEF-framework some thing need to be noted. Currently, the
 
 \subsection{Issues}
 
-Next some of the issues are listed the development team had been confronted with:
+During development the team has been confronted with different issues regarding the ICEF-framework but also with the process moving the specifications to a running ASIM Interlace Model. Next the issues are listed and explained:
 
 \begin{description}
-	\item[unknown line numbers] When transmitting a file to the ICEF manager JavaScript code loads that file preparing it for being sent over the network in form of JSON. That process together with the added preliminary $include$-syntax are causing that error message do not contain appropriate line numbers when errors occur. Thus in case of any failure the problem is sometime very hard to locate.
-	\item[parallel blocks] ASM code and consequently also BSL code allows to write so-called parallel blocks. Those blocks start with $par$, end with $endpar$ and contain code which is executed in parallel - at least theoretical. The important thing to know here is that the order of execution is not guaranteed. This can lead and actually leaded during development to unpredictable behaviour and needs to be used with caution!
-	\item[bugs] As the ICEF framework is still in an alpha version state couple of bugs occurred which could be fixed. However, there are further iterations needed to make the framework stable.
-	\item[testing] Testing approaches still need to be investigated, because at the moment only the text output of a simulation can be checked if the system is running correct. This will be part of the upcoming research.
-	\item[modules] The solution of how modules or how other code snippets are integrated comes with strings attached like the inaccurate line numbers and duplicate name spaces. Thus a re-factoring for later use is highly recommended.
-	\item[From document based to executable] When a system behaviour has been written down in form of an ASM specification it is necessary to note that a direct translation to ASM/BSL code is not always straight forward. One reason is that the functions and rules are not consistently available for coreAS(I)M as well as lot of code for "getting it to run" needs to be worked out.
+	\item[Unknown line numbers] Before transmitting a simulation to the ICEF manager JavaScript code is loading all specified casim files preparing them for being sent over the network in form of a consolidated JSON-message. That process together with the added preliminary $include$-syntax are causing a problem for error message. More precisely that they do not contain appropriate line numbers if something goes wrong. Thus in case of any failure it is sometime very hard to locate the actual cause.
+	\item[Error in block] Errors inside of a block are causing the whole block not being executed for unknown cases. So, if a block has n-statements and the last one has a problem all the other n-1 might not be executed as well. Even if a sequential block has been used. Given that the error messages do not contain correct line numbers finding a problem with debug output to the console also does not work appropriately in all of the cases.
+	\item[Parallel blocks] ASM code and consequently also BSL code allows to write so-called parallel blocks. Those blocks start with $par$, end with $endpar$ and contain code which is executed in parallel - at least theoretical. The important thing to know here is that the order of execution is not guaranteed. This can lead and actually leaded during development to unpredictable behaviour and needs to be used with caution!
+	\item[Bugs] As the ICEF framework is still in an alpha version state couple of bugs occurred which could be fixed. However, there are further iterations needed to make the framework stable.
+	\item[Testing] Various testing approaches still need to be investigated, because at the moment only the text output of a simulation can be checked to test if the system is running correct. These testing approaches will be part of the upcoming research.
+	\item[Modules] The solution of how modules or how other code snippets are integrated comes with strings attached like the mentioned inaccurate line numbers and duplicate name spaces. Thus a re-factoring for later use is highly recommended.
+	\item[From document based to executable] When a system behaviour has been written down in form of an ASM specification it is necessary to note that a direct translation to ASM/BSL code is not always straight forward. One reason is that the functions and rules are not consistently available for coreAS(I)M as well as a lot of code for "getting it to run" needs to be worked out.
 \end{description}
 
 \subsection{Current Status}
 
-The requirements for credit and debit operations have been implemented and are ready for being tested. ... TODO ...
+The requirements for credit and debit operations have been implemented and are ready for more sophisticated tests. Also the base conditions for including further operations or requests handled by the server can be easily extended.
+
+A test scenario has been build which may be used later for high level testing where particular use cases are played through using a predefined set of tests including agents with particular tests.
+
+Nevertheless, B2C-operations and also some of the other requests defined like $AccountHistReq$ still need to be taken care of.
