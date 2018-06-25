@@ -6,11 +6,8 @@
 Egon B\"orger, Luca Carboni and Paolo Dini
 \end{center}
 
-We specify here the refinement of the abstract model defined in D2.1 for the Sardex core payment operations Credit, Debit and B2C (in Euro or SRD).\footnote{We skip the account history and balance operations explained in Sect.3.2 of D2.1, because they seem not be be in the focus anymore.} The 
-refinement moves towards what is needed for an executable version of the 
-model, though it still stays at the functional requirements level of 
-abstraction. It is based upon the additional information obtained in the 
-meantime on details of various system components, on specific data concerning groups, accounts and transactions, and on the resulting intended definition of permission features. This information is taken from Ch. 2 of D3.1.
+We specify here the refinement of the abstract model defined in D2.1 for the Sardex core payment operations Credit, Debit and B2C (in Euro or SRD).\footnote{We skip the account history and balance operations explained in Sect.3.2 of D2.1, because they seem not be be in the focus anymore.} The refinement moves towards what is needed for an executable version of the 
+model, though it still stays at the functional requirements level of abstraction. It is based upon the additional information obtained in the meantime on details of various system components, on specific data concerning groups, accounts and transactions, and on the resulting intended definition of permission features. This information is taken from Ch. 2 of D3.1.
 
 Sect.~\ref{sect:creditops} and Sect.~\ref{sect:debitops} refine the model for the basic credit and debit operations considered in D2.1,  Sect.~\ref{sect:userops} adds the new operations between companies and consumers, called B2C operations. Sect.~\ref{sect:signature} describes the refinement of the signature elements that were introduced in D2.1. Unexplained terminology and notation are used with the meanings explained in D2.1.
 
@@ -49,7 +46,6 @@ and no $Retail$ member.}
 \end{asm}
 
 
-\bigskip
 {\bf Notational convention.} To simplify the exposition, we treat singleton sets, like $Mngr=\{mngr\}$, sometimes as set (here $Mngr$) and sometimes as element (here $mngr$), depending on the context, hoping that this slight abuse of language does not create any ambiguity. 
 In general, we write $x$ for elements of $X$ where $X$ is one of the above 9 groups. To prepare the step towards a natural implementation of the model, we treat $Welcome$ and $On\_Hold$ members as potential members of some of the other groups which have however a $Welcome$ resp. $On\_Hold$ flag set. 
 
@@ -62,13 +58,11 @@ Group= \+
 
 Since by the disjointness constraint each user is assumed to belong to exactly one group, there is a function $group(user)$ which yields the group to which $user$ belongs.
 
-\bigskip
 {\bf Group Profile Metadata.} Each group comes with a set of attributes (called metadata) that are characteristic for its members. They include the following five data types which are used in the refined model as `profile metadata' (besides the ususal `identity metadata' described in D3.1 which provide the information on the ID of a group member, its e-mail address, phone numbers, also its legal name, address, gps, fiscal ID (VAT), etc.).
-
 \begin{itemize}
 	\item $Company$, $Retail$ (and therefore also $Full$) and $Welcome$ members (but not the $Mngr$) come with a $capacity$, a location whose value represents the maximum yearly SRD volume the member committed to \emph{selling}, with payment in SRD, when it stipulated its contract with the Sardex company. The date of the stipulation of $capacity$ is recorded in a location $capacityDate$.
 	\begin{itemize}
-		\item For a given $account$ (typically in CC, see below Sect.~\ref{sect:accounts}), a derived parameterized location $availableCapacity(account)$, introduced in D3.1 as belonging to AccountMetadata, is defined as follows:\footnote{The defining equation for $availableCapacity$ holds only for non-Welcome members, which---differently from $Welcome$ members (see table 4 in D3.1)--- have a defined $account$; it holds for $Welcome$ members only once they have been assigned an $account$.} 
+		\item For a given $account$ (typically in CC, see below Sect.~\ref{sect:accounts}), a derived parameterized location introduced in D3.1 as belonging to AccountMetadata, $availableCapacity(account)$, is defined as follows:\footnote{The defining equation for $availableCapacity$ holds only for non-Welcome members, which---differently from $Welcome$ members (see table 4 in D3.1)--- have a defined $account$; it holds for $Welcome$ members only once they have been assigned an $account$.} 
 		\[availableCapacity(account)=capacity-saleVolume(account)\]
 		where the dynamic function $saleVolume(account)$ indicates the current total volume of \underline{sales} per year\footnote{This implies that $availableCapacity(account)$ is implicitly parametrized by the year.} using that $account$.
 	\end{itemize}
@@ -104,7 +98,6 @@ For each group, say $fromGroup$,  $TT^{op,cur}(fromGroup)$ defines the set $toGr
 %\textcolor{red}{Note we may need to add Channel to the TT definition above (Service or PoS)}\\
 %\textcolor{red}{Fine with me, paolo. But some time ago I asked this question and the answer was that the Channel does not matter...}
 
-\bigskip
 {\bf Transfer Type Constraints for $TT^{Credit,SRD}$.} A $Credit$ operation in $SRD$ currency can be started only by members of one of the following groups (called source group or $fromGroup$ of the operation):
 \begin{itemize}
 	\item $Company$, and therefore also $Full$ and in particular $Mngr$,
@@ -134,28 +127,27 @@ TT^{Credit,SRD}(Consumer\_Verified)=\{Retail,Full\}
 
 Note that this definition, which will be used below for the transfer type check, allows no $Credit$ operation with target group $On\_Hold$. But note that  a $Retail$, $Company$ or $Full$ can have its $creditLimit$ set to 0 (by a broker operation we do not model here) which does not prevent that user from receiving credits for sales.
 
- For ease of reference we say that a group member $MayLaunchCreditOpns$ if it is an element of a group where $TT^{Credit,SRD}$ has a defined value: 
+ For ease of reference we say that a group member $MayLaunchCreditOpns$ if it is an element of a group where $TT^{Credit,SRD}$ has a defined value:\footnote{In the interest of mathematical clarity, the same statement could be written
+  \begin{asm}
+ MayLaunchCreditOpns(mbr) \iff 
+    group(mbr) \in \{ Company, Full, Mngr, Employee, Consumer\_Verified \}
+    \end{asm} }
  \begin{asm}
- MayLaunchCreditOpns(mbr) \iff \+
-    group(mbr) \in Company \cup Full \cup Mngr \cup Employee \cup Consumer\_Verified
+ MayLaunchCreditOpns(mbr) \iff 
+    mbr \in Company \cup Full \cup Mngr \cup Employee \cup Consumer\_Verified
     \end{asm}
 
-\bigskip
 {\bf Transfer Type Constraints for $TT^{Debit,SRD}$.} A $Debit$ operation in $SRD$ currency requires that $fromGroup$ and $toGroup$ are both members of either $Company$ or $Retail$ or $Full$ or $MNGR$. This requirement is expressed in the refined ASM model by the following function definition:
-	
-
 \begin{asm}
   TT^{Debit,SRD}(X)= \{X\} ~~~~~~~~~~ 
              	\FORALL X \in \{Company,Retail,Full,MNGR\}
 \end{asm}
-
 Correspondingly we define the domain predicate of $ TT^{Debit,SRD}$:
- \begin{asm}
-MayLaunchDebitOpns(mbr) \iff \+
-mbr \in Company \cup Full \cup Mngr \cup Employee 
+\begin{asm}
+\label{debitdomaindef}
+MayLaunchDebitOpns(mbr) \iff mbr \in Company \cup Full \cup Mngr \cup Employee
 \end{asm}
 
-\bigskip
 {\bf Transfer Type Constraints for operations in Euro.} In the Sardex system, no $Credit$ operations are allowed in EUR currency, so that no function $TT^{Credit,EUR}$ is needed.\footnote{In D3.1 it is stated that the function does exist but that it is completely $\UNDEF$ined.} A EUR $Debit$ operation can be triggered only by a $Retail$ (and therefore also by a $Full$) member $fromGroup$ with the same $toGroup$. This requirement is expressed in the refined ASM model by the following definition:
 \begin{asm}
 T^{Debit,EUR}(X)=\{X\} ~~~~~~~~~~\FORALL X \in Retail \cup Full  
@@ -166,7 +158,7 @@ In the present formulation of the model we do not use the function $T^{Debit,EUR
 \vspace{12pt}
 
 {\bf Remark on the refinement.} With the above definition of functions $TT^{op,cur}$, the transfer type part of the $Match$ predicate in D2.1 can be expressed as follows. By definition, the $cur$rency parameter of the $amount$ in question can be computed from the $account$ by the function $cur(account)$ (for accounts see Sect.~\ref{sect:accounts}).
-Furthermore, given that each member belongs to exactly one group, from the account parameters $from/to$ we also obtain $group(owner(from/to))$ in the following refinement of the group type constraints, namely $owner(from) \in fromMemberGroup(tt) $ and $owner(to) \in toMemberGroup(tt)$: 
+Furthermore, given that each member belongs to exactly one group, from the account parameters $from/to$ we also obtain $group(owner(from/to))$ in the following refinement of the group type constraints, namely $owner(from) \in fromGroup(tt) $ and $owner(to) \in toGroup(tt)$: 
 
 
 \begin{asm}
@@ -228,7 +220,6 @@ Account(consumer) = Account(consumer\_verified)
 Remark. $Welcome$ members initially have no account yet (formally meaning  $Account(welcome)=\emptyset$). The initial accounts of a 
 $user \in On\_Hold$ are those accounts the $user$ has at the moment it is placed into $On\_Hold$, but by being placed there the $user$ becomes unable to use these accounts.
 
-\bigskip
 {\bf Account Metadata.} Account metadata are used to formulate the constraints for allowed transfer $amount$s, which involve various account attributes like the $balance$, the $creditLimit$, the $upperLimit$, the $capacity$, etc. 
 
 Every $acc$ount has the locations $owner(acc)$ and $curr(acc)$ (which is also called $unit(acc)$) introduced above. For $Bisoo$ and $Topup$ accounts these are the only locations needed in the refined model, so for them there are no other metadata. 
@@ -236,20 +227,18 @@ Every $acc$ount has the locations $owner(acc)$ and $curr(acc)$ (which is also ca
 In addition, for each $acc$ount in $CC \cup Domu \cup Mirror$ there are the following locations, classified as metadata:
 
 \begin{itemize}
-	\item $balance$ (a Real number, modelled as 2-digit decimal.
+	\item $balance$ (a Real number, modelled as 2-digit decimal)
 	
 	\item $creditLimit$ (a non-negative number)\footnote{D3.1 describes also a $creditLimitDate$ location, indicating the date at which the credit limit was set. We skip such locations because no operation has been specified which uses them, so that there is no rule in the model which involves them.}
 	
 	\item $availableBalance$, a derived location required to be non-negative and defined by:
-	\[availableBalance=balance+creditLimit\]
+	\[availableBalance=balance+creditLimit.\]
 \end{itemize}
 
-In addition, $CC$ and $Mirror$ (but not $Domu$) accounts have the following  location:\footnote{We list $availableCapacity$ together with group locations, though in D3.1 it is classified under AccountMetaData.}
-
+In addition, $CC$ and $Mirror$ (but not $Domu$) accounts have the following  location:
 \begin{itemize}
 \item $upperLimit$ denoting the upper balance limit, a positive number
 \end{itemize}
-
 In connection with $balance$ and $saleVolume$ there are three predicates which trigger an alert when the monitored item reaches its (low or high) bound:
 \begin{asm}
 lowBalanceAlert \IFF creditLimit+balance<lowBalanceAlert \+
@@ -263,7 +252,6 @@ highVolumeAlert \IFF capacity-saleVolume<highVolumeAlert \+
 $Income$ and $Prepaid$ accounts have, besides  $owner(acc)$ and $curr(acc)$, also the $balance$ location. Note that a $Prepaid$ account has no $creditLimit$; otherwise stated, its credit limit is always 0.
 
 
-\bigskip
 {\bf Account Connectivity Constraints for user-initiated operations.} The account connectivity constraints serve to describe the account type conditions which are part 
 of the $Match$ predicate defined in D2.1. To keep the model as simple as possible, 
 we describe the intended effect of the new B2C operations in Sect.~\ref{sect:eurob2c} separately, so that we can limit ourselves here to formulate the account connectivity refinement only for user-initiated transactions.
@@ -279,7 +267,7 @@ The essential requirement for user-initiated Credit or Debit operations is two-f
 
 One can formalize the above requirements by defining the function 
 \begin{asm}
-AccT\colon Operation \times Currency \times AccountType \rightarrow \{AccT \mid Acct \subseteq AccountType\}
+AccT\colon Operation \times Currency \times AccountType \rightarrow \{Acct \mid Acct \subseteq AccountType\}
 \end{asm} 
 
 \noindent again by a case distinction $
@@ -299,7 +287,6 @@ MayStartCreditOpns(acct) \IFF acct \in CC \cup Domu \cup Mirror
 \end{asm}
 
 
-\bigskip
 {\bf Remark on Bisoo.}
 In D3.1 also $Debit$ operations in EUR from an $Income$ to a $Bisoo$ account are allowed. 
 Formally it means that in the definition above one includes the clause
@@ -308,14 +295,12 @@ Formally it means that in the definition above one includes the clause
 
 Since in rule $\ASM{EurB2C}$ below (Sect.~\ref{sect:eurob2c}) we provide a direct formalization of the B2C operation, we can do without the $Bisoo$ account and without any $Debit$ operation in EUR from an $Income$ to a $Bisoo$ account.
 
-\bigskip
 {\bf Remark on system-initiated Credit/Debit operations.} In D3.1 the $AccT$ function is defined also for system-initiated operations. $AccT$ with first argument $Credit$ is defined by:
 \[AccT^{Credit,SRD}(CC)=\{CC\} \AND AccT^{Credit,EUR}(Topup)=\{Prepaid\} \]
 
 $AccT$ with first argument $Debit$ is defined by:
 \[AccT^{Debit,EUR}(Topup)=\{Prepaid\}\]
 
-\bigskip
 {\bf Remark on the refinement.} With the above definitions one can redefine the account connectivity constraint part of the $Match$ predicate of D2.1, namely $sourceType(tt)=accountType(from)$ and $destType(tt)=accountType(to)$, as follows:
 
 \begin{asm}
@@ -428,7 +413,8 @@ $\ASM{CreditAccountLimitsCheck}$ checks the following data for the given $amount
 
 {\bf Remark on $creditPercent$.} The main use of the $creditPercent$ location is for statistical purposes, namely to compare the average EUR volume moved by the SRD volume in a given year. However, this feature is not currently implemented and will not be implemented in the CoreASIM model either.
 
-%\textcolor{blue}{Currently the system does not check whether the amount of credits being moved, if the total amount in question is more than 1000, complies with the $percentCredit$ of the Seller, nor is the SRD part of the payment related to the payment of the remaining part of the total amount.} Thus, the current definition of $\ASM{AccountLimitsCheck}$ does not reflect the $creditPercent$ requirement mentioned in D3.1.  \textcolor{red}{So what action should be taken? Should the rule stay or should it be changed to its current implementation?}
+%%%%%%% Note: this text is skipped for now as not immediately relevant to this model
+%\textcolor{blue}{Currently the system does not check whether the amount of credits being moved, if the total amount in question is more than 1000, complies with the $creditPercent$ of the Seller, nor is the SRD part of the payment related to the payment of the remaining part of the total amount.} Thus, the current definition of $\ASM{AccountLimitsCheck}$ does not reflect the $creditPercent$ requirement mentioned in D3.1. \textcolor{red}{So what action should be taken? Should the rule stay or should it be changed to its current implementation?}
 
 \begin{asm}
 \ASM{CreditAccountLimitsCheck}(transfer,\ASM{StepCompletion})=\+
@@ -509,7 +495,7 @@ The $\ASM{DebitTypeCheck}$ machine follows the same pattern as $\ASM{CreditTypeC
 \ASM{DebitTypeCheck}(transfer,creditor,\ASM{Completion})  =\+
 \IF MayLaunchDebitOpns(creditor) \mbox{  // check transfer type}\+
   \THEN ~ \IF  ~ \FORSOME g \in TT^{Debit,SRD}(group(creditor)) 
-          ~~ debitor \in g \footnote{By definition of $TT^{Debit,SRD}$ this condition is equivalent to $debitor \in group(creditor)$.} \+
+          ~~ debitor \in g \footnote{By the definition of the function $TT^{Debit,SRD}$ on Page \pageref{debitdomaindef}, this condition is equivalent to $debitor \in group(creditor)$.} \+
        \THEN  ~ \ASM{Completion}(debit,transfer,creditor) \\
         \ELSE ~ \ASM{Send}
         (ErrMsg(DebitTargetGroupViolation(transfer)),\TO :creditor) \- 
@@ -597,8 +583,7 @@ Small(amount) \IFF amount < 1000 \\
 
 When the $otp$ is acknowledged (i.e.\ resent) by the $debitor$ but too late, an error message informing that the $otp$ expired is sent to the debitor and the creditor and the message is discarded.
 
- If the acknowledgement is received
-within the $lifetimeForOTPs$ foreseen for one-time passwords, the system will $\ASM{CompleteTransaction}$ and update the transaction status from $pending$ to $performed$, but only after a new $\ASM{FinalDebitAccountLimitsCheck}$ succeeded. $\ASM{DebitAccountLimitsCheck}$  refined in this way guarantees that in case of failure the Debit operation is rejected. Therefore in every case the $status$ of the pending transaction is changed to either $performed$ or $rejected$ so that the one-time password can be deleted,  preventing a later application of the $\ASM{DebitRejectCompletion}$ rule (which has to be applied in case of an $Expired(otp)$).
+If the acknowledgement is received within the $lifetimeForOTPs$ foreseen for one-time passwords, the system will $\ASM{CompleteTransaction}$ and update the transaction status from $pending$ to $performed$, but only after a new $\ASM{FinalDebitAccountLimitsCheck}$ succeeded. $\ASM{DebitAccountLimitsCheck}$  refined in this way guarantees that in case of failure the Debit operation is rejected. Therefore in every case the $status$ of the pending transaction is changed to either $performed$ or $rejected$ so that the one-time password can be deleted,  preventing a later application of the $\ASM{DebitRejectCompletion}$ rule (which has to be applied in case of an $Expired(otp)$).
 
 
 \begin{asm}  
@@ -724,7 +709,6 @@ In the current Sardex system, EurB2C operations are triggered by a $retail$ or a
 \end{asm}
 NB. By registering, a $consumer$ becomes a member of $Consumer\_Verified$ whereby its `identity' changes from being a $card$ to a $customer$, with name, surname, etc., and correspondingly its $acc$ounts turn out to be known now as $acc_{customer}$ together with the associated account access function.
 
-\bigskip
 {\bf Remark on Bisoo and Income.} For simplicity of exposition, we have included 
 the  $bisoo_{consumer}$  action (to record, 
 for statistical purposes, the Euro amount of the sale) into  the $\ASM{IssueReward}$ rule. In the 
