@@ -3,37 +3,35 @@
 
 \vspace{-1cm}
 \begin{center}
-Eduard Hirsch
+Eduard Hirsch, Maria Luisa Mulas and Paolo Dini\footnote{Eduard performed the lion share of the implementation and all of the writing of this chapter; Maria Luisa supported the implementation and the trouble-shooting; Paolo did no implementation but thoroughly edited this chapter to mazimize clarity of expression.}
 \end{center}
 
-This chapter is taking a look at the ASIM implementation of the Interlace Project which have been done according to the specifications of D2.1 as well as the refinement specifications of the requirements.
+This chapter describes the ASIM implementation performed according to the specification of Deliverable D2.1 \cite{INTERLACE_D21}, as well as the refinement of the requirements specification presented in Chapter \ref{ch:UpdateBLS} and restated formally in the Appendix of the present report.
 
-In the previous chapter \ref{ch:CoreAsimIntro} the basis for an environment and code execution has been discussed. Further it will be described here how that environment has been utilized. The following detailed implementation design will show what issues and difficulties had to been taken into account.
+Chapter \ref{ch:CoreAsimIntro} discussed the basis for an environment and code execution. This chapter describes how that environment has been utilized. The following detailed implementation design will show what issues had to been taken into account and what difficulties needed to be overcome to achieve a running implementation.
 
 
 \section{Introduction}
 \label{sec:impl_intro}
 
-The requirements specifications are the basis for the implementation of an executable ASIM model. That model can be found on GitHub \footnote{https://github.com/InterlaceProject/ASIMSpec} will act as a foundation and test/verification template for further business implementations.
+The requirements specifications are the basis for the implementation of an executable ASIM model. The coreASIM code that implements the model of the business logic presented in Chapter \ref{ch:UpdateBLS} can be found on GitHub.\footnote{\url{https://github.com/InterlaceProject/ASIMSpec}} This code will act as a foundation and test/verification template for further business implementations.
 
-This main part of that document is now focusing on the way the ASIM model actually was implemented and how the missing functional parts of the back-end are realized which is mainly about simulating a simple ledger.
+This chapter focuses on how the ASIM model was implemented and how the missing functional parts of the backend are realized, which is mainly about simulating a simple ledger.
 
 \section{Agents}
 \label{sec:impl-agents}
 
-The implementation base is founded on several ASIM-agents which are programmed to act independent and communicate with each other by the base messaging system provided by the ICEF infrastructure.
+The implementation base consists of several ASIM agents which are programmed to act independently and to communicate with each other by means of the messaging system provided by the ICEF infrastructure.
 
-There are small differences between the available ASIM-agents and they can be, base on their purpose, categorized into the following three groups:
-
+There are small differences between the available ASIM agents and they can be, based on their purpose, categorized into the following three groups:
 \begin{itemize}
 	\item full agents
 	\item dynamic agents
 	\item non-functional agents
 \end{itemize}
+\textit{Full agents} are started right away \st{from the beginning} \textcolor{red}{when the ICEF is launched}. They process requests or handle other duties over the environment's lifetime. \textit{Dynamic agents} are created during a specific phase of a test and destroyed after that test has been completed. \textit{Non-functional agents} are never started directly and are \st{facilitated} \textcolor{red}{created} for integration into another agent. They host initialization code or helper functions in order to compensate for the missing modularization feature of the ASIM-BSL language.
 
-\textit{Full agents} are started right away from the beginning. They are processing request or are handling other duties over the environment lifetime. \textit{Dynamic agents} are created during a specific phase of a test and destroyed after that test has been completed. \textit{Non-functional agents} are never started directly and are facilitated for integration into another agent. They are hosting initialization code or helper functions in order to compensate for the missing modularization feature of the ASIM-BSL language.
-
-To get more familiar with the actual ASIM realization an extract of available agents is listed in table \ref{tab:model-agents}. Those may act as a template for extending the scenario applying additional use cases or tests. They are covering the core payment functionality, thus credit as well as debit operations.
+Table \ref{tab:model-agents} shows an extract of available agents, to help familiarize ourselves with the actual ASIM realization. These agents can act as a template for extending the scenarios by applying additional use cases or tests. They cover the core payment functionality, thus credit as well as debit operations.
 
 \begin{table}[H]
 \begin{centering}
@@ -45,19 +43,19 @@ To get more familiar with the actual ASIM realization an extract of available ag
 \Xhline{1.5pt}
 $scheduler$				& Scheduling, creating and destroying dynamic agents & full\\[3pt]
 \hline
-$server$				& Server which talks to the dynamic clients in order to handle payment and ledger specific requests & full\\[3pt]
+$server$				& Server which talks to the dynamic clients in order to handle payment and ledger-specific requests & full\\[3pt]
 \hline
 $CreditRequestClient$	& Handles a test credit request & dynamic\\[3pt]
 \hline
-$DebitRequestClient$	& Initiating a test debit request & dynamic\\[3pt]
+$DebitRequestClient$	& Initiates a test debit request & dynamic\\[3pt]
 \hline
-$DebitAcknoledgeClient$	& Confirming a test debit request & dynamic\\[3pt]
+$DebitAcknoledgeClient$	& Confirms a test debit request & dynamic\\[3pt]
 \hline
-$initdata$				& Fake database and back-end initalization code to be included into the \textit{server} agent & non-functional\\[3pt]
+$initdata$				& Fake database and backend initalization code to be included into the \textit{server} agent & non-functional\\[3pt]
 \Xhline{1.5pt}
 \end{tabular}
 }
-\caption{\small\textbf{Agent list and their respective functionality}}
+\caption{\small\textbf{Agent list and their respective functionalities}}
 \label{tab:model-agents}
 \end{centering}
 \vspace{-0.5cm}
@@ -65,9 +63,9 @@ $initdata$				& Fake database and back-end initalization code to be included int
 
 \section{Execution}
 
-As mentioned in chapter \ref{ch:CoreAsimIntro} the specifications are executed using the ICEF framework. There is has been covered how a JSON ICEF file can be loaded and started. Now details are given how that process is working in depth particular for Interlace specification.
+As mentioned in Chapter \ref{ch:CoreAsimIntro} the specifications are executed using the ICEF framework. There we covered how a JSON ICEF file can be loaded and started. Now we give details about how that process works, in particular for the INTERLACE specification.
 
-The whole process starts with the main ICEF definition file in the ASIMSpec directory called run.icef by definition and is shown in Listing \ref{lst:interlace-json-spec}. It is illustrating how the different types of agents are included into the simulation. To explain further all agents are located in the directories \textit{casim} together with \textit{casim/clients}. Agent file names are the same as described in table \ref{tab:model-agents} including the suffix ".casim". \textit{casim} contains all full plus their non-functional agents which are joined later on. \textit{casim/clients} hosts all the relevant clients talking to a server. Currently there is one client for a credit request and two clients for a debit request.
+The whole process starts with the main ICEF definition file in the ASIMSpec directory, which is called run.icef by definition, and is shown in Listing \ref{lst:interlace-json-spec}. This listing illustrates how the different types of agents are included in the simulation. To explain further, all agents are located in the directory \textit{casim} together with \textit{casim/clients}. Agent file names are the same as described in Table \ref{tab:model-agents}, including the suffix ".casim". \textit{casim} contains all full plus their non-functional agents which are joined later on. \textit{casim/clients} hosts all the relevant clients talking to a server. Currently there is one client for a credit request and two clients for a debit request.
 
 \begin{center}
 \begin{minipage}{0.8\textwidth}
@@ -96,18 +94,18 @@ The whole process starts with the main ICEF definition file in the ASIMSpec dire
 \end{minipage}
 \end{center}
 
-When looking closer at the icef definition one can see that there are couple of agents defined inside of a json-array with an attribute called \textit{include}. All agents in that array will be added to the main file. That means that CreditRequestClient, DebitRequestClient and DebitAcknowledgeClient are added to the scheduler and initdata is added to server agent.
+When looking closer at the ICEF definition one can see that there are a couple of agents defined inside of a JSON array with an attribute called \textit{include}. All agents in that array will be added to the main file. That means that CreditRequestClient, DebitRequestClient and DebitAcknowledgeClient are added to the scheduler and initdata is added to server agent.
 
 \textbf{Important note:} The include syntax is used to append code from a different file to an agent but comes with strings attached. See \ref{sec:impl-include} for further details.
 
-Consequently the loading module will assemble no more than two ASIMs - a scheduler and a server. That assembled JSON String is sent to the manger which is initializing the simulation environment and distributing the clients over the available brappers.
+Consequently the loading module will assemble no more than two ASIMs: a scheduler and a server. That assembled JSON String is sent to the manger which initializes the simulation environment and distributes the clients over the available brappers.
 
-\subsection{Main Agents Tasks}
+\subsection{Main Agent Tasks}
 \label{subsec:impl-agent-tasks}
 
-As mentioned in the beginning of that section two main agents, scheduler and server, are the core of the running environment. Once started both instantly start working. The server listens for messages on the communication channel in order to process potential request and the scheduler is initializing the first test and starting clients which should be active during that particular test. When a client has been initialized it will carry out its assigned duties which will be to assemble a request to the server and handle the resulting query-response traffic. Of course the request types are of different types depending on the current test and the type of the client. When the client is done it is sending a message to the scheduler which will terminate the client.
+As mentioned in the beginning of that section \textcolor{blue}{[{\bf which} section??]} two main agents, scheduler and server, are the core of the running environment. Once started both instantly start working. The server listens for messages on the communication channel in order to process potential requests and the scheduler initializes the first test and starts clients which should be active during that particular test. When a client has been initialized it will carry out its assigned duties, which will be to assemble a request to the server and handle the resulting query-response traffic. Of course the request types are different depending on the current test and the type of the client. When the client is done it sends a message to the scheduler which then terminates the client.
 
-\subsubsection{The scheduler}\ as quickly introduced before is responsible for spawning new clients which are taking over different tasks. To do so the scheduler is defining various things in advance. First the current tests need to be identified which has been done by creating a universe as well as two location:
+\subsubsection{The scheduler},\ as briefly introduced earlier, is responsible for spawning new clients that take over different tasks. To do so the scheduler defines various things in advance. First, the current tests need to be identified, which is done by creating a universe as well as two locations:
 
 \begin{lstlisting}[language=bsl]
 	universe TEST_STATE = { START, TEST_CREDIT, TEST_DEBIT }
@@ -115,36 +113,29 @@ As mentioned in the beginning of that section two main agents, scheduler and ser
 	controlled nextTest: TEST_STATE -> TEST_STATE
 \end{lstlisting}
 
-The universe \textit{TEST\_STATE} defines the available test list. \textit{currentTest} is set from the the universe \textit{TEST\_STATE} and is defining the currently executed test. Finally \textit{nextTest} is a function which takes as parameter the current test as type \textit{TEST\_STATE} and gives you as result the next test of the queue which is of the same type. To initialized the predefined locations the following command are executed:
-
+The universe \textit{TEST\_STATE} defines the available test list. \textit{currentTest} is set from the universe \textit{TEST\_STATE} and defines the test being currently executed. Finally \textit{nextTest} is a function which takes as parameter the current test as type \textit{TEST\_STATE} and gives as result the next test in the queue which is of the same type. To initialize the predefined locations the following command are executed:
 \begin{lstlisting}[language=bsl]
 	currentTest := START
 	nextTest(START) := TEST_CREDIT
 	nextTest(TEST_CREDIT) := TEST_DEBIT
 \end{lstlisting}
-
-Now it is possible during the execution of the schedulers main program to transition from one test to the next by
-
+Now it is possible during the execution of the scheduler's main program to transition from one test to the next by
 \begin{lstlisting}[language=bsl]
-	currentTest := nextTest(currentTest)
+	currentTest := nextTest(currentTest),
 \end{lstlisting}
+applying the current test to the nextTest function. That can be done as long as the return value of the function is \textit{undef}, implying that no other test is left.
 
-applying the current test to the nextTest function. That can be done as long as the return value of the function is \textit{undef} implying that no other test is left.
-
-For the \textit{current test} a functional location is applied which returns a list of client agent for a given test state which can be defined as follows:
-
+For the \textit{current test}, a functional location is applied \textcolor{blue}{[Do you mean used?]}
+which returns a list of client agents for a given test state.  \st{which} \textcolor{red}{The function} can be defined as follows:
 \begin{lstlisting}[language=bsl]
 	controlled nextClient: TEST_STATE -> LIST
 \end{lstlisting}
-
-That \textit{nextClient} function needs to be setted up during the initialization phase of the agent as well
-
+That \textit{nextClient} function needs to be set up during the initialization phase of the agent as well
 \begin{lstlisting}[language=bsl]
 	nextClient(TEST_CREDIT) := [ CreditRequestClient ]
-	nextClient(TEST_DEBIT)  := [ DebitAcknowledgeClient, DebitRequestClient ]
+	nextClient(TEST_DEBIT)  := [ DebitAcknowledgeClient, DebitRequestClient ],
 \end{lstlisting}
-
-showing that we have one client for a credit request test and two clients for a debit request. Also important to remember is that rules for a client agent are initially defined in a separate file but as noted already included into the scheduler later by just appending the code. Thus each tested client is absolutely required to have unique names for the \textit{initialization}, the \textit{program} and the \textit{policy} rule \textbf{over all} included files!
+showing that we have one client for a credit request test and two clients for a debit request. Also important to remember is that rules for a client agent are initially defined in a separate file but as noted already they are included into the scheduler later by just appending the code. Thus each tested client is absolutely required to have unique names for the \textit{initialization}, the \textit{program} and the \textit{policy} rule \textbf{over all} included files!
 
 Next the missing parts are added up to get the full picture on how the clients are started. In particular in which way the base rules for a dynamic client are defined and how they are finally instantiated and handled during runtime. Listing \ref{lst:impl-sched-core} is illustrating the management of the different clients.
 

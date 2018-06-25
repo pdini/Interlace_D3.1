@@ -82,6 +82,8 @@
 \usepackage{eurosym}
 %%%%%%%%%%%%%%%%%%%%%%
 
+%\usepackage[title]{appendix}
+
 
 %TIKZ
 \usepackage{tikz}
@@ -236,6 +238,8 @@
 \setlength\cftparskip{0pt}
 \setlength\cftbeforechapskip{12pt}
 
+%\renewcommand{\cfttoctitlefont}{\normalfont\MakeUppercase}
+
 \usepackage{abstract}
 \renewcommand{\abstractnamefont}{\large \bfseries}
 %\setlength{\abstitleskip}{-\absparindent}
@@ -282,13 +286,30 @@ the business logic. Further, the code structure is described and examined in ter
 %\input{2-DLTs_Selected/dlt}
 %\input{3-Functional_Requirements/funreq}
 \chapter*{References}
-\renewcommand{\section}[2]{}
+%\renewcommand{\section}[2]{}
 
 \setlength{\parskip}{0.8\baselineskip}
 \bibliographystyle{plainurl}
 \small
 \addcontentsline{toc}{chapter}{References}
 \bibliography{Bib/BioComp_References}
+
+\appendix
+
+\addcontentsline{toc}{chapter}{Appendix: Complete Functional Requirements and Business Logic Model (2018)}
+
+%\setcounter{chapter}{0}
+%\renewcommand{\thechapter}{\Alph{chapter}}
+%\renewcommand{\thesection}{\thechapter\arabic{section}}
+
+\setcounter{chapter}{1}
+\renewcommand\thechapter{}
+\makeatletter
+\renewcommand\thesection{\@Alph\c@chapter.\@arabic\c@section}
+\makeatother
+
+\input{6-Appendix/SardexNewPaymentSpec_V5}
+
 
 %===================================================
 %================== APPENDIX
