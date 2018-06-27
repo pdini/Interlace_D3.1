@@ -267,7 +267,7 @@ The essential requirement for user-initiated Credit or Debit operations is two-f
 
 One can formalize the above requirements by defining the function 
 \begin{asm}
-AccT\colon Operation \times Currency \times AccountType \rightarrow \{Acct \mid Acct \subseteq AccountType\}
+AccT\colon Operation \times Currency \times AccountType \rightarrow \{ \textcolor{red}{Acct} \mid \textcolor{red}{Acct} \subseteq AccountType\}
 \end{asm} 
 
 \noindent again by a case distinction $
@@ -283,7 +283,7 @@ AccT^{Debit,SRD}(X) =\{CC\} & \IF X \in CC
 
  As above, for ease of reference we say that an account $MayStartCreditOpns$ if it is an element of an account type where $AccT^{Credit,SRD}$ has a defined value: 
 \begin{asm}
-MayStartCreditOpns(acct) \IFF acct \in CC \cup Domu \cup Mirror 
+MayStartCreditOpns(\textcolor{red}{acct}) \IFF \textcolor{red}{acct} \in CC \cup Domu \cup Mirror 
 \end{asm}
 
 
@@ -360,10 +360,10 @@ make the nested credit type check pattern explicit as a machine $\ASM{CreditType
              \THEN ~ \IF ~ accountType(to) \in 
                   AccT^{Credit,SRD}(accountType(from))\+
                   \THEN ~ \ASM{Completion}(transfer) \\
-                  \ELSE ~ \ASM{Send}(ErrMsg(CreditTargetAccountViolation(transfer)),\TO :mbr) \-
-             \ELSE ~ \ASM{Send}(ErrMsg(CreditSourceAccountViolation(transfer)),\TO :mbr)\-
-       \ELSE ~ \ASM{Send}(ErrMsg(CreditTargetGroupViolation(transfer)),\TO :mbr) \- 
-  \ELSE ~  \ASM{Send}(NotAccountOwnerOrCreditSourceGroupViolation(transfer),\TO :mbr)\dec\dec\-
+                  \ELSE ~ \ASM{Send}(ErrMsg(CreditTargetAccountViolation(transfer)),\TO mbr) \-
+             \ELSE ~ \ASM{Send}(ErrMsg(CreditSourceAccountViolation(transfer)),\TO mbr)\-
+       \ELSE ~ \ASM{Send}(ErrMsg(CreditTargetGroupViolation(transfer)),\TO mbr) \- 
+  \ELSE ~  \ASM{Send}(NotAccountOwnerOrCreditSourceGroupViolation(transfer),\TO mbr)\dec\dec\-
 \WHERE \+
    transfer = (credit, channel, from, to, amount)   
 \end{asm}
@@ -381,7 +381,7 @@ Now we can define $\ASM{CreditPreviewReq}$ as a $\ASM{CreditTypeCheck}$ instance
 \WHERE \+
    \ASM{PermitPerformReq}(transfer)=\+
       \ASM{Send}
-      (YouMayTriggerPerformReq(transfer),\TO :owner(from))
+      (YouMayTriggerPerformReq(transfer),\TO owner(from))
 \end{asm}
 
 \subsection{ $\ASM{CreditPerformReq}$ program}
@@ -389,7 +389,7 @@ Now we can define $\ASM{CreditPreviewReq}$ as a $\ASM{CreditTypeCheck}$ instance
 
 
 Similarly, the $\ASM{CreditPerformReq}$ rule uses an instance of  $\ASM{CreditTypeCheck}$ where the parameter $\ASM{Completion}$  is instantiated to a rule
-$\ASM{CreditAccountLimitsCheck}$. In other words, to execute $\ASM{CreditPerformReq}$, first the $\ASM{CreditTypeCheck}$ is executed once more, but if it succeeds, to complete the operation, instead of $\ASM{Send} (YouMayTriggerPerformReq(transfer),\TO :owner(from)$, a rule $\ASM{CreditAccountLimitsCheck}$ is called to $TryToCompleteCreditOpn$. That rule specifies the check of the various constraints on the $amount$ of the Credit operation, i.e.\ it refines the $balancecheck$ function of D2.1. Like $\ASM{CreditTypeCheck}$, it is an $\ASM{IfThenElseCascade}$ pattern instance and also comes with a $\ASM{Completion}$ parameter. For $\ASM{CreditPerformReq}$ this parameter is instantiated by a $\ASM{CompleteTransaction}$ component.
+$\ASM{CreditAccountLimitsCheck}$. In other words, to execute $\ASM{CreditPerformReq}$, first the $\ASM{CreditTypeCheck}$ is executed once more, but if it succeeds, to complete the operation, instead of $\ASM{Send} (YouMayTriggerPerformReq(transfer),\TO owner(from)$, a rule $\ASM{CreditAccountLimitsCheck}$ is called to $TryToCompleteCreditOpn$. That rule specifies the check of the various constraints on the $amount$ of the Credit operation, i.e.\ it refines the $balancecheck$ function of D2.1. Like $\ASM{CreditTypeCheck}$, it is an $\ASM{IfThenElseCascade}$ pattern instance and also comes with a $\ASM{Completion}$ parameter. For $\ASM{CreditPerformReq}$ this parameter is instantiated by a $\ASM{CompleteTransaction}$ component.
 
 \begin{asm}
 \ASM{CreditPerformReq}((channel,from,to,amount),mbr)  =\+
@@ -423,11 +423,11 @@ $\ASM{CreditAccountLimitsCheck}$ checks the following data for the given $amount
          \THEN ~ \IF HasSellCapacityFor(amount,to) \+
             \THEN ~ \ASM{StepCompletion} \\
             \ELSE 
-             ~ \ASM{Send}(ErrMsg(CapacityViolation(transfer)),\TO :owner(from))\-
+             ~ \ASM{Send}(ErrMsg(CapacityViolation(transfer)),\TO owner(from))\-
          \ELSE 
-         ~ \ASM{Send}(ErrMsg(UpperLimitViolation(transfer)),\TO :owner(from))\-
+         ~ \ASM{Send}(ErrMsg(UpperLimitViolation(transfer)),\TO owner(from))\-
       \ELSE 
-      ~ \ASM{Send}(ErrMsg(AvailBalanceViolation(transfer)),\TO :owner(from))\dec\-
+      ~ \ASM{Send}(ErrMsg(AvailBalanceViolation(transfer)),\TO owner(from))\dec\-
       \WHERE \+
 transfer=(credit,channel,from,to,amount)\\
 CanBeSpentBy(from,amount) \IFF availableBalance(from) \geq amount \\
@@ -442,7 +442,7 @@ The $\ASM{CompleteTransaction}$ component still remains rather abstract, as in D
 \begin{asm}
 \ASM{CompleteTransaction}(Credit,transfer)=\+   
    \ASM{Append}(transaction(Credit,transfer,ttResult,now),Ledger)\\
-   \ASM{Send}(Confirmed(Credit,transfer),\TO :owner(from))\\
+   \ASM{Send}(Confirmed(Credit,transfer),\TO owner(from))\\
    saleVolume(to):=saleVolume(to)+amount\footnote{We treat the dynamic function $saleVolume$ as belonging to AccountMetaData, apparently in accordance with D3.1.} \-
 \WHERE \+
  transfer = (channel,from,to,amount)\\
@@ -485,7 +485,7 @@ As for Credit operations, the $\ASM{DebitPreviewReq}$ step essentially performs 
 transfer=(debitor,channel,amount)\\
 \ASM{PermitPerformReq}(debit,transfer,creditor)=\+
 \ASM{Send}
-(YouMayTriggerPerformReq(debit,transfer),\TO : creditor)\footnote{Note that this message,  by its parameters, differs from the message with same name $YouMayTriggerPerformReq$ used in the rule $\ASM{CreditPreviewReq}$.}
+(YouMayTriggerPerformReq(debit,transfer),\TO  creditor)\footnote{Note that this message,  by its parameters, differs from the message with same name $YouMayTriggerPerformReq$ used in the rule $\ASM{CreditPreviewReq}$.}
 \end{asm}
 
 The $\ASM{DebitTypeCheck}$ machine follows the same pattern as $\ASM{CreditTypeCheck}$. However, it needs no account connectivity check because the $\ASM{DebitAccountLimitsCheck}$ component uses directly the correct accounts  $cc(creditor)$ and $cc(debitor)$, which are the only ones permitted for a Debit operation in SRD.
@@ -498,9 +498,9 @@ The $\ASM{DebitTypeCheck}$ machine follows the same pattern as $\ASM{CreditTypeC
           ~~ debitor \in g \footnote{By the definition of the function $TT^{Debit,SRD}$ on Page \pageref{debitdomaindef}, this condition is equivalent to $debitor \in group(creditor)$.} \+
        \THEN  ~ \ASM{Completion}(debit,transfer,creditor) \\
         \ELSE ~ \ASM{Send}
-        (ErrMsg(DebitTargetGroupViolation(transfer)),\TO :creditor) \- 
+        (ErrMsg(DebitTargetGroupViolation(transfer)),\TO creditor) \- 
   \ELSE ~ \ASM{Send}
-  (ErrMsg(DebitSourceGroupViolation(transfer)),\TO :creditor)\-
+  (ErrMsg(DebitSourceGroupViolation(transfer)),\TO creditor)\-
  \WHERE \+
    transfer = (debitor,channel,amount) 
 \end{asm}
@@ -538,21 +538,18 @@ the only ones permitted for a user-initiated Debit operation in SRD (as defined 
        \THEN ~ \IF HasSellCapacityFor(amount,cc(creditor)) \+
            \THEN ~ \ASM{NextStep} \\
            \ELSE 
-           ~ \ASM{Send}(ErrMsg(CapacityViolation(transfer)),\TO :creditor)\-
+           ~ \ASM{Send}(ErrMsg(CapacityViolation(transfer)),\TO creditor)\-
        \ELSE 
-       ~ \ASM{Send}(ErrMsg(UpperLimitViolation(transfer)),\TO :creditor)\-
+       ~ \ASM{Send}(ErrMsg(UpperLimitViolation(transfer)),\TO creditor)\-
    \ELSE 
-    ~ \ASM{Send}(ErrMsg(AvailBalanceViolation(transfer)),\TO :creditor)\dec\-
+    ~ \ASM{Send}(ErrMsg(AvailBalanceViolation(transfer)),\TO creditor)\dec\-
  \WHERE \+
     transfer=(debitor,channel,amount)
 \end{asm}
 
 
 The machine  $\ASM{RequestDebitAck}$ completes the transaction without further 
-ado in case  the
-$amount$ is $Small$ (less than 100), namely by appending it to the $Ledger$ (using the system location for the current date, denoted $today$). For every other $amount$, $\ASM{RequestAck}$
-creates a $OneTimePassword$ $otp$ (using the current system time, denoted by $now$), records its birthtime (the beginning of its lifetime), records the $otp$ with the transaction (including the computed transfer type) as a $PendingTransaction$ and sends the $otp$  with an agreement request to the $debitor$. To execute 
-$\ASM{DebitAckCompletion}$ a $DebitAckMsg$ must arrive; if such a message does not arrive within the lifetime of $otp$, $\ASM{DebitRejectCompletion}$ will be executed.
+ado in case  the $amount$ is $Small$ (less than 100), namely by appending it to the $Ledger$ (using the system location for the current date, denoted $today$). For every other $amount$, $\ASM{RequestAck}$ creates a $OneTimePassword$ $otp$ (using the current system time, denoted by $now$), records its birthtime (the beginning of its lifetime), records the $otp$ with the transaction (including the computed transfer type) as a $PendingTransaction$ and sends the $otp$  with an agreement request to the $debitor$. To execute $\ASM{DebitAckCompletion}$ a $DebitAckMsg$ must arrive; if such a message does not arrive within the lifetime of $otp$, $\ASM{DebitRejectCompletion}$ will be executed.
 
 \begin{asm}
 \ASM{RequestDebitAck}(transfer,creditor)=\+
@@ -565,15 +562,15 @@ $\ASM{DebitAckCompletion}$ a $DebitAckMsg$ must arrive; if such a message does n
           birthTime(otp):=now \mbox{ // current system time}\\
           \ASM{Insert}(pendgTransact,PendingTransaction)\\ 
           status(pendgTransact):=pending \\
-          \ASM{Send}(ConfirmationReq(pendgTransact),\TO :debitor)\footnote{There is no need to keep the $channel$ parameter because the confirmation request can be sent through any channel, not necessarily the one through which the Debit request arrived, and also the acknowledgement can arrive via any channel.}
+          \ASM{Send}(ConfirmationReq(pendgTransact),\TO debitor)\footnote{There is no need to keep the $channel$ parameter because the confirmation request can be sent through any channel, not necessarily the one through which the Debit request arrived, and also the acknowledgement can arrive via any channel.}
        \dec\-
 \WHERE \+
 transfer=(debitor,channel,amount)\\
 Small(amount) \IFF amount < 1000 \\
  \ASM{CompleteTransaction}(Debit,transfer,creditor)\footnote{This machine differs slightly from the one with the same name used in $\ASM{CreditPerformReq}$, as can be seen from its parameters.} =\+     
    \ASM{Append}(transaction(Debit,transfer,creditor,today),Ledger)\\
-   \ASM{Send}(Confirmed(Debit,transfer),\TO :debitor)\\
-   \ASM{Send}(Confirmed(Debit,transfer),\TO :creditor)\\
+   \ASM{Send}(Confirmed(Debit,transfer),\TO debitor)\\
+   \ASM{Send}(Confirmed(Debit,transfer),\TO creditor)\\
    saleVolume(creditor):=saleVolume(creditor)+amount
 \end{asm}
 
@@ -588,18 +585,18 @@ If the acknowledgement is received within the $lifetimeForOTPs$ foreseen for one
 
 \begin{asm}  
 \ASM{DebitAckCompletion} =\+           
-\IF Received(DebitAckMsg(pendgTransact),\FROM debitor) \THEN \\
+\IF Received(DebitAckMsg(pendingTransact),\FROM debitor) \THEN \\
  \LET pendingTransact= (otp,debitor,channel,amount,creditor)\footnote{Using the $\LET$ clause here relies on the assumption (which can be checked to be true for the model) that $DebitAckMsg$es are formed with the expected correct parameters.}\+
   \IF Expired(otp) \THEN \+
-    \ASM{Send}(ErrMsg(ExpiredOtpFor(DebitAck,amount,creditor)),\TO :debitor) \\
-    \ASM{Send}(ErrMsg(ExpiredOtpFor(DebitAck,amount,creditor)),\TO :creditor)\- 
-  \ELSE ~\IF pendgTransact  \in PendingTransaction \AND
-    status(pendgTransact) =pending\footnote{Otherwise just discard the message, nothing else happens to the $otp$ or the pending transaction. In D2.1 the possibility to send out an error message considered.}  \+
+    \ASM{Send}(ErrMsg(ExpiredOtpFor(DebitAck,amount,creditor)),\TO debitor) \\
+    \ASM{Send}(ErrMsg(ExpiredOtpFor(DebitAck,amount,creditor)),\TO creditor)\- 
+  \ELSE ~\IF pendingTransact  \in PendingTransaction \AND
+    status(pendingTransact) =pending\footnote{Otherwise just discard the message, nothing else happens to the $otp$ or the pending transaction. In D2.1 the possibility to send out an error message was considered.}  \+
        \THEN \+
           \ASM{FinalDebitAccountLimitsCheck}\+
               ~~~~~~ (pendingTransact,\ASM{CompleteTransaction}(Debit,pendingTransact))\-
                 \ASM{Delete}(otp,OneTimePassword)\dec\dec\-  
-\ASM{Consume}(DebitAckMsg(pendgTransact)) \dec\-
+\ASM{Consume}(DebitAckMsg(pendingTransact)) \dec\-
 \WHERE \+
 Expired(otp) \IFF now-birthtime(otp) > lifetimeForOTPs\\
 \ASM{CompleteTransaction}(Debit,pendingTransact)=\+
@@ -618,13 +615,13 @@ The $\ASM{FinalDebitAccountLimitsCheck}$ refines the  $\ASM{DebitAccountLimitsCh
       \THEN ~ \IF HasSellCapacityFor(amount,cc(creditor)) \+
          \THEN ~ \ASM{NextStep} \\
          \ELSE \+
-           \ASM{Send}(ErrMsg(CapacityViolation(transfer)),\TO :creditor)\\
+           \ASM{Send}(ErrMsg(CapacityViolation(transfer)),\TO creditor)\\
             status(pendingTransact):=rejected \dec\-
      \ELSE \+
-    \ASM{Send}(ErrMsg(UpperLimitViolation(transfer)),\TO :creditor)\\
+    \ASM{Send}(ErrMsg(UpperLimitViolation(transfer)),\TO creditor)\\
      status(pendingTransact):=rejected \dec\-
   \ELSE \+
-   \ASM{Send}(ErrMsg(AvailBalanceViolation(transfer)),\TO :creditor)\\
+   \ASM{Send}(ErrMsg(AvailBalanceViolation(transfer)),\TO creditor)\\
   status(pendingTransact):=rejected
 \end{asm}
 
@@ -639,8 +636,8 @@ In case the $debitor$ does not confirm the Debit request within the $lifetime$ f
        \ASM{Delete}(otp,OneTimePassword) \\
       \IF status(pendingT)=pending \THEN \+
          status(pendingT):=rejected\\
-         \ASM{Send}(RejectMsg(Debit,amount,creditor),\TO :creditor)\\  
-         \ASM{Send}(OtpExpired(Debit,amount,creditor),\TO :debitor)  
+         \ASM{Send}(RejectMsg(Debit,amount,creditor),\TO creditor)\\  
+         \ASM{Send}(OtpExpired(Debit,amount,creditor),\TO debitor)  
 \end{asm}
 
 \section{New B2C operations}
@@ -790,9 +787,9 @@ For Credit/Debit Perform requests the only relevant additional constraint is tha
 \begin{asm}
 \IF Received(YouMayProceedWith(transfer),\FROM sardex) \THEN \+
 \IF kind(transfer)=credit \THEN \+
-\ASM{Send}(CreditPerformReq(transfer), \TO : sardex) \-
+\ASM{Send}(CreditPerformReq(transfer), \TO  sardex) \-
 \IF kind(transfer)=debit \THEN \+
-\ASM{Send}(DebitPerformReq(transfer), \TO : sardex)  \-
+\ASM{Send}(DebitPerformReq(transfer), \TO  sardex)  \-
 \ASM{Consume}(YouMayProceedWith(transfer))
 \end{asm}
 
@@ -800,12 +797,12 @@ In case of a Debit operation a debitor has to confirm a received debit request b
 \begin{asm}
 \IF Received(ConfirmationReq(amount,creditor,otp),\FROM sardex) \THEN \+
 \IF Agreed(amount,creditor,otp)\+
-\THEN ~ \ASM{Send}(DebitAckMsg(amount,creditor,otp), \TO :sardex) \\
-\ELSE ~ \ASM{Send}(DebitRejectMsg(amount,creditor,otp), \TO :sardex)\-
+\THEN ~ \ASM{Send}(DebitAckMsg(amount,creditor,otp), \TO sardex) \\
+\ELSE ~ \ASM{Send}(DebitRejectMsg(amount,creditor,otp), \TO sardex)\-
 \ASM{Consume}(ConfirmationReq(amount,creditor,otp))
 \end{asm}
 
-\newpage
+
 \section{Sub-Appendix 1: Complete Model}
 \label{sect:appendixModel}
 
@@ -846,7 +843,7 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
       \WHERE \+
          \ASM{PermitPerformReq}(transfer)=\+
         \ASM{Send}
-        (YouMayTriggerPerformReq(transfer),\TO :owner(from))
+        (YouMayTriggerPerformReq(transfer),\TO owner(from))
  \end{asm}
  
  
@@ -875,10 +872,10 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
  \THEN ~ \IF ~ accountType(to) \in 
  AccT^{Credit,SRD}(accountType(from))\+
  \THEN ~ \ASM{Completion}(transfer) \\
- \ELSE ~ \ASM{Send}(ErrMsg(CreditTargetAccountViolation(transfer)),\TO :mbr) \-
- \ELSE ~ \ASM{Send}(ErrMsg(CreditSourceAccountViolation(transfer)),\TO :mbr)\-
- \ELSE ~ \ASM{Send}(ErrMsg(CreditTargetGroupViolation(transfer)),\TO :mbr) \- 
- \ELSE ~  \ASM{Send}(NotAccountOwnerOrCreditSourceGroupViolation(transfer),\TO :mbr)\-
+ \ELSE ~ \ASM{Send}(ErrMsg(CreditTargetAccountViolation(transfer)),\TO mbr) \-
+ \ELSE ~ \ASM{Send}(ErrMsg(CreditSourceAccountViolation(transfer)),\TO mbr)\-
+ \ELSE ~ \ASM{Send}(ErrMsg(CreditTargetGroupViolation(transfer)),\TO mbr) \- 
+ \ELSE ~  \ASM{Send}(NotAccountOwnerOrCreditSourceGroupViolation(transfer),\TO mbr)\-
  \WHERE \+
  transfer = (credit, channel, from, to, amount)   
  \end{asm}
@@ -890,11 +887,11 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
  \THEN ~ \IF HasSellCapacityFor(amount,to) \+
  \THEN ~ \ASM{StepCompletion} \\
  \ELSE 
- ~ \ASM{Send}(ErrMsg(CapacityViolation(transfer)),\TO :owner(from))\-
+ ~ \ASM{Send}(ErrMsg(CapacityViolation(transfer)),\TO owner(from))\-
  \ELSE 
- ~ \ASM{Send}(ErrMsg(UpperLimitViolation(transfer)),\TO :owner(from))\-
+ ~ \ASM{Send}(ErrMsg(UpperLimitViolation(transfer)),\TO owner(from))\-
  \ELSE 
- ~ \ASM{Send}(ErrMsg(AvailBalanceViolation(transfer)),\TO :owner(from))\dec\-
+ ~ \ASM{Send}(ErrMsg(AvailBalanceViolation(transfer)),\TO owner(from))\dec\-
  \WHERE \+
  transfer=(credit,channel,from,to,amount)\\
  CanBeSpentBy(from,amount) \IFF availableBalance(from) \geq amount \\
@@ -907,7 +904,7 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
  \begin{asm}
  \ASM{CompleteTransaction}(Credit,transfer)=\+   
  \ASM{Append}(transaction(Credit,transfer,ttResult,now),Ledger)\\
- \ASM{Send}(Confirmed(Credit,transfer),\TO :owner(from))\\
+ \ASM{Send}(Confirmed(Credit,transfer),\TO owner(from))\\
  saleVolume(to):=saleVolume(to)+amount\footnote{We treat the dynamic function $saleVolume$ as belonging to AccountMetaData, apparently in accordance with D3.1.} \-
  \WHERE \+
  transfer = (channel,from,to,amount)\\
@@ -926,7 +923,7 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
   \WHERE \+
      \ASM{PermitPerformReq}(debit,transfer,creditor)=\+
         \ASM{Send}
-        (YouMayTriggerPerformReq(debit,transfer),\TO : creditor)
+        (YouMayTriggerPerformReq(debit,transfer),\TO  creditor)
 \end{asm}
  
 
@@ -951,9 +948,9 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
  \THEN ~ \IF debitor \in group(creditor) \+
  \THEN  ~ \ASM{Completion}(debit,transfer,creditor) \\
  \ELSE ~ \ASM{Send}
- (ErrMsg(DebitTargetGroupViolation(transfer)),\TO :creditor) \- 
+ (ErrMsg(DebitTargetGroupViolation(transfer)),\TO creditor) \- 
  \ELSE ~ \ASM{Send}
- (ErrMsg(DebitSourceGroupViolation(transfer)),\TO :creditor)\-
+ (ErrMsg(DebitSourceGroupViolation(transfer)),\TO creditor)\-
  \WHERE \+
  transfer = (debitor,channel,amount) 
  \end{asm}
@@ -965,11 +962,11 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
  \THEN ~ \IF HasSellCapacityFor(amount,cc(creditor)) \+
  \THEN ~ \ASM{NextStep}\\
  \ELSE 
- ~ \ASM{Send}(ErrMsg(CapacityViolation(transfer)),\TO :creditor)\-
+ ~ \ASM{Send}(ErrMsg(CapacityViolation(transfer)),\TO creditor)\-
  \ELSE 
- ~ \ASM{Send}(ErrMsg(UpperLimitViolation(transfer)),\TO :creditor)\-
+ ~ \ASM{Send}(ErrMsg(UpperLimitViolation(transfer)),\TO creditor)\-
  \ELSE 
- ~ \ASM{Send}(ErrMsg(AvailBalanceViolation(transfer)),\TO :creditor)\dec\-
+ ~ \ASM{Send}(ErrMsg(AvailBalanceViolation(transfer)),\TO creditor)\dec\-
  \WHERE \+
  transfer=(debitor,channel,amount)
  \end{asm}
@@ -984,13 +981,13 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
  \THEN ~ \IF HasSellCapacityFor(amount,cc(creditor)) \+
  \THEN ~ \ASM{NextStep} \\
  \ELSE \+
- \ASM{Send}(ErrMsg(CapacityViolation(transfer)),\TO :creditor)\\
+ \ASM{Send}(ErrMsg(CapacityViolation(transfer)),\TO creditor)\\
  status(pendingTransact):=rejected \dec\-
  \ELSE \+
- \ASM{Send}(ErrMsg(UpperLimitViolation(transfer)),\TO :creditor)\\
+ \ASM{Send}(ErrMsg(UpperLimitViolation(transfer)),\TO creditor)\\
  status(pendingTransact):=rejected \dec\-
  \ELSE \+
- \ASM{Send}(ErrMsg(AvailBalanceViolation(transfer)),\TO :creditor)\\
+ \ASM{Send}(ErrMsg(AvailBalanceViolation(transfer)),\TO creditor)\\
  status(pendingTransact):=rejected
  \end{asm}
  
@@ -1007,15 +1004,15 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
  birthTime(otp):=now \mbox{ // current system time}\\
  \ASM{Insert}(pendgTransact,PendingTransaction)\\ 
  status(pendgTransact):=pending \\
- \ASM{Send}(ConfirmationReq(pendgTransact),\TO :debitor)
+ \ASM{Send}(ConfirmationReq(pendgTransact),\TO debitor)
  \dec\-
  \WHERE \+
  transfer=(debitor,channel,amount)\\
  Small(amount) \IFF amount < 1000 \\
  \ASM{CompleteTransaction}(Debit,transfer,creditor) =\+     
  \ASM{Append}(transaction(Debit,transfer,creditor,today),Ledger)\\
- \ASM{Send}(Confirmed(Debit,transfer),\TO :debitor)\\
- \ASM{Send}(Confirmed(Debit,transfer),\TO :creditor)\\
+ \ASM{Send}(Confirmed(Debit,transfer),\TO debitor)\\
+ \ASM{Send}(Confirmed(Debit,transfer),\TO creditor)\\
  salesVolume(creditor):=salesVolume(creditor)+amount
  \end{asm}
  
@@ -1028,8 +1025,8 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
  \IF Received(DebitAckMsg(pendgTransact),\FROM debitor) \THEN \\
  \LET pendingTransact= (otp,debitor,channel,amount,creditor)\footnote{Using the $\LET$ clause here uses the assumption (which can be checked to be true for the model) that $DebitAckMsg$es are formed with the expected correct parameters.}\+
  \IF Expired(otp) \THEN \+
- \ASM{Send}(ErrMsg(ExpiredOtpFor(DebitAck,amount,creditor)),\TO :debitor) \\
- \ASM{Send}(ErrMsg(ExpiredOtpFor(DebitAck,amount,creditor)),\TO :creditor)\- 
+ \ASM{Send}(ErrMsg(ExpiredOtpFor(DebitAck,amount,creditor)),\TO debitor) \\
+ \ASM{Send}(ErrMsg(ExpiredOtpFor(DebitAck,amount,creditor)),\TO creditor)\- 
  \ELSE ~\IF pendgTransact  \in PendingTransaction \AND
  status(pendgTransact) =pending\footnote{Otherwise just discard the message, nothing else happens to the $otp$ or the pending transaction. In D2.1 the possibility to send out an error message considered.}  \+
  \THEN \+
@@ -1054,8 +1051,8 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
  \ASM{Delete}(otp,OneTimePassword) \\
  \IF status(pendingT)=pending \THEN \+
  status(pendingT):=rejected\\
- \ASM{Send}(RejectMsg(Debit,amount,creditor),\TO :creditor)\\  
- \ASM{Send}(OtpExpired(Debit,amount,creditor),\TO :debitor)  
+ \ASM{Send}(RejectMsg(Debit,amount,creditor),\TO creditor)\\  
+ \ASM{Send}(OtpExpired(Debit,amount,creditor),\TO debitor)  
  \end{asm}
  
  \subsection{The B2C operations}
@@ -1146,7 +1143,7 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
  \ASM{LowPrepaymentAlert}=\+
  \FORALL  retail  \in Retail \cup Full \+
  \IF CloseToZero(balance(prepaid_{retail}))  \THEN \+
- \ASM{Send}(PrepaymentAlertMsg(lowPrepaidBalance),\TO :retail)
+ \ASM{Send}(PrepaymentAlertMsg(lowPrepaidBalance),\TO retail)
  \end{asm}
   
   
