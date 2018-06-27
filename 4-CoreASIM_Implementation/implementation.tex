@@ -63,9 +63,9 @@ $initdata$				& Fake database and backend initalization code to be included into
 
 \section{Execution}
 
-As mentioned in chapter \ref{ch:CoreAsimIntro} the specifications are executed using the ICEF framework. There is has been covered how a JSON ICEF file can be loaded and started. Now details are given how that process is working in depth particular for Interlace specification.
+As mentioned in Chapter \ref{ch:CoreAsimIntro}, the specifications are executed using the ICEF framework. In Chapter \ref{ch:CoreAsimIntro} we covered how a JSON ICEF file can be loaded and started. Now details are given about how that process works in particular for the INTERLACE specification.
 
-The whole process starts with the main ICEF definition file in the ASIMSpec directory called run.icef by definition and is shown in Listing \ref{lst:interlace-json-spec}. It is illustrating how the different types of agents are included into the simulation. To explain further all agents are located in the directories \textit{casim} together with \textit{casim/clients}. Agent file names are the same as described in table \ref{tab:model-agents} including the suffix ".casim". \textit{casim} contains all full plus their non-functional agents which are joined later on. \textit{casim/clients} hosts all the relevant clients talking to a server. Currently there is one client for a credit request and two clients for a debit request.
+The process, shown in Listing \ref{lst:interlace-json-spec}, starts with the main ICEF definition file in the ASIMSpec directory called run.icef by definition. The listing illustrates how the different types of agents are included in the simulation. To explain further, all agents are located in the directory \textit{casim} together with \textit{casim/clients}. Agent file names are the same as described in Table \ref{tab:model-agents} and include the suffix ".casim". The directory \textit{casim} contains all full and their non-functional agents, which are joined later on. The directory \textit{casim/clients} hosts all the relevant clients talking to a server. Currently there is one client for a credit request and two clients for a debit request.
 
 \begin{center}
 \begin{minipage}{0.8\textwidth}
@@ -94,18 +94,22 @@ The whole process starts with the main ICEF definition file in the ASIMSpec dire
 \end{minipage}
 \end{center}
 
-When looking closer at the icef definition one can see that there are couple of agents defined inside of a json-array with an attribute called \textit{include}. All agents in that array will be added to the main file. That means that CreditRequestClient, DebitRequestClient and DebitAcknowledgeClient are added to the scheduler and initdata is added to server agent.
+When looking closer at the ICEF definition, one can see that there are a couple of agents defined inside of a JSON array with an attribute called \textit{include}. All agents in that array will be added to the main file. That means that CreditRequestClient, DebitRequestClient and DebitAcknowledgeClient are added to the scheduler and initdata is added to the server agent.
 
-\textbf{Important note:} The include syntax is used to append code from a different file to an agent but comes with strings attached. See \ref{sec:impl-include} for further details.
+\textbf{Important note:} The include syntax is used to append code from a different file to an agent but comes with strings attached. See Section \ref{sec:impl-include} for further details.
 
-Consequently the loading module will assemble no more than two ASIMs - a scheduler and a server. That assembled JSON String is sent to the manger which is initializing the simulation environment and distributing the clients over the available brappers.
+Consequently, the loading module will assemble no more than two ASIMs: a scheduler and a server. The assembled JSON String is sent to the manager which initializes the simulation environment and distributes the clients over the available brappers.
 
-\subsection{Main Agents Tasks}
+\subsection{Main Agent Tasks}
 \label{subsec:impl-agent-tasks}
 
-As mentioned in the beginning of that section two main agents, scheduler and server, are the core of the running environment. Once started both instantly start working. The server listens for messages on the communication channel in order to process potential request and the scheduler is initializing the first test and starting clients which should be active during that particular test. When a client has been initialized it will carry out its assigned duties which will be to assemble a request to the server and handle the resulting query-response traffic. Of course the request types are of different types depending on the current test and the type of the client. When the client is done it is sending a message to the scheduler which will terminate the client.
+As mentioned at the beginning of this chapter, two main agents, scheduler and server, are the core of the running environment. Once started, both instantly start working. The server listens for messages on the communication channel in order to process potential requests and the scheduler  initializes the first test and starts clients which should be active during that particular test. When a client has been initialized, it will carry out its assigned duties which will be to assemble a request for the server and to handle the resulting query-response traffic. Of course the request types are of different types depending on the current test and the type of the client. When the client is done it sends a corresponding message to the scheduler, which terminates it.
 
-\subsubsection{The scheduler}\ as quickly introduced before is responsible for spawning new clients which are taking over different tasks. To do so the scheduler is defining various things in advance. First the current tests need to be identified which has been done by creating a universe as well as two location:
+\subsubsection{The scheduler}, as briefly introduced above, is responsible for spawning new clients which take over different tasks. To do so, the scheduler defines various things in advance.
+
+\begin{quote}
+\small
+\textbf{First,} the current tests need to be identified, which is done by creating a universe as well as two locations:
 
 \begin{lstlisting}[language=bsl]
 	universe TEST_STATE = { START, TEST_CREDIT, TEST_DEBIT }
@@ -113,38 +117,31 @@ As mentioned in the beginning of that section two main agents, scheduler and ser
 	controlled nextTest: TEST_STATE -> TEST_STATE
 \end{lstlisting}
 
-The universe \textit{TEST\_STATE} defines the available test list. \textit{currentTest} is set from the the universe \textit{TEST\_STATE} and is defining the currently executed test. Finally \textit{nextTest} is a function which takes as parameter the current test as type \textit{TEST\_STATE} and gives you as result the next test of the queue which is of the same type. To initialized the predefined locations the following command are executed:
-
+The universe \textit{TEST\_STATE} defines the available test list. \textit{currentTest} is \st{set from} \textcolor{red}{an element of} the universe \textit{TEST\_STATE} and defines the currently executed test. Finally, \textit{nextTest} is a function which takes as parameter the current test as type \textit{TEST\_STATE} and gives you as result the next test in the queue which is of the same type. To initialize the predefined locations the following commands are executed:
 \begin{lstlisting}[language=bsl]
 	currentTest := START
 	nextTest(START) := TEST_CREDIT
 	nextTest(TEST_CREDIT) := TEST_DEBIT
 \end{lstlisting}
-
-Now it is possible during the execution of the schedulers main program to transition from one test to the next by
-
+During the execution of the scheduler's main program it is possible to transition from one test to the next by
 \begin{lstlisting}[language=bsl]
-	currentTest := nextTest(currentTest)
+	currentTest := nextTest(currentTest),
 \end{lstlisting}
+applying the current test to the nextTest function. This can be done until the return value of the function is \textit{undef}, implying that no other test is left.
 
-applying the current test to the nextTest function. That can be done as long as the return value of the function is \textit{undef} implying that no other test is left.
-
-For the \textit{current test} a functional location is applied which returns a list of client agent for a given test state which can be defined as follows:
-
+For \st{the} \textcolor{red}{each} \textit{current test}, a functional location is \st{applied} \textcolor{red}{used} which returns a list of client agents for a given test state. The functional location can be defined as follows:
 \begin{lstlisting}[language=bsl]
 	controlled nextClient: TEST_STATE -> LIST
 \end{lstlisting}
 
-That \textit{nextClient} function needs to be setted up during the initialization phase of the agent as well
-
+That \textit{nextClient} function needs to be set up during the initialization phase of the agent as well:
 \begin{lstlisting}[language=bsl]
 	nextClient(TEST_CREDIT) := [ CreditRequestClient ]
-	nextClient(TEST_DEBIT)  := [ DebitAcknowledgeClient, DebitRequestClient ]
+	nextClient(TEST_DEBIT)  := [ DebitAcknowledgeClient, DebitRequestClient ],
 \end{lstlisting}
+showing that we have one client for a credit request test and two clients for a debit request. Also important to remember is that rules for a client agent are initially defined in a separate file but, as noted already, they are included in the scheduler later by just appending the code. Thus, each tested client is absolutely required to have unique names for the \textit{initialization}, the \textit{program} and the \textit{policy} \st{rule} \textcolor{red}{rules} \textbf{over all} included files!
 
-showing that we have one client for a credit request test and two clients for a debit request. Also important to remember is that rules for a client agent are initially defined in a separate file but as noted already included into the scheduler later by just appending the code. Thus each tested client is absolutely required to have unique names for the \textit{initialization}, the \textit{program} and the \textit{policy} rule \textbf{over all} included files!
-
-Next the missing parts are added up to get the full picture on how the clients are started. In particular in which way the base rules for a dynamic client are defined and how they are finally instantiated and handled during runtime. Listing \ref{lst:impl-sched-core} is illustrating the management of the different clients.
+\textbf{Next}, the missing parts are added up to get the full picture on how the clients are started. In particular, how the base rules for a dynamic client are defined and how they are eventually instantiated and handled during runtime. Listing \ref{lst:impl-sched-core} illustrates the management of the different clients.
 
 \begin{center}
 \begin{minipage}{0.8\textwidth}
@@ -184,7 +181,13 @@ Next the missing parts are added up to get the full picture on how the clients a
 \end{minipage}
 \end{center}
 
-In that listing we can identify three parts. \textbf{First} the definition of three functions which are taking a $CLIENT$ as parameter and returning a $FUNCTION$ can be observed, namely $initBy$, $withProg$ and $andPol$. That $FUNCTION$ return type can be any rule we have defined inside of the scheduler or inside of the dynamic clients which are included to the scheduler. \textbf{Second} for client $CreditRquestClient$ those three function values are set. So for example it is possible to apply $initBy(CreditRequestClient) := InitCreditRequestClient$ and afterwards to call function $InitCreditRequestClient$ by using  $initBy(CreditRequestClient)()$. \textbf{At last} during the iterative execution of the $Program$ rule the actual starting of the client is process. If a valid test has been selected $nextClient(currentTest)$ provides a list of clients valid during that particular test. The $forall$ loop is walking through that list and using the respective iteration to instantiate the chosen client. This instantiation is done by calling $createASIM$ command and passing the start up rule ($initializedBy$), the main program rule ($withProgram$) and the scheduling policy ($andPolicy$).
+In this listing we can identify three parts:
+\begin{enumerate}
+\item The definition of three functions that take a $CLIENT$ as parameter and return a $FUNCTION$ can be observed, namely $initBy$, $withProg$, and $andPol$. This $FUNCTION$ return type can be any rule we have defined inside of the scheduler or inside of the dynamic clients which are included to \textcolor{red}{(in? by? "to" does not sound right here)} the scheduler.
+\item For client $CreditRquestClient$ these three function values are set. So for example it is possible to apply \textcolor{red}{(what do you mean by "apply"?)} $initBy(CreditRequestClient) := InitCreditRequestClient$ and afterwards to call function $InitCreditRequestClient$ by using  $initBy(CreditRequestClient)()$.
+\item During the iterative execution of the $Program$ rule the actual starting of the client is processed. If a valid test has been selected, $nextClient(currentTest)$ provides a list of clients valid during that particular test. The $forall$ loop walks through that list and uses the corresponding iteration to instantiate the chosen client. This instantiation is done by calling the $createASIM$ command and passing the start-up rule ($initializedBy$), the main program rule ($withProgram$), and the scheduling policy ($andPolicy$).
+\end{enumerate}
+
 
 In line 27 of listing \ref{lst:impl-sched-core} the count of active clients is stored. That count is reduced by one when a "Done" message has been received by a dynamic client. Also the client is shut down by calling
 
@@ -192,26 +195,28 @@ In line 27 of listing \ref{lst:impl-sched-core} the count of active clients is s
 	destroyASIM clientName
 \end{lstlisting}
 
-After the $activeClients$ count has been reduced to $0$ again all clients have terminated and the next test can be covered. To conclude it is possible to say that $activeClients$ count is used as a structure similar to semaphores which is taking care that no new clients are issued as long as it has a value bigger than $0$ and the scheduler is therefore in something similar to a paused state. Certainly, is it not really paused but in a "busy wait loop".
+After the $activeClients$ \st{count} \textcolor{red}{counter} has been reduced to $0$ again, all clients have terminated and the next test can be covered. To conclude, it is possible to say that the $activeClients$ \textcolor{red}{counter} is used as a structure similar to semaphores, which takes care that no new clients are issued as long as it has a value bigger than $0$, and the scheduler is therefore in something similar to a paused state. Certainly, is it not really paused but in a ``busy wait loop''.
 
-\subsubsection{The server}\ agent is acting as the main component which is implementing most of the specified requirements, which is for the moment credit and debit operations. The server is started right away when CASIMA has received and processed the JSON file for the simulation.
+\end{quote}
 
-When the init-rule called $Start$ is executed the $Ledger$ and $PendingTransaction$ are initialized as empty maps, an OTP lifetime is set as well as the $Logger$ is setted up. The logger offers several logging levels and details about it can be found in section \ref{sec:impl-log}. Also a rule called $InitData()$ is executed at start-up. It is important to know that the Eclipse Plug-in is showing that this rule is having a Problem/Error because it is not defined in the server.casim file and thus not recognizable for it. Nevertheless, that rule is placed correctly and will work fine, because it is defined in the non-functional agent $initdata$. The content of $initdata$ is, due to the $include$ statement inside of the run.icef, appended to the server.casim before it is sent to the CASIMA manger.
+\subsubsection{The server}\ agent acts as the main component that implements most of the  requirements specified, which for the moment is credit and debit operations. The server is started right away when CASIMA has received and processed the JSON file for the simulation.
 
-Rule $initData$ in the $initdata$ client is consolidating the rest of the initialization inside. To be more specific the following locations are prepared for later usage when it is called:
+When the init-rule called $Start$ is executed, the $Ledger$ and $PendingTransaction$ are initialized as empty maps, an OTP lifetime is set, and the $Logger$ is set up. The logger offers several logging levels and details about it can be found in Section \ref{sec:impl-log}. Also a rule called $InitData()$ is executed at start-up. It is important to know that the Eclipse Plug-in shows that this rule has a Problem/Error because it is not defined in the server.casim file and thus it is not recognizable by it. Nevertheless, this rule is placed correctly and will work fine, because it is defined in the non-functional agent $initdata$. Due to the $include$ statement inside of the run.icef, the content of $initdata$ is appended to the server.casim before it is sent to the CASIMA manager.
+
+Rule $initData$ in the $initdata$ client consolidates the rest of the initialization inside. To be more specific, the following locations are prepared for later use when it is called:
 
 \begin{itemize}
 	\item $sessionData$ ... simulates session information
 	\item $profileTable$ ... contains user profiles
 	\item $accountTable$ ... user accounts
-	\item $userGroupTable$ ... specifying users group membership
+	\item $userGroupTable$ ... specifies users' group membership
 	\item $TT$ ... transfer type translation table
 	\item $accountConnectivity$ ... transferability between accounts
 \end{itemize}
 
-After the start-up phase has been finished the server is going into listening mode when the main program $DispatchMessages$ is called iteratively. In there all relevant messages received by the server are taken care of. In listing \ref{lst:impl-msg-dispatch} the dispatch process of server can be viewed in detail. All inbox messages of the current engine tick are fetched using the $inboxOf$ in addition to the $forall$ statement. The message reference $m$ as named in the loop is used to retrieve subject, message and sender of the current post box entry $m$.
+After the start-up phase has been completed, the server goes into listening mode, in which the main program $DispatchMessages$ is called iteratively. In this mode, all relevant messages received by the server are taken care of. In listing \ref{lst:impl-msg-dispatch} the dispatch process of server can be viewed in detail. All inbox messages of the current engine tick are fetched using the $inboxOf$ in addition to the $forall$ statement. The message reference $m$ as named in the loop is used to retrieve subject, message, and sender of the current post box entry $m$.
 
-Messages which are not recognized having an accurate message type are discarded. The message type is defined by the message subject and is compared to one of the predefined entries in the universe definition $MESSAGE\_REQUESTS$. For real world use it is essential to introduce some kind of additional message signing to ensure by whom the message has been sent.
+Messages that are not recognized as having an accurate message type are discarded. The message type is defined by the message subject and is compared to one of the predefined entries in the universe definition $MESSAGE\_REQUESTS$. For real-world use it is essential to introduce some kind of additional message signing to \st{ensure} \textcolor{red}{verify} by whom the message has been sent.
 
 \begin{center}
 \begin{minipage}{0.8\textwidth}
@@ -256,9 +261,8 @@ Nevertheless, it is an approach for handling the code separation in order to avo
 
 For being able to use \textbf{Eclipse} and the ASIM eclipse hinting/error detection provided by the plugin another quick fix has been introduced. So if you'd add a dynamic or non-function agent it will be appended at some point to a parent agent. Thus definitions like "CoreASIM asimname" would occur twice inside of that final agent. For the interpreter to work correctly it is consequently necessary to have only one header defining the name of an agent and to remove that header definition inside of the included files. But when you are removing the header definition Eclipse is not able any more to provide correct syntax highlighting, hinting or error detection.
 
-Thus you now have the possibility to mark a section which will be removed during the agent assembling. The beginning of such a section is marked with \textcolor{eclipseComment}{/*includeskip begin*/} and the end with \textcolor{eclipseComment}{/*includeskip end*/}. When using those markers they need to be placed exactly as described - no additional white-spaces (space, tab, return, ...) or different casing. Listing \ref{lst:includeskip} is showing a short example.
+Thus you now have the possibility to mark a section which will be removed during the agent assembling. The beginning of such a section is marked with \textcolor{eclipseComment}{/*includeskip begin*/} and the end with \textcolor{eclipseComment}{/*includeskip end*/}. When using those markers they need to be placed exactly as described - no additional white-spaces (space, tab, return, ...) or different casing. Listing \ref{lst:includeskip} shows a short example.
 
-Inside of the skipped section there may be many different things placed as shown in the example in order to work seamlessly with the Eclipse hinting. So you could also place names of locations or universes. The reason putting them there is to avoid a warning by the Eclipse plugin that the variable/location has not been defined yet. So in order to check correct spelling and avoid the problems cause by those only getting obvious at interpretation time.
 
 \begin{center}
 \begin{minipage}{0.8\textwidth}
@@ -282,6 +286,9 @@ rule somerule = {
 \end{lstlisting}
 \end{minipage}
 \end{center}
+
+Inside of the skipped section there may be many different things placed as shown in the example in order to work seamlessly with the Eclipse hinting. So you could also place names of locations or universes. The reason putting them there is to avoid a warning by the Eclipse plugin that the variable/location has not been defined yet. So in order to check correct spelling and avoid the problems cause by those only getting obvious at interpretation time.
+
 
 \section{Dynamic Clients}
 \label{sec:impl-dyn-clients}
