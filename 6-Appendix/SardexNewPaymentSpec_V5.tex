@@ -558,11 +558,11 @@ ado in case  the $amount$ is $Small$ (less than 100), namely by appending it to 
    \THEN ~ \ASM{CompleteTransaction}(Debit,transfer,creditor) \-
    \ELSE \+
        \LET otp= \NEW(OneTimePassword)\\
-       \LET pendgTransact=(otp,transfer,creditor)\+
+       \LET pendingTransact=(otp,transfer,creditor)\+
           birthTime(otp):=now \mbox{ // current system time}\\
-          \ASM{Insert}(pendgTransact,PendingTransaction)\\ 
-          status(pendgTransact):=pending \\
-          \ASM{Send}(ConfirmationReq(pendgTransact),\TO debitor)\footnote{There is no need to keep the $channel$ parameter because the confirmation request can be sent through any channel, not necessarily the one through which the Debit request arrived, and also the acknowledgement can arrive via any channel.}
+          \ASM{Insert}(pendingTransact,PendingTransaction)\\ 
+          status(pendingTransact):=pending \\
+          \ASM{Send}(ConfirmationReq(pendingTransact),\TO debitor)\footnote{There is no need to keep the $channel$ parameter because the confirmation request can be sent through any channel, not necessarily the one through which the Debit request arrived, and also the acknowledgement can arrive via any channel.}
        \dec\-
 \WHERE \+
 transfer=(debitor,channel,amount)\\

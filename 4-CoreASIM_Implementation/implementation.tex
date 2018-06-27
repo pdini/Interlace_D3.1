@@ -3,37 +3,35 @@
 
 \vspace{-1cm}
 \begin{center}
-Eduard Hirsch
+Eduard Hirsch, Maria Luisa Mulas and Paolo Dini\footnote{Eduard wrote this chapter and was the main implementer. Maryl\`u supported the implementation effort. Paolo did no implementation but thoroughly edited this chapter to optimize clarity of expression.}
 \end{center}
 
-This chapter is taking a look at the ASIM implementation of the Interlace Project which have been done according to the specifications of D2.1 as well as the refinement specifications of the requirements.
+This chapter describes the ASIM implementation of the INTERLACE business logic according to the specifications of Deliverable D2.1 \cite{INTERLACE_D21}, the requirements specification refinement presented in Chapter \ref{ch:UpdateBLS}, and the formalization of the refinement provided in the Appendix.
 
-In the previous chapter \ref{ch:CoreAsimIntro} the basis for an environment and code execution has been discussed. Further it will be described here how that environment has been utilized. The following detailed implementation design will show what issues and difficulties had to been taken into account.
+While Chapter \ref{ch:CoreAsimIntro} discusses the code execution environment, this chapter describes how that environment was utilized. The following detailed discussion of the implementation design shows what issues were taken into account and what difficulties were overcome.
 
 
 \section{Introduction}
 \label{sec:impl_intro}
 
-The requirements specifications are the basis for the implementation of an executable ASIM model. That model can be found on GitHub \footnote{https://github.com/InterlaceProject/ASIMSpec} will act as a foundation and test/verification template for further business implementations.
+The requirements specifications are the basis for the implementation of an executable ASIM model. That model can be found on GitHub,\footnote{\url{https://github.com/InterlaceProject/ASIMSpec}} and will act as a foundation and test/verification template for further business implementations.
 
-This main part of that document is now focusing on the way the ASIM model actually was implemented and how the missing functional parts of the back-end are realized which is mainly about simulating a simple ledger.
+This chapter focuses on the way the ASIM model was implemented and how the missing functional parts of the backend, which is mainly about simulating a simple ledger, were realized.
 
 \section{Agents}
 \label{sec:impl-agents}
 
-The implementation base is founded on several ASIM-agents which are programmed to act independent and communicate with each other by the base messaging system provided by the ICEF infrastructure.
+The implementation is based on several ASIM agents which are programmed to act independently and to communicate with each other through the messaging system provided by the ICEF infrastructure.
 
-There are small differences between the available ASIM-agents and they can be, base on their purpose, categorized into the following three groups:
-
+There are small differences between the available ASIM agents. They can be categorized into the following three groups, based on their purpose:
 \begin{itemize}
 	\item full agents
 	\item dynamic agents
 	\item non-functional agents
 \end{itemize}
+\textit{Full agents} are started right away \st{from the beginning} \textcolor{red}{when the ICEF is launched}. They process requests or handle other duties over the environment's lifetime. \textit{Dynamic agents} are created during a specific phase of a test and destroyed after that test has been completed. \textit{Non-functional agents} are never started directly and are \st{facilitated for} \textcolor{red}{structured to facilitate their} integration into another agent. They host initialization code or helper functions in order to compensate for the missing modularization feature of the ASIM-BSL language.
 
-\textit{Full agents} are started right away from the beginning. They are processing request or are handling other duties over the environment lifetime. \textit{Dynamic agents} are created during a specific phase of a test and destroyed after that test has been completed. \textit{Non-functional agents} are never started directly and are facilitated for integration into another agent. They are hosting initialization code or helper functions in order to compensate for the missing modularization feature of the ASIM-BSL language.
-
-To get more familiar with the actual ASIM realization an extract of available agents is listed in table \ref{tab:model-agents}. Those may act as a template for extending the scenario applying additional use cases or tests. They are covering the core payment functionality, thus credit as well as debit operations.
+To get more familiar with the actual ASIM realization an extract of available agents is listed in Table \ref{tab:model-agents}. They may act as a template for extending the scenarios for additional use cases or tests. They cover the core payment functionality, thus credit as well as debit operations.
 
 \begin{table}[H]
 \begin{centering}
@@ -41,19 +39,19 @@ To get more familiar with the actual ASIM realization an extract of available ag
 {
 \begin{tabular}{ r | p{9cm} | l }
 \hline
-\textbf{Agent}	& Function & Type \\
+\textbf{Agent}	& \textbf{Function} & \textbf{Type} \\
 \Xhline{1.5pt}
 $scheduler$				& Scheduling, creating and destroying dynamic agents & full\\[3pt]
 \hline
-$server$				& Server which talks to the dynamic clients in order to handle payment and ledger specific requests & full\\[3pt]
+$server$				& Server which talks to the dynamic clients in order to handle payment and ledger-specific requests & full\\[3pt]
 \hline
 $CreditRequestClient$	& Handles a test credit request & dynamic\\[3pt]
 \hline
-$DebitRequestClient$	& Initiating a test debit request & dynamic\\[3pt]
+$DebitRequestClient$	& Initiates a test debit request & dynamic\\[3pt]
 \hline
-$DebitAcknoledgeClient$	& Confirming a test debit request & dynamic\\[3pt]
+$DebitAcknoledgeClient$	& Confirms a test debit request & dynamic\\[3pt]
 \hline
-$initdata$				& Fake database and back-end initalization code to be included into the \textit{server} agent & non-functional\\[3pt]
+$initdata$				& Fake database and backend initalization code to be included into the \textit{server} agent & non-functional\\[3pt]
 \Xhline{1.5pt}
 \end{tabular}
 }
