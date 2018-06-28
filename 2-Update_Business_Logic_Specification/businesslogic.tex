@@ -7,9 +7,10 @@ Paolo Dini, Luca Carboni, Giuseppe Littera, Egon B\"orger and Chrystopher Nehani
 \end{center}
 
 \section{Context and Overview}
-The business logic specification provided in Deliverable D2.1 \cite{INTERLACE_D21} concerns user-initiated transactions. Although this is a subset of all possible operations (initiated by the users or by the System, which we refer to as $SysAdmin$) that a mutual credit system platform must support, it is a viable starting point for testing an initial executable CoreASIM model. D2.1 did not provide all the details of the transaction request operations, it left their specification at a fairly abstract level. This chapter provides the next step in the iterative refinement of the specification in the form of a detailed description of the Permissioning workflow, whose implementation as part of the CoreASIM model is then described in Chapter \ref{ch:CoreAsimImplementation}. The description of the Permissioning iterative refinement relies on graphical and tabular depictions of the variables and functions involved. As this reflects the process that was used to build a shared understanding within the INTERLACE team itself, it is hoped that it will also make it easier for newcomers to the INTERLACE open source community to understand the implementation and the logic behind it.
+The business logic specification provided in Deliverable D2.1 \cite{INTERLACE_D21} concerns user-initiated transactions. Although this is a subset of all possible operations (initiated by the users or by the System, which we refer to as $SysAdmin$) that a mutual credit system platform must support, it is a viable starting point for testing an initial executable CoreASIM model. D2.1 did not provide all the details of the transaction request operations, it left their specification at a fairly abstract level. This chapter provides the next step in the iterative refinement of the specification in the form of a detailed description of the Permissioning workflow, whose implementation as part of the CoreASIM model is then described in Chapter \ref{ch:CoreAsimImplementation}. The description of the Permissioning iterative refinement relies on graphical and tabular depictions of the variables and functions involved. As this reflects the process that was used to build a shared understanding within the INTERLACE team itself, it is hoped that it will also make it easier for newcomers to the INTERLACE open source community to understand the implementation and the logic behind it. Finally, the refined requirements presented in this chapter are also formalized completely in the Appendix to this report, which could be seen as an iteration on Chapter 3 of D2.1.
 
-At the highest level the INTERLACE transactional platform is a dynamic information system that interacts with a database at the backend and with live users at the front-end. As already discussed in D2.1, the transaction engine relies on many categories of concepts that, together, constitute the domain model of the system. According to the ASM methodology \cite{BoergerStaerk2003,BoergerRaschke2018}, these have been subdivided into ASIMs comprised of rules, programs, and various kinds of functions. Whereas concepts such as `user' or 'transaction amount' are immediately clear, many more concepts and data structures are needed to specify and model the system. Before we get into the details, it helps to introduce three high-level perspectives through which the transaction engine can be characterized as an abstract machine and as a social construct: privacy (private-public dichotomy), dynamics (frequency domain), and transaction workflow already mentioned (time domain).
+At the highest level the INTERLACE transactional platform is a dynamic information system that interacts with a database at the backend and with live users at the front-end. As already discussed in D2.1, the transaction engine relies on many categories of concepts that, together, constitute the domain model of the system. According to the Abstract State Machine (ASM) methodology \cite{BoergerStaerk2003,BoergerRaschke2018}, these have been subdivided into Abstract State Interaction Machines (ASIMs) 
+\cite{BIOMICSD42,BIOMICSD52} comprised of rules, programs, and various kinds of functions. Whereas concepts such as `user' or `transaction amount' are immediately clear, many more concepts and data structures are needed to specify and model the system. Before we get into the details, it helps to introduce three high-level perspectives through which the transaction engine can be characterized as an abstract machine and as a social construct: privacy (private-public dichotomy), dynamics (frequency domain), and transaction workflow already mentioned (time domain).
 
 \begin{figure}[h]
 \vspace{-0.5cm}
@@ -20,7 +21,7 @@ At the highest level the INTERLACE transactional platform is a dynamic informati
 \vspace{-0.5cm}
 \end{figure}
 
-The first principle that influences the architecture of the system at a global level is the need to comply with the GDPR directive. Figure \ref{fig:privatepublicmetaData} shows how from this point of view the Transaction MetaData can be regarded as more public than the Account MetaData since it only contains a memo describing the transaction. The figure also shows that sub-dividing the meta-data in this manner makes it possible to limit the need for GDPR compliance\footnote{General Data Protection Regulation: \url{https://www.eugdpr.org/}} only to the Identity and Profile MetaData. Second, in a physics context the level of dynamicity of the variables could be described as the characteristic frequency (or its inverse, time-scale) at which different kinds of variables change as the transactional workflow is carried out. Figure \ref{fig:staticdynamicmetadata} shows how this principle applies to the system's meta-data.
+The first principle that influences the architecture of the system at a global level is the need to comply with the GDPR directive. Figure \ref{fig:privatepublicmetaData} shows how from this point of view the Transaction MetaData can be regarded as more public than the Account MetaData since it only contains a memo describing the transaction. The figure also shows that sub-dividing the meta-data in this manner makes it possible to limit the need for GDPR compliance\footnote{General Data Protection Regulation: \url{https://www.eugdpr.org/}} only to the Identity and Profile MetaData. Second, in a physics context the level of dynamicity of the variables could be described as the characteristic frequency (or its inverse, time-scale) at which different kinds of variables change as the transactional workflow is carried out. Figure \ref{fig:staticdynamicmetadata} shows how this principle applies to the system's meta-data -- and happens to match the same ordering as the privacy view.
 
 \begin{figure}[h]
 \vspace{-0.5cm}
@@ -50,11 +51,11 @@ Users are organized by user types called `Groups'. Consistently with the Appendi
 \begin{quote}
 \vspace{-0.3cm}
 \small
-For example, when describing a Debit transaction use case, at the User level the Seller initiates the Debit transaction to draw funds from the Buyer's account. In this scenario, therefore, the Seller is the $fromUser$ and the Buyer is the $toUser$. However, at the Group level things are different. As part of the transactability tests to be described fully in later sections, to each group that initiates a transaction ($fromGroup$) is associated a set of groups that can be on the receiving end of that transaction. In the case of a Debit transaction, whereas the \emph{request} goes to the Buyer, the receiving end of the transaction is not the Buyer, it is the Seller. Therefore, in a Debit operation $fromGroup$ = Seller, and $toGroup$ = Seller too!
+For example, in a Credit transaction, $fromUser$, $fromGroup$, and $fromAccount$ are all associated with the Buyer, whereas the $toUser$, $toGroup$, and $toAccount$ are associated with the Seller, i.e.\ the party receiving the funds. In a Debit transaction, on the other hand, at the User level the Seller initiates the Debit transaction to draw funds from the Buyer's account. In this scenario, therefore, the Seller is the $fromUser$ and the Buyer is the $toUser$. However, at the Group level things are different and match the behaviour of the Accounts level. The $fromGroup$ and the $fromAccount$ are associated with the party that is paying, i.e.\ the Buyer; and the $toGroup$ and the $toAccount$ are associated with the Seller. See Section \ref{sec:intlevels} for a detailed diagram.
 \vspace{-0.3cm}
 \end{quote}
 
-The possible confusion created by debit transactions is resolved at the level of the accounts. See Section \ref{sec:intlevels}. The original Sardex system divided its users into 29 different groups. This generated a great deal of complexity that is drastically reduced in the INTERLACE version of the platform. The new user type taxonomy involves only 9 groups, as shown in Table \ref{tab:groups}.
+The original Sardex system divided its users into 29 different groups. This generated a great deal of complexity that is drastically reduced in the INTERLACE version of the platform. The new user type taxonomy involves only 9 groups, as shown in Table \ref{tab:groups}.
 
 %\setcounter{table}{0}
 \setlength{\tabcolsep}{10pt}
@@ -75,7 +76,7 @@ $Company$ & Company, which could be a retailer, that can use B2E and B2B but \em
 \hline
 $Full$ & This group has all the functions of $Retail$ and of $Company$ \\
 \hline
-$Employee$ & Employee of a $company\in Company$ or of a $full \in Full$ \\
+$Employee$ & Employee of a $company\in Company$ or of a $full \in Full$ (or, also, of $mngr \in Mngr$)\\
 \hline
 $On$\_$Hold$ & User whose privileges have been suspended (for whatever reason) \\
 \hline
@@ -108,7 +109,7 @@ As shown in Figure \ref{fig:currchan}, the Sardex/INTERLACE platform supports tr
 \end{figure}
 
 \subsection{Accounts}
-As shown in Table \ref{tab:accounts}, the accounts implemented in the model reflect the current operations of the Sardex system and the needs of a wide range of business operations and interactions. Some of the account types, for example MIRROR, may be phased out as the high-level architecture of the family of Sardex circuits grows and different algorithms replace the current strict controls on the balance of payments between different circuits. Also an account can be referred to as $fromAcct$ or $toAcct$ depending on its role in the transaction. See Section \ref{sec:intlevels}.
+As shown in Table \ref{tab:accounts}, the accounts implemented in the model reflect the current operations of the Sardex system and the needs of a wide range of business operations and interactions. Some of the account types, for example MIRROR, may be phased out as the high-level architecture of the family of Sardex circuits grows and different algorithms replace the current strict controls on the balance of payments between different circuits. Also, an account can be referred to as $fromAcct$ or $toAcct$ depending on its role in the transaction. See Section \ref{sec:intlevels}.
 
 \setlength{\tabcolsep}{10pt}
 \begin{table}[htbp]
@@ -133,7 +134,7 @@ $Prepaid$ & Statistical EUR account from which the 2\% child B2C transaction fee
 $Bisoo$ & Statistical EUR account used by $consumer$ to pay into Income \\
 \hline
 $Topup$ & Statistical EUR account used by $MNGR$ to recharge $retail$'s Prepaid account upon receipt of \\
-&\hspace{0.5cm} EUR payment. It is recharged back to zero gradually with each B2C transaction. \\
+&\hspace{0.5cm} a EUR payment. It is recharged back to zero gradually with each B2C transaction. \\
 \Xhline{1.5pt}
 \end{tabular}
 }
@@ -144,7 +145,7 @@ $Topup$ & Statistical EUR account used by $MNGR$ to recharge $retail$'s Prepaid 
 \end{table}
 
 \subsection{Account Limits}
-Table \ref{tab:accountLimits} shows the account limit parameters that apply to the SRD accounts CC, DOMU, and MIRROR. The credit limit is straightforward, it is the maximum negative value the account balance can reach. However, note that it is expressed as a \emph{positive} number. This is important to keep in mind for the calculations that are based on the value of this parameter. The credit limit is set at the time a user signs the contract with Sardex and is reviewed at least every year after that. The upper limit is, similarly, the maximum value the balance of the account is allowed to reach. Whereas the credit limit can be considered to be a safety measure for the circuit, the upper limit is more a safety measure for the user, since if the balance becomes too large-positive it may be difficult for the user to find ways to spend the credits in a useful time (for the user). Capacity is the maximum total sale volume that the user commits to accepting in one year. The alerts are safety buffers set by the user to alert him/her when the account balance and/or the sale volume approach these limits.
+Table \ref{tab:accountLimits} shows the account limit parameters that apply to the SRD accounts CC, DOMU, and MIRROR. The credit limit is straightforward, it is the maximum negative value the account balance can reach. However, note that it is expressed as a \emph{positive} number (actually, a \emph{non-negative} number, since it can be 0) . This is important to keep in mind for the calculations that are based on the value of this parameter. The credit limit is set at the time a user signs the contract with Sardex and is reviewed at least every year after that. The upper limit is, similarly, the maximum value the balance of the account is allowed to reach. Whereas the credit limit can be considered to be a safety measure for the circuit, the upper limit is more a safety measure for the user, since if the balance becomes too large-positive it may be difficult for the user to find ways to spend the credits in a useful time (for the user). Capacity is the maximum total sale volume that the user commits to accepting in one year. The alerts are safety buffers set by the user to alert him/her when the account balance and/or the sale volume approach these limits.
 
 \setlength{\tabcolsep}{10pt}
 \begin{table}[htbp]
@@ -156,7 +157,7 @@ Table \ref{tab:accountLimits} shows the account limit parameters that apply to t
 \hline
 \textbf{Account Limit Parameter} & \textbf{Description} \\
 \Xhline{1.5pt}
-$creditLimit$& Maximum negative SRD balance allowed (\emph{positive} number) \\
+$creditLimit$& Maximum negative SRD balance allowed (\emph{non-negative} number) \\
 \hline
 $upperLimit$ & Maximum positive SRD balance allowed (positive number)\\
 \hline
@@ -185,17 +186,17 @@ Operation = \{ credit, debit \}.
 \end{align}
 
 \begin{figure}[h]
-\vspace{-0.5cm}
+\vspace{-1cm}
 \centering
 \includegraphics[width=15cm]{Figures/Account_Limits_CC}
 \caption{\small\textbf{Visualization of the $CC$ account limits}}
 \label{fig:accountLimitsCC}
-\vspace{-0.8cm}
+\vspace{-0.6cm}
 \end{figure}
 
 
 \begin{figure}[htbp]
-\vspace{-0.8cm}
+\vspace{-0.6cm}
 \centering
 \includegraphics[width=15.6cm]{Figures/Account_Limits_Prepaid}
 \caption{\small\textbf{Visualization of the $Prepaid$ account limit}}
@@ -206,12 +207,12 @@ Operation = \{ credit, debit \}.
 
 \subsection{Interaction Levels}
 \label{sec:intlevels}
-The interactions between circuit participants can be described from different points of view that correlate loosely to a stack view of the system. As shown in Figure \ref{fig:stack}, it is helpful to identify qualitatively the different levels of such a stack, acknowledging that it is \emph{more} than a networking communication stack in terms of scope but \emph{less} than one in terms of precision. `A' and `B' refer to the Buyer and the Seller respectively. Figure \ref{fig:stack} extends the two communication levels described in D2.1, but does so qualitatively. For the purposes of the implementation, we need a smaller set of levels but a more precise and specific vocabulary to identify the end-points of the transaction.
+The interactions between circuit participants can be described from different points of view that correlate loosely to a stack view of the system. As shown in Figure \ref{fig:stack}, it is helpful to identify qualitatively the different levels of such a stack, acknowledging that it is \emph{more} than a networking communication stack in terms of scope but \emph{less} than one in terms of precision. `A' and `B' refer to the Buyer and the Seller respectively. Figure \ref{fig:stack} extends the two communication levels described in D2.1, but does so qualitatively. A formal desription will be provided in later sections and in the Appendix. For the purposes of the implementation, we need a smaller set of levels but a more precise and specific vocabulary to identify the end-points of the transaction.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=17.5cm]{Figures/Stack}
-\caption{\small\textbf{Stack view of the INTERLACE communication, economic, and financial  interactions}\\
+\caption{\small\textbf{Stack view of the INTERLACE communication, economic, and financial interactions}\\
 (Stack view of from where to where the different payloads are moved in interactions)}
 \label{fig:stack}
 \vspace{-0.5cm}
@@ -239,12 +240,12 @@ Figure \ref{fig:visibility} shows which groups ($toGroup$) are visible to which 
 
 In general, transactability correlates to visibility. However, there is not a strict 1-1 relationship between them. For the example of a $company$ paying its own $employee$s as part of the B2E programme, $employee$ remains invisible to a search, but $company$ has the $username$ of the $employee$ and can perform a credit transaction to pay (part of) their salary.
 
-On the right of Figure \ref{fig:visibility} we show that some groups are always invisible $\{ F \}$ others are always visibile $\{ T \}$, and others could be either $\{T, F\}$. For example, a company could be put in the shadow state if it has reached its maximum positive credit limit.
+On the right of Figure \ref{fig:visibility} we show that some groups are always invisible $\{ F \}$ and others could be either visible or invisible $\{T, F\}$. For example, a company could be put in the shadow state if it has reached its maximum positive credit limit.
 
 \subsection{B2C Operations}
 This report extends the use cases covered by D2.1 by adding also the Business to Consumer (B2C) use cases. B2C was developed to increase the number and volume of transactions, i.e.\ the size of the Sardex economy, by extending the ability to transact in SRD to people not otherwise connected to the circuit. The principle involves offering the opportunity to $retail$ers to reward their EUR customers with an SRD rebate.
 
-The amount of the reward is a percent, in SRD, of the amount in EUR paid by a $consumer$ to a $retail$, where the percent is set by $retail$ and it is an example of the $MetaData$ for this group. The reward is stored on a smart card that is offered to $consumer$ at the time of purchase. This is shown as a child transaction in B2C Use Case 2, Figure \ref{fig:B2C1}.
+The amount of the reward is a percent, in SRD, of the amount in EUR paid by a $consumer$ or a $consumer$\_$verified$ to a $retail$, where the percent is set by $retail$ and it is an example of the $MetaData$ for this group. The reward is stored on a smart card that is offered to $consumer$ at the time of purchase. A $consumer$\_$verified$ already has a card, so their card is simply topped up. This is shown as a child transaction in B2C Use Case 2, Figure \ref{fig:B2C1}.
 
 \begin{figure}[htbp]
 \centering
@@ -253,7 +254,7 @@ The amount of the reward is a percent, in SRD, of the amount in EUR paid by a $c
 \label{fig:B2C1}
 \end{figure}
 
-Use Case 2 also involves a second child transaction, a 2\% fee, in EUR, paid from $retail$'s Prepaid account to $MNGR$'s Topup account. The asterisks next to these account names, in the figure, indicate that these two accounts are \emph{owned} by these two users but are not \emph{controlled} by them. They are controlled by $SysAdmin$. These EUR accounts are `statistical' rather than `real', meaning that they simply keep track of actual EUR amounts but do not themselves hold Euros. Sardex S.p.A. would need to be a bank for that to be possible. For Use Case 2 to be executable, for a given $retail$er, its Prepaid account needs to have sufficient funds. When it runs out of statistical Euros, $retail$ can pay $MNGR$ some amount of Euros using any of the standard payment systems, through a bank or a payment service provider like PayPal. This triggers Use Case 1, also shown in Figure \ref{fig:B2C1}.
+Use Case 2 also involves a second child transaction, a 2\% fee, in EUR, paid from $retail$'s Prepaid account to $MNGR$'s Topup account. The asterisks next to these account names, in the figure, indicate that these two accounts are \emph{owned} by these two users but are not \emph{controlled} by them. They are controlled by $SysAdmin$. These EUR accounts are `statistical' rather than `real', meaning that they only keep track of actual EUR amounts but do not themselves hold Euros. Sardex S.p.A. would need to be a bank for that to be possible. For Use Case 2 to be executable, for a given $retail$er, its Prepaid account needs to have sufficient funds. When it runs out of statistical Euros, $retail$ can pay $MNGR$ some amount of Euros using any of the standard payment systems, through a bank or a payment service provider like PayPal. This triggers Use Case 1, also shown in Figure \ref{fig:B2C1}.
 
 \begin{figure}[h]
 \centering
@@ -265,7 +266,7 @@ Use Case 2 also involves a second child transaction, a 2\% fee, in EUR, paid fro
 Figure \ref{fig:B2C2} shows the SRD transaction a $consumer$ can perform, i.e.\ the spending of the SRD accumulated as rewards, once they have registered and have become $consumer$\_$verified$. The figure also shows that Use Case 3 is relevant also to $employee$s (B2E) and that Use Case 4 is relevant to both B2E users and to non-$retail$ company users (B2B).
 
 \subsection{Initial Account State}
-Table \ref{tab:InitialAccountSets} shows the initial allocation of accounts to the different user groups. The allocation is `initial' because  depending on the history of a given user the number of its accounts could change. For legal reasons, as a general principle \emph{change} can only mean \emph{increase}. In other words, once a user has become the owner of an account it can never be taken away from them, even if, for example, its access to it is suspended due to misbehaviour. Another example is a $Retail$ user who upgrades to the $Full$ group and a year later changes its mind and goes back to $Retail$. It will retain its DOMU account even if it won't be able to use it anymore.
+Table \ref{tab:InitialAccountSets} shows the initial allocation of accounts to the different user groups. The allocation is `initial' because  depending on the history of a given user the number of its accounts could change. For legal reasons, as a general principle `change' can only mean `increase'. In other words, once a user has become the owner of an account it can never be taken away from them, even if, for example, the user's access to it is suspended due to misbehaviour. Another example is a $Retail$ user who upgrades to the $Full$ group and a year later changes its mind and goes back to $Retail$. It will retain its DOMU account even if it won't be able to use it anymore.
 
 {\bf Note: Each user can have no more than one account of a given type.}
 
@@ -288,7 +289,7 @@ $Full$		& $\{ CC, DOMU, Prepaid^*, Income \}$ \\
 \hline
 $Employee$	& $\{ CC \}$ \\
 \hline
-$On$\_$Hold$	& $\{ CC, DOMU, Prepaid^*, Income \}$ \\
+$On$\_$Hold$	& $x$, where $x \in Powerset(CC, DOMU, Prepaid^*, Income)$ \\
 \hline
 $Consumer$	& $\{ CC, Bisoo^* \}$ \\
 \hline
@@ -304,7 +305,7 @@ $MNGR$ 		& $\{ CC, Topup^*, MIRROR \}$ \\
 \vspace{-1cm}
 \end{table}
 
-The Prepaid account shown for $Company$ does not relate to B2C operations but to inter-circuit trade, which also involves a euroFee.
+The Prepaid account shown for $Company$ does not relate to B2C operations but to inter-circuit trade, which also involves a euroFee. A user cannot start as $On$\_$Hold$, it will start as one of the other groups. For legal reasons an account cannot be taken away once it has been assigned to a user. Therefore, since any user can be suspended and become $On$\_$Hold$, this group could have different combinations of accounts (with the exception of the MNGR account).
 
 \section{Transactability Workflow}
 \subsection{Identity MetaData}
@@ -313,7 +314,7 @@ Table \ref{tab:IdentityMetaData} collects the identity meta-data for all the gro
 The meta-data variables are not capitalized because they are assumed to be singletons: for a given member, e.g.\ a $company$, there is only one $memberID$. However, since there are many $memberID$s, one for each member, we could also say that $memberID \in MemberID$. Since there are cases where a user may have more than one meta-data variable, for example a company with more than one phone number, this is indicated in the Type column as an array, i.e.\ `String[ ]'.
 
 \begin{table}[H]
-\vspace{-0.5cm}
+\vspace{-0.3cm}
 \begin{centering}
 \small
 {
@@ -332,7 +333,7 @@ $Consumer$	& {\bf memberID}	&Integer & Unique member identifier \\
 \caption{\small\textbf{Identity MetaData for all the groups}}
 \label{tab:IdentityMetaData}
 \end{centering}
-\vspace{-1cm}
+\vspace{-1.2cm}
 \end{table}
 
 \subsection{Profile MetaData}
@@ -498,7 +499,7 @@ TT_4 &= \{ Company \},	&& TT_5 = \{ MNGR \},			&& TT_6 = \{ Full \}.
 \end{align*}
 Through currying, Table \ref{tab:TTs} then shows the TT function as four sub-functions.
 
-The Transfer Type test shown in Figure \ref{fig:transactabilitywkflow} involves checking whether the recipient of a Credit or Debit transaction in a given currency is in the range of the corresponding $TT$ function of the initiator. In other words, the initiator, or $fromGroup$ member, is the independent or input parameter to the function and appears in the left column in Table \ref{tab:TTs}.
+The Transfer Type test shown in Figure \ref{fig:transactabilitywkflow} involves checking whether the recipient (Seller) of a Credit or Debit transaction in a given currency is in the range of the corresponding $TT$ function of the Buyer. In other words, the Buyer, or $fromGroup$ member, is the independent or input parameter to the function and appears in the left column in Table \ref{tab:TTs}.
 
 \setlength{\tabcolsep}{10pt}
 \setlength\extrarowheight{3pt}
@@ -513,21 +514,21 @@ The Transfer Type test shown in Figure \ref{fig:transactabilitywkflow} involves 
 \Xhline{1.5pt}
 $Welcome$	& $\emptyset$ 				& $\emptyset$	& $\emptyset$	& $\emptyset$	 \\[3pt]
 \hline
-$Retail$		& $\emptyset$				& $TT_1$ 		& $\emptyset$	& $TT_1$	 \\[3pt]
+$Retail$		& $\emptyset$				& $TT_5$ 		& $\emptyset$	& $TT_1$	 \\[3pt]
 \hline
-$Company$	& $TT_3 \cup TT_5 \cup TT_6$ & $TT_4$		& $\emptyset$	& $\emptyset$	 \\[3pt]
+$Company$	& $TT_3 \cup TT_5 \cup TT_6$ & $TT_4 \cup TT_5 \cup TT_6$		& $\emptyset$	& $\emptyset$	 \\[3pt]
 \hline
-$Full$		& $TT_3 \cup TT_5 \cup TT_6$ & $TT_6$		& $\emptyset$	& $TT_6$	 \\[3pt]
+$Full$		& $TT_3 \cup TT_5 \cup TT_6$ & $TT_4 \cup TT_5 \cup TT_6$	& $\emptyset$	& $TT_6$	 \\[3pt]
 \hline
-$Employee$	& $TT_2 \cup TT_6$ 		& $\emptyset$	&$\emptyset$ 	& $\emptyset$	 \\[3pt]
+$Employee$	& $TT_2 \cup TT_6$ 		& $TT_2 \cup TT_6$	&$\emptyset$ 	& $\emptyset$	 \\[3pt]
 \hline
 $On$\_$Hold$	& $\emptyset$				& $\emptyset$	& $\emptyset$	& $\emptyset$	 \\[3pt]
 \hline
 $Consumer$	& $\emptyset$				& $\emptyset$	& $\emptyset$	&$\emptyset$ 	 \\[3pt]
 \hline
-$Consumer$\_$Verified$ & $TT_1 \cup TT_6$ 	& $\emptyset$	& $\emptyset$ 	& $\emptyset$	 \\[3pt]
+$Consumer$\_$Verified$ & $TT_1 \cup TT_6$ 	& $TT_2 \cup TT_6$	& $\emptyset$ 	& $\emptyset$	 \\[3pt]
 \hline
-$MNGR$ 		& $TT_3 \cup TT_5 \cup TT_6$ & $TT_5$ & $\emptyset$ & $\emptyset$	 \\[3pt]
+$MNGR$ 		& $TT_3 \cup TT_5 \cup TT_6$ & $TT_4 \cup TT_6$ & $\emptyset$ & $\emptyset$	 \\[3pt]
 \Xhline{1.5pt}
 \end{tabular}
 }
