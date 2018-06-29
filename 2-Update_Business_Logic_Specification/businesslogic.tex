@@ -208,17 +208,20 @@ Operation = \{ credit, debit \}.
 \subsection{Interaction Levels}
 \label{sec:intlevels}
 The interactions between circuit participants can be described from different points of view that correlate loosely to a stack view of the system. As shown in Figure \ref{fig:stack}, it is helpful to identify qualitatively the different levels of such a stack, acknowledging that it is \emph{more} than a networking communication stack in terms of scope but \emph{less} than one in terms of precision. `A' and `B' refer to the Buyer and the Seller respectively. Figure \ref{fig:stack} extends the two communication levels described in D2.1, but does so qualitatively. A formal desription will be provided in later sections and in the Appendix. For the purposes of the implementation, we need a smaller set of levels but a more precise and specific vocabulary to identify the end-points of the transaction.
-
 \begin{figure}[H]
 \centering
 \includegraphics[width=17.5cm]{Figures/Stack}
 \caption{\small\textbf{Stack view of the INTERLACE communication, economic, and financial interactions}\\
 (Stack view of from where to where the different payloads are moved in interactions)}
 \label{fig:stack}
-\vspace{-0.5cm}
+\vspace{-0.3cm}
 \end{figure}
 
-Figure \ref{fig:vocabulary} shows this additional information as concerns levels 1-4, which are labelled in the first column in the same way as in Figure \ref{fig:stack}, along with some more information. In particular, this figure could be seen to integrate aspects of Figures \ref{fig:stack} and \ref{fig:transactabilitywkflow}, with the purpose of facilitating the conceptual understanding of the specification. The different types of `MetaData' relevant to transactions are shown in the approximate position where they are polled. For example, the $\%$ of SRD accepted by a given user over 1000-EUR transaction values is part of the Profile MetaData of the $Company$ group but not the $Consumer$\_$Verified$ group's.
+\begin{quote}
+\small
+Figure \ref{fig:stack} has taken a long time to arrive at, and was changed several times after long and difficult discussions. It was created, and should be interpreted, as some kind of Rosetta stone that brings together different views of the transactions: economic, user-centred, mathematical, database-centred, and system communications. In addition, it is also meant to maintain ``conceptual'' backward compatibility with the previous system, in which the Transfer Types are attributes of the transaction recipients (i.e.\ the Sellers), rather than mathematical functions whose \emph{values} need to include the Sellers and whose input parameters are the Buyers. This second view adopted here, which is mathematical, allows to express the condition about whether or not a Buyer and a Seller can transact based on how the function is defined. Section \ref{subsec:perm-trans-types} describes this function in detail.
+\vspace{-0.5cm}
+\end{quote}
 
 \begin{figure}[htbp]
 \centering
@@ -226,6 +229,8 @@ Figure \ref{fig:vocabulary} shows this additional information as concerns levels
 \caption{\small\textbf{Actors, parameters, levels, data structures, computational process, and conditions}}
 \label{fig:vocabulary}
 \end{figure}
+
+Figure \ref{fig:vocabulary} shows this additional information as concerns levels 1-4, which are labelled in the first column in the same way as in Figure \ref{fig:stack}, along with some more information. In particular, this figure could be seen to integrate aspects of Figures \ref{fig:stack} and \ref{fig:transactabilitywkflow}, with the purpose of facilitating the conceptual understanding of the specification. The different types of `MetaData' relevant to transactions are shown in the approximate position where they are polled. For example, the $\%$ of SRD accepted by a given user over 1000-EUR transaction values is part of the Profile MetaData of the $Company$ group but not the $Consumer$\_$Verified$ group's.
 
 \subsection{Visibility}
 Figure \ref{fig:visibility} shows which groups ($toGroup$) are visible to which groups ($fromGroup$) by a `1' at the intersection of the $(row, column)$ corresponding to a choice of $(fromGroup, toGroup)$. For example, $Company$ is visible to $Employee$, meaning that $Employee$ can do a search for $Company$, but not vice versa. In this case $Employee$ is not visible due to privacy legislation.
@@ -254,14 +259,14 @@ The amount of the reward is a percent, in SRD, of the amount in EUR paid by a $c
 \label{fig:B2C1}
 \end{figure}
 
-Use Case 2 also involves a second child transaction, a 2\% fee, in EUR, paid from $retail$'s Prepaid account to $MNGR$'s Topup account. The asterisks next to these account names, in the figure, indicate that these two accounts are \emph{owned} by these two users but are not \emph{controlled} by them. They are controlled by $SysAdmin$. These EUR accounts are `statistical' rather than `real', meaning that they only keep track of actual EUR amounts but do not themselves hold Euros. Sardex S.p.A. would need to be a bank for that to be possible. For Use Case 2 to be executable, for a given $retail$er, its Prepaid account needs to have sufficient funds. When it runs out of statistical Euros, $retail$ can pay $MNGR$ some amount of Euros using any of the standard payment systems, through a bank or a payment service provider like PayPal. This triggers Use Case 1, also shown in Figure \ref{fig:B2C1}.
-
 \begin{figure}[h]
 \centering
 \includegraphics[width=15cm]{Figures/B2C2}
 \caption{\small\textbf{SRD transactions for B2C, B2E, and B2B users}}
 \label{fig:B2C2}
 \end{figure}
+
+Use Case 2 also involves a second child transaction, a 2\% fee, in EUR, paid from $retail$'s Prepaid account to $MNGR$'s Topup account. The asterisks next to these account names, in the figure, indicate that these two accounts are \emph{owned} by these two users but are not \emph{controlled} by them. They are controlled by $SysAdmin$. These EUR accounts are `statistical' rather than `real', meaning that they only keep track of actual EUR amounts but do not themselves hold Euros. Sardex S.p.A. would need to be a bank for that to be possible. For Use Case 2 to be executable, for a given $retail$er, its Prepaid account needs to have sufficient funds. When it runs out of statistical Euros, $retail$ can pay $MNGR$ some amount of Euros using any of the standard payment systems, through a bank or a payment service provider like PayPal. This triggers Use Case 1, also shown in Figure \ref{fig:B2C1}.
 
 Figure \ref{fig:B2C2} shows the SRD transaction a $consumer$ can perform, i.e.\ the spending of the SRD accumulated as rewards, once they have registered and have become $consumer$\_$verified$. The figure also shows that Use Case 3 is relevant also to $employee$s (B2E) and that Use Case 4 is relevant to both B2E users and to non-$retail$ company users (B2B).
 
@@ -394,6 +399,25 @@ $Company$	& {\bf entityName}$^*$		&String	& Legal entity name \\
 			& {\bf firstName	}$^*$			&String & First name \\
 			& {\bf surName}$^*$			&String & Surname \\
 \Xhline{1.5pt}
+\end{tabular}
+}
+\caption{\small\textbf{Profile MetaData for the $Welcome$, $Retail$, and $Company$ groups}\\
+($^*$Indicates fields that can be modified by the user)\\
+($^{**}$Indicates fields that can be modified by the user but that are updated only at a fixed time interval)}
+\label{tab:ProfileMetaData1}
+\end{centering}
+\end{table}
+
+
+\setlength{\tabcolsep}{5pt}
+\begin{table}[H]
+\begin{centering}
+\small
+{
+\begin{tabular}{ r | c | l | l }
+\hline
+\textbf{Group}	& {\bf Profile MetaData} & {\bf Type} & {\bf Description} \\
+\Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
 $Full$		& {\bf entityName}$^*$		&String	& Legal entity name \\
@@ -411,31 +435,13 @@ $Full$		& {\bf entityName}$^*$		&String	& Legal entity name \\
 \cline{2-2}
 			& {\bf firstName}$^*$			&String	& First name \\
 			& {\bf surName}$^*$			&String	& Surname \\
+
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
 $Employee$	& {\bf firstName}$^*$			&String	& First name \\
 			& {\bf surName}$^*$			&String	& Surname \\
 			& {\bf employedBy}			&String	& Name of legal entity employed by \\
-\Xhline{1.5pt}
-\end{tabular}
-}
-\caption{\small\textbf{Profile MetaData for the $Welcome$, $Retail$, $Company$, $Full$, and $Employee$ groups}\\
-($^*$Indicates fields that can be modified by the user)\\
-($^{**}$Indicates fields that can be modified by the user but that are updated only at a fixed time interval)}
-\label{tab:ProfileMetaData1}
-\end{centering}
-\end{table}
-
-
-\setlength{\tabcolsep}{5pt}
-\begin{table}[H]
-\begin{centering}
-\small
-{
-\begin{tabular}{ r | c | l | l }
-\hline
-\textbf{Group}	& {\bf Profile MetaData} & {\bf Type} & {\bf Description} \\
 \Xhline{1.5pt}
 			& \emph{(Obligatory MetaData)} & & \\
 \cline{2-2}
@@ -471,13 +477,13 @@ $MNGR$ 		& {\bf entityName}$^*$		&String	& Legal entity name \\
 \Xhline{1.5pt}
 \end{tabular}
 }
-\caption{\small\textbf{Profile MetaData for the $On$\_$Hold$, $Consumer$, $Consumer$\_$Verified$, and $MNGR$ groups}\\
+\caption{\small\textbf{Profile MetaData for the $Full$, $Employee$, $On$\_$Hold$, $Consumer$, $Consumer$\_$Verified$, and $MNGR$ groups}\\
 ($^*$Indicates fields that can be modified by the user)\\
 ($^{**}$Indicates fields that can be modified by the user but that are updated only at a fixed time interval)
 }
 \label{tab:ProfileMetaData2}
 \end{centering}
-\vspace{-1.5cm}
+\vspace{-1.0cm}
 \end{table}
 
 \subsection{Transfer Types}
@@ -514,19 +520,19 @@ The Transfer Type test shown in Figure \ref{fig:transactabilitywkflow} involves 
 \Xhline{1.5pt}
 $Welcome$	& $\emptyset$ 				& $\emptyset$	& $\emptyset$	& $\emptyset$	 \\[3pt]
 \hline
-$Retail$		& $\emptyset$				& $TT_5$ 		& $\emptyset$	& $TT_1$	 \\[3pt]
+$Retail$		& $\emptyset$				& $TT_5$ 		& $\emptyset$	& $\emptyset$	 \\[3pt]
 \hline
 $Company$	& $TT_3 \cup TT_5 \cup TT_6$ & $TT_4 \cup TT_5 \cup TT_6$		& $\emptyset$	& $\emptyset$	 \\[3pt]
 \hline
-$Full$		& $TT_3 \cup TT_5 \cup TT_6$ & $TT_4 \cup TT_5 \cup TT_6$	& $\emptyset$	& $TT_6$	 \\[3pt]
+$Full$		& $TT_3 \cup TT_5 \cup TT_6$ & $TT_4 \cup TT_5 \cup TT_6$	& $\emptyset$	& $\emptyset$	 \\[3pt]
 \hline
 $Employee$	& $TT_2 \cup TT_6$ 		& $TT_2 \cup TT_6$	&$\emptyset$ 	& $\emptyset$	 \\[3pt]
 \hline
 $On$\_$Hold$	& $\emptyset$				& $\emptyset$	& $\emptyset$	& $\emptyset$	 \\[3pt]
 \hline
-$Consumer$	& $\emptyset$				& $\emptyset$	& $\emptyset$	&$\emptyset$ 	 \\[3pt]
+$Consumer$	& $\emptyset$				& $\emptyset$	& $\emptyset$	& $TT_1 \cup TT_6$ 	 \\[3pt]
 \hline
-$Consumer$\_$Verified$ & $TT_1 \cup TT_6$ 	& $TT_2 \cup TT_6$	& $\emptyset$ 	& $\emptyset$	 \\[3pt]
+$Consumer$\_$Verified$ & $TT_1 \cup TT_6$ 	& $TT_1 \cup TT_6$	& $\emptyset$ 	& $TT_1 \cup TT_6$	 \\[3pt]
 \hline
 $MNGR$ 		& $TT_3 \cup TT_5 \cup TT_6$ & $TT_4 \cup TT_6$ & $\emptyset$ & $\emptyset$	 \\[3pt]
 \Xhline{1.5pt}
@@ -565,35 +571,37 @@ Figure \ref{fig:SysAdmin_Acct_Connectivity} shows a similar connectivity functio
 \subsection{User Transactability Functions}
 \textbf{\small Note: this section has no bearing on the implementation, it is included to help interpret Figure \ref{fig:stack}.}
 
-Figures \ref{fig:UTF1}-\ref{fig:UTF4} show a visualization of the interactions relevant to Layer 1 of Figure \ref{fig:stack}, filtered by the Account Connectivity constraints.
+Figures \ref{fig:UTF1}-\ref{fig:UTF4} show a visualization of the interactions relevant to the ``1-User'' layer of Figure \ref{fig:stack}, filtered by the Account Connectivity constraints.
 
-\begin{figure}[h]
+\begin{figure}[H]
 \vspace{-0.5cm}
 \centering
-\includegraphics[width=17.5cm]{Figures/UTF1}
+\includegraphics[width=16cm]{Figures/UTF1}
 \caption{\small\textbf{User Transactability Function 1}}
 \label{fig:UTF1}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
-\includegraphics[width=17.5cm]{Figures/UTF2}
+\includegraphics[width=16cm]{Figures/UTF2}
 \caption{\small\textbf{User Transactability Function 2}}
 \label{fig:UTF2}
+\vspace{-1cm}
 \end{figure}
 
 \begin{figure}[H]
 \vspace{-0.5cm}
 \centering
-\includegraphics[width=17.5cm]{Figures/UTF3}
+\includegraphics[width=16cm]{Figures/UTF3}
 \caption{\small\textbf{User Transactability Function 3}}
 \label{fig:UTF3}
-%\vspace{-1cm}
+\vspace{-1cm}
 \end{figure}
 
 \begin{figure}[H]
+\vspace{-0.5cm}
 \centering
-\includegraphics[width=17.5cm]{Figures/UTF4}
+\includegraphics[width=16cm]{Figures/UTF4}
 \caption{\small\textbf{User Transactability Function 4}}
 \label{fig:UTF4}
 \end{figure}
@@ -603,40 +611,33 @@ Figures \ref{fig:UTF1}-\ref{fig:UTF4} show a visualization of the interactions r
 \subsection{Group Transactability Functions}
 \textbf{\small Note: this section has no bearing on the implementation, it is included to help interpret Figure \ref{fig:stack}.}
 
-The effect of the Transfer Types test together with the Account Connectivity test results in what we call the Group Transactability Function (GTF). Since there are 4 combinations of currency and channel, there are 4 different GTFs. There is no need to use them as an additional test, since they do not add anything new to Tests 1 and 2 of Figure \ref{fig:transactabilitywkflow}. However, it is still useful to include them here as another visualization of these first two tests of the Permissioning workflow, see Figures \ref{fig:GTF1}-\ref{fig:GTF4}.
-\newpage
+Figures \ref{fig:GTF1}-\ref{fig:GTF4} show a visualization of the interactions relevant to ``2-Group'' layer of Figure \ref{fig:stack}, filtered by the Account Connectivity constraints. In other words, the effect of the Transfer Types test together with the Account Connectivity test results in what we call the Group Transactability Function (GTF). Since there are 4 combinations of currency and channel, there are 4 different GTFs. There is no need to use them as an additional test, since they do not add anything new to Tests 1 and 2 of Figure \ref{fig:transactabilitywkflow}. However, it is still useful to include them here as another visualization of these first two tests of the Permissioning workflow.
 
-\vspace*{1cm}
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
-\includegraphics[width=17.5cm]{Figures/GTF1}
+\includegraphics[width=16cm]{Figures/GTF1}
 \caption{\small\textbf{Group Transactability Function 1}}
 \label{fig:GTF1}
 \end{figure}
 
-\vspace*{2cm}
-
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
-\includegraphics[width=17.5cm]{Figures/GTF2}
+\includegraphics[width=16cm]{Figures/GTF2}
 \caption{\small\textbf{Group Transactability Function 2}}
 \label{fig:GTF2}
 \end{figure}
-%\vspace*{0.5cm}
 \newpage
 
 \begin{figure}[H]
-%\vspace{-0.5cm}
 \centering
-\includegraphics[width=17.5cm]{Figures/GTF3}
+\includegraphics[width=16cm]{Figures/GTF3}
 \caption{\small\textbf{Group Transactability Function 3}}
 \label{fig:GTF3}
-%\vspace{-1cm}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=17.5cm]{Figures/GTF4}
+\includegraphics[width=16cm]{Figures/GTF4}
 \caption{\small\textbf{Group Transactability Function 4}}
 \label{fig:GTF4}
 \end{figure}
