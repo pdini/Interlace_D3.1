@@ -189,7 +189,7 @@ In this listing we can identify three parts:
 \end{enumerate}
 
 
-In line 27 of listing \ref{lst:impl-sched-core} the count of active clients is stored. That count is reduced by one when a "Done" message has been received by a dynamic client. Also the client is shut down by calling
+In line 27 of Listing \ref{lst:impl-sched-core} the count of active clients is stored. That count is reduced by one when a "Done" message has been received by a dynamic client. Also the client is shut down by calling
 
 \begin{lstlisting}[language=bsl]
 	destroyASIM clientName
@@ -214,9 +214,11 @@ Rule $initData$ in the $initdata$ client consolidates the rest of the initializa
 	\item $accountConnectivity$ ... transferability between accounts
 \end{itemize}
 
-After the start-up phase has been completed, the server goes into listening mode, in which the main program $DispatchMessages$ is called iteratively. In this mode, all relevant messages received by the server are taken care of. In listing \ref{lst:impl-msg-dispatch} the dispatch process of server can be viewed in detail. All inbox messages of the current engine tick are fetched using the $inboxOf$ in addition to the $forall$ statement. The message reference $m$ as named in the loop is used to retrieve subject, message, and sender of the current post box entry $m$.
+After the start-up phase has been completed, the server goes into listening mode, in which the main program $DispatchMessages$ is called iteratively. In this mode, all relevant messages received by the server are taken care of. In Listing \ref{lst:impl-msg-dispatch} the dispatch process of server can be viewed in detail. All inbox messages of the current engine tick are fetched using the $inboxOf$ in addition to the $forall$ statement. The message reference $m$ as named in the loop is used to retrieve subject, message, and sender of the current post box entry $m$.
 
 Messages that are not recognized as having an accurate message type are discarded. The message type is defined by the message subject and is compared to one of the predefined entries in the universe definition $MESSAGE\_REQUESTS$. For real-world use it is essential to introduce some kind of additional message signing to \st{ensure} \textcolor{red}{verify} by whom the message has been sent.
+
+\textcolor{red}{\bf @Eduard: you used CreditReviewReq  instead of CreditPreviewReq below!} 
 
 \begin{center}
 \begin{minipage}{0.8\textwidth}
@@ -247,26 +249,23 @@ rule DispatchMessages = {
 \section{Modularization and Include Syntax}
 \label{sec:impl-include}
 
-For the Interlace specification the ICEF framework has been extended to support an "include" syntax inside of the ICEF JSON files in order to import sources to an agent. This has been added in order to compensate for the "Modularity" module of ASM which stops working in ASIM because of its distributed nature.
+For the INTERLACE specification the ICEF framework has been extended to support an "include" syntax inside of the ICEF JSON files in order to import sources to an agent. This has been added in order to compensate for the "Modularity" module of ASM which stops working in ASIM because of its distributed nature.
 
-However, it is important to know that the include statement needs to be used with caution, because one need to be aware that it is nothing more but appending the content of the included file to the main agent file. This appending raises the following issues:
+However, it is important to realize that the include statement needs to be used with caution, because one needs to be aware that it effects nothing more than the appending of the content of the included file to the main agent file. This appending raises the following issues:
 
 \begin{itemize}
 	\item Line numbers are different to the original files
-	\item For a compilation problem it might be necessary to take a look at all files, main as well as included ones
-	\item Naming needs to be consistent throughout all files. E.g. Eclipse will not notify a developer whether a name for a rule, location, ... has been used twice.
+	\item For a compilation problem it might be necessary to take a look at all files, the main as well as included ones
+	\item Naming needs to be consistent throughout all files. E.g.\ Eclipse will not notify a developer whether a name for a rule, location, etc has been used twice.
 \end{itemize}
 
-Nevertheless, it is an approach for handling the code separation in order to avoid a single and extremely long file which would be difficult to maintain and work with.
+Nevertheless, it is a useful approach for handling code separation, in order to avoid a single and extremely long file which would be difficult to maintain and work with.
 
-For being able to use \textbf{Eclipse} and the ASIM eclipse hinting/error detection provided by the plugin another quick fix has been introduced. So if you'd add a dynamic or non-function agent it will be appended at some point to a parent agent. Thus definitions like "CoreASIM asimname" would occur twice inside of that final agent. For the interpreter to work correctly it is consequently necessary to have only one header defining the name of an agent and to remove that header definition inside of the included files. But when you are removing the header definition Eclipse is not able any more to provide correct syntax highlighting, hinting or error detection.
-
-Thus you now have the possibility to mark a section which will be removed during the agent assembling. The beginning of such a section is marked with \textcolor{eclipseComment}{/*includeskip begin*/} and the end with \textcolor{eclipseComment}{/*includeskip end*/}. When using those markers they need to be placed exactly as described - no additional white-spaces (space, tab, return, ...) or different casing. Listing \ref{lst:includeskip} shows a short example.
-
+In order to be able to use \textbf{Eclipse} and the ASIM eclipse hinting/error detection provided by the plugin, another ``quick-fix'' has been introduced. For the case when a dynamic or non-function agent needs to be added, it will be appended at some point to a parent agent. Thus definitions like ``CoreASIM asimname'' would occur twice inside of that final agent. For the interpreter to work correctly it is necessary to have only one header defining the name of an agent and, therefore, to remove that header definition inside of the included files. However, if the header definition is not present at all in the file before it is included, Eclipse is not able to provide correct syntax highlighting, hinting or error detection.
 
 \begin{center}
 \begin{minipage}{0.8\textwidth}
-%\small
+\small
 \begin{lstlisting}[language=bsl_lst,caption={\bf\small includeskip usage},label=lst:includeskip]
 /*includeskip begin*/
 	//this part will be removed
@@ -287,27 +286,29 @@ rule somerule = {
 \end{minipage}
 \end{center}
 
-Inside of the skipped section there may be many different things placed as shown in the example in order to work seamlessly with the Eclipse hinting. So you could also place names of locations or universes. The reason putting them there is to avoid a warning by the Eclipse plugin that the variable/location has not been defined yet. So in order to check correct spelling and avoid the problems cause by those only getting obvious at interpretation time.
+Thus, the new quick-fix is to give the programmer the possibility to mark a section which will be removed during the agent assembly. The beginning of such a section is marked with \textcolor{eclipseComment}{/*includeskip begin*/} and the end with \textcolor{eclipseComment}{/*includeskip end*/}. When using these markers they need to be placed exactly as described -- no additional white spaces (space, tab, return, ...) or different letter cases. Listing \ref{lst:includeskip} shows a simple example.
+
+Inside of the skipped section there may be many different things placed as shown in the example in order to work seamlessly with the Eclipse hinting. Place names of locations or universes can also used. The reason for putting them there is to avoid a warning by the Eclipse plugin that the variable/location has not been defined yet; in other words, in order to check correct spelling and avoid the problems caused by any such issues only becoming obvious at interpretation time.
 
 
 \section{Dynamic Clients}
 \label{sec:impl-dyn-clients}
 
-This section will elaborate about the dynamic client features and functionalities. It is explained how they are used as well as how they process the information and create the various request. Further, details about the message types is given in detail.
+This section elaborates further on the dynamic client features and functionalities. It explains how they are used as well as how they process the information and create the various requests. Further, details about the message types are given in detail.
 
 \subsection{Communication and Message passing}
 \label{sec:impl-com-msg}
 
-As mentioned in chapter \ref{ch:CoreAsimIntro} section \ref{sec:coreasim-details} communication in the ICEF framework is based on message passing. Thus each agent has the possibility to send messages to a named agent as well as receive message from any other. Those can be picked up at the agent specific mailbox using the designated functions provided by the communication Plug-in.
+As mentioned in Chapter \ref{ch:CoreAsimIntro}, Section \ref{sec:coreasim-details}, communication in the ICEF framework is based on message passing. Thus each agent has the possibility to send messages to a named agent as well as receive messages from any other. The messages can be picked up at the agent-specific mailbox using the designated functions provided by the communication plugin.
 
-All agents work independent, do not share state between each other and only are aware of their own status. Consequently, they have to rely on that mailing system to share information. This is an important fact because in a real-world scenario clients are also working independent from each other. In order to support that independence ASIM agents are applying that distributed design pattern.
+All agents work independent, do not share any states, and only are aware of their own status. Consequently, they have to rely on the mailing system to share information. This is an important fact because in a real-world scenario clients are also working independently of each other. In order to support this independence ASIM agents apply the distributed design pattern.
 
-Messages from one client to another are not encrypted. Thus it is important to realized that security needs to be taken into account separately and is currently not part of the implemented model but very important when planning a business-ready product.
+Messages from one client to another are not encrypted. Thus it is important to realize that security needs to be taken into account separately. Security is currently not part of the implemented model but it is a very important part of the planning of a business-ready product.
 
 \subsection{Message Types}
 \label{subsec:impl-msg-types}
 
-At the moment there are several message types part of debit and credit requests. Table \ref{tab:impl-transfer-types} is giving an overview which messages are in use for handling transfer operations. The messages are listed in the order of occurrence, however, the precise overall communication sequence is shown in figure \ref{fig:impl-msg-crc} and figure \ref{fig:impl-msg-drc}. Finally, the listed message types in table \ref{tab:impl-msg-generic-types} are operation (debit, credit) agnostic but vary based on their transfer parameters.
+At the moment there are several message types that are part of debit and credit requests. Table \ref{tab:impl-transfer-types} gives an overview of which messages are in use for handling transfer operations. The messages are listed in the order of occurrence. However, the precise overall communication sequence is shown in Figures \ref{fig:impl-msg-crc} and \ref{fig:impl-msg-drc}. Finally, the message types listed in Table \ref{tab:impl-msg-generic-types} are operation-agnostic (debit, credit) but vary based on their transfer parameters.
 
 \begin{table}[H]
 \begin{centering}
@@ -315,7 +316,7 @@ At the moment there are several message types part of debit and credit requests.
 {
 \begin{tabular}{ r | p{7cm} | p{4cm} }
 \hline
-\textbf{Message Name} & Used For & Attached Parameters \\
+\textbf{Message Name} & \textbf{Purpose} & \textbf{Attached Parameters} \\
 \Xhline{1.5pt}
 
 CreditPreviewReq & first check of \textbf{credit} request & CRP$^{*}$ \\[3pt]
@@ -326,9 +327,9 @@ DebitPreviewReq & first check of \textbf{debit} request & DRP$^{**}$ \\[3pt]
 \hline
 DebitPerformReq & request to actually perform a \textbf{debit} request & DRP$^{**}$ \\[3pt]
 \hline
-ConfirmationReq & asking debitor for permission to perform that \textbf{debit}-transfer & DRP$^{**}$, OTP$^{***}$ \\[3pt]
+ConfirmationReq & to ask debitor for permission to perform the \textbf{debit} transfer & DRP$^{**}$, OTP$^{***}$ \\[3pt]
 \hline
-DebitAckMsg & debitor gives permission to perform that \textbf{debit}-transfer & DRP$^{**, 1}$, OTP$^{***}$ \\[3pt]
+DebitAckMsg & debitor gives permission to perform the \textbf{debit} transfer & DRP$^{**, 1}$, OTP$^{***}$ \\[3pt]
 
 \Xhline{1.5pt}
 \end{tabular}
@@ -336,49 +337,52 @@ DebitAckMsg & debitor gives permission to perform that \textbf{debit}-transfer &
 \caption{\small\textbf{Credit/Debit message types overview}\\
 ($^{*}$Credit Request Parameters: from-account, to-account, amount, meta-data, channel, member)\\
 ($^{**}$Debit Request Parameters:  creditor, debtor, amount, meta-data, channel)\\
-($^{***}$One Time Pad, $^1$optional)}
+($^{***}$One Time \st{Pad} \textcolor{red}{Password}, $^1$optional)}
 \label{tab:impl-transfer-types}
 \end{centering}
 \vspace{-0.5cm}
 \end{table}
 
-
+\setlength{\tabcolsep}{6pt}
 \begin{table}[H]
 \begin{centering}
 \small
 {
-\begin{tabular}{ r | p{7cm} | p{3.1cm} }
+\begin{tabular}{ r | p{6.7cm} | p{4.4cm} }
 \hline
-\textbf{Message Name} & Used For & Attached Parameters \\
+\textbf{Message Name} & \textbf{Purpose} & \textbf{Attached Parameters} \\
 \Xhline{1.5pt}
-
 ProceedMessage & answer from server that the CreditPreviewReq has been successful & CRP$^{*}$/DRP$^{**}$\\[3pt]
 \hline
-DoNotProceedMessage & answer from server that the CreditPreviewReq has NOT  been successful & error-text, CRP$^{*}$/DRP$^{**}$\\[3pt]
+DoNotProceedMessage & answer from server that the CreditPreviewReq has NOT  been successful & error message, CRP$^{*}$/DRP$^{**}$\\[3pt]
 \hline
-NoPermitted & answer from server that the CreditPerformReq has NOT  been successful & error-text, CRP$^{*}$/DRP$^{**}$ \\[3pt]
+NoPermitted \ \textcolor{red}{NotPermitted?} & answer from server that the CreditPerformReq has NOT been successful & error message, CRP$^{*}$/DRP$^{**}$ \\[3pt]
 \hline
-TransferPerformedSuccessful\ & answer from server that the CreditPerformReq has been successful and the transfer has been recorded and confirmed & success-message, CRP$^{*}$/DRP$^{**}$ \\[3pt]
+TransferPerformedSuccessful\ & answer from server that the CreditPerformReq has been successful and the transfer has been recorded and confirmed & success message, CRP$^{*}$/DRP$^{**}$ \\[3pt]
 \hline
-Done & Message to Scheduler the client simulation is done and can be terminated & none \\[3pt]
-
+Done & Message to Scheduler that the client simulation is done and can be terminated & none \\[3pt]
 \Xhline{1.5pt}
 \end{tabular}
 }
-\caption{\small\textbf{Operation agnostic message types overview}\\
-($^{*}$Credit Request Parameters: from-account, to-account, amount, meta-data, channel, member)\\
+\caption{\small\textbf{Operation-agnostic message types overview}\\
+($^{*}$Credit Request Parameters: fromAccount, toAccount, amount, meta-data, channel, member)\\
 ($^{**}$Debit Request Parameters:  creditor, debtor, amount, meta-data, channel)}
 \label{tab:impl-msg-generic-types}
 \end{centering}
-\vspace{-0.5cm}
+\vspace{-1cm}
 \end{table}
 
-Lets review the implementation of a credit review request to a running agent called "server" in listing \ref{lst:impl-msg-send}. When taking a closer look at line 9 it can be observed that the $send$ command is setting a location named $CREDITREQUEST$ for the message content and one called $CreditReviewReq$ is used for defining the message subject.
+Let's review the implementation of a credit \st{review} \textcolor{red}{preview} request to a running agent called ``server'' in Listing \ref{lst:impl-msg-send}. When taking a closer look at line 9 it can be observed that the $send$ command is setting a location named $CREDITREQUEST$ for the message content and one called $CreditReviewReq$ is used for defining the message subject.
 
-$CREDITREQUEST$ is of type map, which is used in BSL/ASM language as a set of key/value-pairs. That map carries the information required for that message type, implying that for the credit transfer example in listing \ref{lst:impl-msg-send} the parameters are chosen accordingly (see CRP in table \ref{tab:impl-transfer-types}).
+\textcolor{red}{\bf @Eduard: you used CreditReviewReq  instead of CreditPreviewReq above!} 
 
-The actual message type is determined by the subject. As mentioned $CreditReviewReq$ content is used for defining the subject. At client level, unfortunately, it is not possible to predefine a universe containing the $CreditReviewReq$ like done in the head section of the server. The reason is that the $createASIM$ command used in the scheduler for spawning dynamic clients does not allow to include a header section, just an init rule, the main program and finally the scheduling policy. The consequence is that the used message types for clients are locations of type $STRING$ which are created in the init rule and setted up as locations having same name like their values. See line 1 in listing \ref{lst:impl-msg-send}.
+$CREDITREQUEST$ is of type \textcolor{red}{of} map that is used in the BSL/ASM language as a set of key/value-pairs. That map carries the information required for that message type, implying that for the credit transfer example in Listing \ref{lst:impl-msg-send} the parameters are chosen accordingly (see CRP in Table \ref{tab:impl-transfer-types}).
 
+\textcolor{red}{\bf @Eduard: you used CreditReviewReq  instead of CreditPreviewReq below (twice)!} 
+
+The actual message type is determined by the subject. As mentioned, the $CreditReviewReq$ content is used for defining the subject. At client level, unfortunately, it is not possible to predefine a universe containing the $CreditReviewReq$ like it is done in the head section of the server. The reason is that the $createASIM$ command used in the scheduler for spawning dynamic clients does not allow to include a header section: just an init rule, the main program, and the scheduling policy. The consequence is that the message types used for clients are locations of type $STRING$, which are created in the init rule and set up as locations whose names are the same as their values. See line 1 in Listing \ref{lst:impl-msg-send}.
+
+\textcolor{red}{\bf @Eduard: you used CreditReviewReq  instead of CreditPreviewReq below!} 
 \begin{center}
 \begin{minipage}{0.8\textwidth}
 \small
@@ -396,25 +400,28 @@ The actual message type is determined by the subject. As mentioned $CreditReview
 \end{minipage}
 \end{center}
 
-Concluding further the subject containing the message type is always converted to $STRING$ type in order to stay consistent. Also server agent, which is using a universe definition, is converting its enumerative representation of message types to $STRING$ by calling $toString(CreditReviewReq)$ when sticking to the example of credit review request.
+\textcolor{red}{\bf @Eduard: you used CreditReviewReq  instead of CreditPreviewReq below!}
 
-The reason for naming locations exactly after their content is based on a programmers principle which says that strings which are static and never change should be represented by an unchangeable variable name or in ASM/BSL language terms as a predefined location. That best-practices principle has the following benefits:
+Concluding, the subject containing the message type is always converted to the $STRING$ type in order to stay consistent. Also the server agent, which uses a universe definition, converts its enumerative representation of message types to $STRING$ by calling $toString(CreditReviewReq)$ when sticking \textcolor{red}{what do you mean by ``sticking''?} to the example of credit \st{review} \textcolor{red}{preview} request.
+
+The reason for naming locations exactly after their content is based on a programming principle which says that strings which are static and never change should be represented by an unchangeable variable name or, in ASM/BSL language terms, as a predefined location. This best practices principle has the following benefits:
 
 \begin{itemize}
-	\item Typing errors can be immediately found because an IDE\footnote{Integrated development environment} usually shows them as unknown or undefined. Whereas a misspelled text might be only found during runtime.
-	\item Known variables/locations can be facilitated during syntax completion and therefore simplify and speed up the implementation process.
-	\item It is easyer to find states which still need to be taken care of on other places.
+	\item Typing errors can be immediately found because an IDE\footnote{Integrated Development Environment} usually shows them as unknown or undefined. Whereas a misspelled text might be only found at runtime.
+	\item Known variables/locations can be \st{facilitated during} \textcolor{red}{provided through} syntax completion, thereby simplifying and speeding up the implementation process.
+	\item It is easier to find states which still need to be taken care of on other places. \textcolor{red}{I do not understand what you mean by `on other places'}
 	\item Usage of specific types might be restricted under certain conditions.
 \end{itemize}
 
 \subsection{Client Features and Functionalities}
 \label{subsec:impl-client-features}
 
-For Interlace, and of course for any other software project, it is important to test its correctness. This document will not talk about those tests but covers details on how clients are prepared to support a testing environment. These clients will be later facilitated to act like user devices performing a specific action or transfer.
+For INTERLACE, and of course for any other software project, it is important to test the correctness \textcolor{red}{of the model and of the implementation}. This document will not talk about these tests; rather, it covers details of how clients are prepared to support a testing environment. These clients will later be \st{facilitated} \textcolor{red}{programmed} to act like user devices performing a specific action or transfer.
 
-That clients are called "dynamic" due to their limited lifespan and are as of section \ref{sec:impl-agents} not intended to be started right with the begin of the Interlace simulation but rather in terms of an on-demand need. Thus, their lifespan is meant to be restricted to the duration of their specific task.
+Such clients are called ``dynamic'' due to their limited lifespan and as explained in Section \ref{sec:impl-agents} are not intended to be started right at the beginning of the INTERLACE simulation but, rather, on an on-demand basis. Thus, their lifespan is meant to be restricted to the duration of their specific task.
 
-To perform those tasks similar to a user-device-action an additional layer has been introduced which was not part of the requirements definitions. That layer explained in detail in section \ref{sec:impl-login-layer} adds a pseudo-login possibility and holds session-similar information for each created client by the scheduler. Thus in terms of network-topology the name of an ASIM is defined as the address of a device and the (member-)name of a user can be looked up inside a session table.
+\textcolor{red}{I really do not understand what you mean in this paragraph. Are you saying that test ASIMs are ``devices'' that act like users? What is a user-device-action?}
+To perform tasks similar to a user-device-action, an additional layer has been introduced which was not part of the requirements definitions. This layer, explained in detail in Section \ref{sec:impl-login-layer} \textcolor{red}{missing/wrong reference}, adds a pseudo-login possibility and holds session-like information for each client created by the scheduler. Thus, in terms of network topology the name of an ASIM is defined as the address of a device and the (member-)name of a user can be looked up inside a session table.
 
 \begin{figure}[htbp]
   \centering
@@ -423,13 +430,18 @@ To perform those tasks similar to a user-device-action an additional layer has b
   \label{fig:impl-msg-crc}
 \end{figure}
 
-When following the sequence diagram in \ref{fig:impl-msg-crc} it is necessary to keep in mind that these messages are send from a $CreditRequestClient$ but initiated and owned by a member which is logged in and registered in the session data lookup table. For the server agent process it is important know which member is currently sending that transfer in order to perform various checks and store valid transfers. Certainly, same applies for the $DebitRequestClient$ and the $DebitAcknowledgeClient$ of figure \ref{fig:impl-msg-drc}.
 
-\textbf{Dynamic Request Clients} start off when being created by the $scheduler$ agent and don't send or receive any request beforehand. According to a typical state machine the clients manage their own states and acting along them. CRC\footnote{Credit Request Client} and DRC \footnote{Debit Request Client} are using four main states which are explained in detail in \ref{subsec:impl-states}.
+When following the sequence diagram in Figure \ref{fig:impl-msg-crc}, it is necessary to keep in mind that these messages are sent from a $CreditRequestClient$ but initiated and owned by a member who is logged in and registered in the session's data lookup table. For the server agent process it is important to know which member is currently sending that transfer in order to perform various checks and store valid transfers. Certainly, the same applies for the $DebitRequestClient$ and the $DebitAcknowledgeClient$ of Figure \ref{fig:impl-msg-drc}.
 
-The message sequence from client to server is specified in \ref{fig:impl-msg-crc} for the CRC-client and in \ref{fig:impl-msg-drc} for the DRC-client. When investigating those two figures it is standing out that the message sequence looks very similar, only the names vary by their prefix (debit versus credit). However, what might not be obvious here is that the request parameters are quite different.
+\textcolor{red}{``Do not proceed the message'' does not make sense in English. Perhaps you mean ``Do not forward the message"? If so, can you please change the two figures below and also the code? I.e. DoNotProceedMessage should become DoNotForwardMessage.}
 
-Another main difference between credit and debit message sequence is though, that a debit request needs $ConfirmationReq$ as well as $DebitAckMsg$. This is necessary because a initiating creditor (seller) needs to have the transaction confirmed by the debtor (buyer) to be sure having a valid transaction which is crediting the payment to the sellers own account.
+
+
+\textbf{Dynamic Request Clients} start off when they are created by the $scheduler$ agent and do not send or receive any request beforehand. Consistently with a typical state machine, the clients manage their own states and act according to them. CRC\footnote{Credit Request Client} and DRC \footnote{Debit Request Client} use four main states that are explained in detail in Section \ref{subsec:impl-states}.
+
+The message sequence from client to server is specified in Section \ref{fig:impl-msg-crc} for the CRC and in Section \ref{fig:impl-msg-drc} for the DRC. In comparing those two figures, it is clear that the message sequences look very similar: only the names vary by their prefix (debit versus credit). However, what might not be obvious here is that the request parameters are quite different.
+
+Another main difference between the credit and debit message sequences is, though, that a debit request needs $ConfirmationReq$ as well as $DebitAckMsg$. This is necessary because an initiating creditor (Seller) needs to have the transaction confirmed by the debtor (Buyer) to be sure of having a valid transaction which credits the payment to the Seller's own account.
 
 \begin{figure}[htbp]
   \centering
@@ -438,50 +450,51 @@ Another main difference between credit and debit message sequence is though, tha
   \label{fig:impl-msg-drc}
 \end{figure}
 
-The sequence diagrams denote optional flows using option boxes. These boxes are having a unique numbered name. An option $OPT$ at the first level has a number (choice $1$ or $2$) as well as an abbreviated name ($DnPM$, $PM$). Sub-options in the second level are alphabetically numbered and also followed by an abbreviated name. Squared brackets underneath the option name indicate the current option choice.
+The sequence diagrams denote optional flows using option boxes. These boxes have a unique, numbered name. An option $OPT$ at the first level has a number (choice $1$ or $2$) as well as an abbreviated name ($DnPM$, $PM$). Sub-options in the second level are alphabetically numbered and also followed by an abbreviated name. Square brackets underneath the option name indicate the current option choice.
 
-ASIMs currently do not have the possibility to sleep for some time or until an event has occurred. Nevertheless, agents are able to reduce the executed command in the current tick to a minimum achieving a similar result. Inside of the sequence diagrams activated clients are shown by the vertical fully colored bars. Non-active phases are indicated by the vertical dashed lines.
+\textcolor{red}{It is not clear to me what `to reduce the executed command to a minimum' means. Even if I "fix" it as `to reduce the number of executed commands to a minimum' I am still not entirely clear what you mean. Sure, decreasing the number of commands executed would slow things down, but with a GHz processor what difference does that make?}
 
-The emulated users in the figures are pictured on top of the clients to show that request are send by particular member.
+ASIMs currently do not have the possibility to sleep for some time or until an event has occurred. Nevertheless, agents are able to reduce the executed command in the current tick to a minimum, thereby achieving a similar result. Inside of the sequence diagrams, activated clients are shown by the vertical fully colored bars. Non-active phases are indicated by the vertical dashed lines.
 
-Scheduler and server are agents which can be seen as autonomous processes in the simulation. The scheduler mainly acts as an orchestration tool for testing purposes and will be removed for actually deployed applications whereas the server agent needs to exist in a real-world scenario. Maybe not as a process running on a centralized server structure but when taking a real distributed scenario into account it'll be implemented using some kind of smart contract running inside of a virtual machine in a blockchain-environment.
+The emulated users in the figures are pictured on top of the clients to show that requests are sent by particular members.
+
+Scheduler and server are agents which can be seen as autonomous processes in the simulation. The scheduler mainly acts as an orchestration tool for testing purposes and will be removed for actually deployed applications, whereas the server agent needs to exist in a real-world scenario. Maybe not as a process running on a centralized server structure but when taking a real distributed scenario into account it will be implemented using some kind of smart contract running inside of a virtual machine in a blockchain environment.
 
 \subsection{State Management}
 \label{subsec:impl-states}
 
-\subsubsection{Client States}\ are managed over four predefined pseudo-static locations which are as following
-
+\subsubsection{Client States}\ are managed over four predefined pseudo-static locations, as follows:
 \begin{itemize}
-	\item SEND: only sending message
+	\item SEND: only when sending a message
 	\item RECEIVE: receive and directly respond to messages
-	\item TERMINATE: end execution; send "Done" message
+	\item TERMINATE: end execution; send ``Done'' message
 	\item DONE: everything is done; ready to be terminated
 \end{itemize}
+$SEND$ might be used if a sequence of messages is sent where no reply message is needed, or just to submit an initial message at start-up before going right into the $RECEIVE$ mode.
 
-$SEND$ might be used if a sequence of messages will be sent were no replay message is needed or just to submit an initial message at start-up before going right into the $RECEIVE$-mode.
+$RECEIVE$ waits for the messages and acts accordingly. When a message has been received and it is necessary to send a response it is done right in $RECEIVE$ mode without changing to $SEND$ mode.
 
-$RECEIVE$ waits for the messages and act accordingly. When a message has been received and it is necessary to send a response it is done right in $RECEIVE$-mode without changing to $SEND$-mode.
+$SEND$ and $RECEIVE$ states could be set alternately, but when the $TERMINATE$ state is applied \textcolor{red}{By `applied' do you mean `requested'?} the process of shutting down the agent has been started. Once the $DONE$ state is reached, even if not stopped yet by the scheduler, the client won't do anything useful anymore.
 
-$SEND$ and $RECEIVE$ state could be set alternately but when state $TERMINATE$ is applied the process of shutting down the agent has been started. Once $DONE$-state is reached, even if not stopped yet by the scheduler, the client won't do anything useful any more.
+The DAC\footnote{Debit Acknowledge Client} uses the same states except for the $SEND$ state because it only needs to receive and confirm a transfer by using the given one-time \st{pad} \textcolor{red}{password}. The DAC is an example of the fact that not all of the states need to be covered by a client, which may be relevant when creating new clients.
 
-The DAC\footnote{Debit Acknowledge Client} uses the same states except for the $SEND$-state because it only needs to receive and confirm a transfer by using the given one time pad. The DAC is an example that not all of the states need to covered by a client which might be of interest when creating new clients.
+\subsubsection{Server \& Scheduler States}\ are not technically a part of this section, since it is mainly about the dynamic clients. Nevertheless, a brief explanation of their states is given here to keep them together.
 
-\subsubsection{Server \& Scheduler States}\ are not particular part of that section which is mainly about the dynamic clients, nevertheless, a brief explanation of their states is given here to keep them together.
+\underline{The server} does not have any particular mode or state management yet. It just waits for messages and when it receives one it processes it directly.
 
-\textbf{The server} does not have any particular mode or state management yet. It is just waiting for messages and when receiving one it will be directly processed.
+\underline{The scheduler} mainly has its test states, as mentioned in Section \ref{subsec:impl-agent-tasks}, and transitions from one test to another till there are no tests left. For each test the scheduler has two stages:
+\begin{packed_item1}
+\small
+\item \textbf{First}, in the starting phase all the clients of that particular test are started and counted. Clients which should be part of one test state need to be defined as dynamic and appended to the scheduler by using the $include$ statement in the $run.icef$ definition.
+\item Then, the scheduler in its \textbf{second} phase waits for as many $DONE$ messages as the number of clients that have been issued \textcolor{red}{[do you mean spawned, or instantiated?]}. Finally, when the client count is zero, the scheduler goes to the next test and starts that two-phase process again.
+\end{packed_item1}
 
-\textbf{The scheduler} mainly has its test states as mentioned in  subsection \ref{subsec:impl-agent-tasks} and is transitioning from one test to another till there are no tests left. For each test the scheduler has two stages.
-
-\textbf{First} in a starting phase all clients of that particular test are started and counted. Clients which should be part of one test state need to be defined as a dynamic client and appended to the scheduler by using the $include$-statement in the $run.icef$ definition.
-
-Then the scheduler in its \textbf{second} phase waits for as many $DONE$-messages like clients have been issued. Finally, when the client count is zero, the scheduler goes to the next test and starts that two-phase process again.
 
 %%%%%%%%%%TODO%%%%%%%%%
 \section{Logging}
 \label{sec:impl-log}
 
-The server agent needs to place many different status messages of different importance. In order to manage their occurrence a simple logger has been added. The logger introduces five log levels:
-
+The server agent needs to place many different status messages of different importance. In order to manage their occurrence, a simple logger has been added. The logger introduces five log levels:
 \begin{enumerate}
 	\item FATAL
 	\item ERROR
@@ -489,8 +502,7 @@ The server agent needs to place many different status messages of different impo
 	\item INFO
 	\item DEBUG
 \end{enumerate}
-
-Those levels denote different severities which can be applied to the logger and defines the maximum severity of a message presented to the executing user. To explain further $FATAL$ messages should be printed always whereas $DEBUG$ messages are only of interest for developers who need very detailed information of the current state.
+These levels denote the different severities that can be \st{applied to} \textcolor{red}{recorded into} the logger and \st{define} \textcolor{red}{necessarily communicate} the maximum severity of a message presented to the executing user. To explain further, $FATAL$ messages should be printed always, whereas $DEBUG$ messages are only of interest for developers who need very detailed information of the current state.
 
 Consequently, the maximum log level can be given at agent start-up inside of the $init$ rule. The rule used to define the level is explained here
 
@@ -502,27 +514,27 @@ Consequently, the maximum log level can be given at agent start-up inside of the
 	initCustomLogger(DEBUG)
 \end{lstlisting}
 
-When initialized the logger can be used at any place by calling the $do\_log$-rule which is taking two parameters. The first is the actual the message printed to the output and the second parameter is describing the importance of that message by using one of the five mentioned severity levels. The listing beneath shows first how to log a message with severity $INFO$ and the second call illustrates a $FATAL$ error message output.
+When initialized, the logger can be used at any place by calling the $do\_log$ rule, which takes two parameters. The first is the actual message printed to the output and the second parameter describes the importance of that message by using one of the five mentioned severity levels. The listing below shows first how to log a message with severity $INFO$ and the second call illustrates a $FATAL$ error message output.
 	
 \begin{lstlisting}[language=bsl]
-	// A "INFO"-level message
-	do_log("Transfer has been performed successful", INFO)
+	// An "INFO"-level message
+	do_log("Transfer has been performed successfully", INFO)
 	...
 	// A "FATAL"-level error message
-	do_log("List 'Leger' in unknown state", FATAL)
+	do_log("List 'Ledger' in unknown state", FATAL)
 \end{lstlisting}
 
-Currently the logger implementation can only be applied meaningful inside of the server itself, because the implementation is also hosted by the server agent definition file $server.casim$ directly. Certainly, it would be possible to put the logger into a different file but the $include$ statement of the $run.icef$ is not supported by the Eclipse Plug-in. Consequently, if the logger implementation would be separated out into an additional file all occurrences of $do\_log$ calls would be marked as erroneous (although they are not) and would then turn the coding-assistance-tools inside of Eclipse into an unusable environment.
+Currently, the logger implementation can only be applied \textcolor{red}{utilized?} meaningfully inside of the server itself, because the implementation is also hosted by the server agent definition file $server.casim$ directly. It would certainly be possible to put the logger into a different file, but the $include$ statement of the $run.icef$ is not supported by the Eclipse plugin. Consequently, if the logger implementation were separated out into an additional file, all occurrences of $do\_log$ calls would be marked as erroneous (even if they were not) and would then turn the coding-assistance tools inside of Eclipse into an unusable environment.
 
 
 \section{Test Scenario}
 \label{sec:impl-test}
 
-This deliverable is not covering the test management for the ICEF implementation of Interlace. However, in order to check if a base workflow of a requirement is working in its most simple form a strategy has been followed which has been partly explained already by other sections of chapter \ref{ch:CoreAsimImplementation}. The scope of this section will be therefore to put those parts together and extend the missing bits.
+This deliverable does not cover the test management for the ICEF implementation of INTERLACE. However, in order to check if a base workflow of a requirement is working in its most simple form a strategy has been followed which has been partly explained already by other sections of this chapter. The scope of this section will therefore be to put these parts together and extend the missing bits.
 
 \subsection{Separation of Concerns}
 
-When looking at the environment from a testing perspective there are three parts which can be distinguished. 
+When looking at the environment from a testing perspective there are three parts which can be distinguished:
 
 \begin{enumerate}
 	\item Actual system requirements implementations
@@ -530,15 +542,16 @@ When looking at the environment from a testing perspective there are three parts
 	\item Simulation environment
 \end{enumerate}
 
-The "actual system requirement implementations" mentioned first cover parts which are needed for a possible real-world system. Without those the system would not be able to function and can be seen as the core part of the application which is entitled to be tested.
+The "actual system requirement implementations" cover parts that are needed for a possible real-world system. Without these, the system would not be able to function. Therefore, they can be seen as the core part of the application which is entitled \textcolor{red}{[do you mean `supposed'?]} to be tested.
 
-Second, code parts have been implemented which are only there for performing and validating a test of a particular scenario use case. Currently those scenarios are credit and debit operation requests sent from virtual clients.
+Second, code parts have been implemented which are only there for performing and validating a test of a particular scenario use case. Currently these scenarios are credit and debit operation requests sent from virtual clients.
 
-Last, parts of the system had to be implemented prototypical and in their most basic form in order to receive a very simple executable version which can accommodate the test scenarios. Those parts were not included by the requirements definitions nor by the refinements. These parts comprise implementation details not relevant to the requirements as well as the main ledger implementation.
+Last, parts of the system had to be implemented in a prototypical and most basic form in order to achieve a very simple executable version which can accommodate the test scenarios. These parts were not included in the requirements definitions or in the refinements. These parts comprise implementation details not relevant to the requirements or to the main ledger implementation.
 
-In \ref{subsec:impl-agent-tasks} the main agents are explained which are a $scheduler$ and a $server$. Those two, when assembled for execution, are containing all implementations. The $server$ covers the actual system requirement realizations and as well simulation environment code. To be more specific the $server$ is dispatching message request explained in \ref{lst:impl-msg-dispatch} and is performing read actions to virtual profile, account, etc. information together with pushing transactions to a primitive ledger shown in \ref{subsec:impl-sim-env}.
+In Section \ref{subsec:impl-agent-tasks} the main agents are explained, $scheduler$ and $server$. When assembled for execution, they are fully implemented. The $server$ covers the actual system requirement realizations as well as the simulation environment code. To be more specific, the $server$ dispatches the message requests explained in Section \ref{lst:impl-msg-dispatch} and performs read actions to the virtual profile, account, etc. information, together with pushing transactions to a primitive ledger discussed in Section \ref{subsec:impl-sim-env}.
 
-The $scheduler$ mostly contains testing routines but partly also routines handling necessary client implementations which are not covered by the requirements. The test routines are responsible for starting and destroying clients. As a short reminder, the $scheduler$ is able to do so because it also contains all the client code. Further, listing \ref{lst:impl-msg-send} shows the sending of a test credit request issued by the $CreditRequestClient$. This message is processed by a challenge-respond sequence between the server and the client imitating a transaction.
+The $scheduler$ mostly contains testing routines but partly also routines that handle the necessary client implementations that are not covered by the requirements. The test routines are responsible for starting and destroying clients. As a short reminder, the $scheduler$ is able to do so because it also contains all the client code. Further, Listing \ref{lst:impl-msg-send} shows the sending of a test credit request issued by the $CreditRequestClient$. This message is processed by a challenge-respond 
+\textcolor{red}{[Do you mean `challenge-response'?]} sequence between the server and the client that imitates a transaction.
 
 Concluding, a correct execution is currently only shown by a client which outputs a transfer-performed message when done. In case of an error the client would provide a message indicating the cause.
 
@@ -547,7 +560,7 @@ Concluding, a correct execution is currently only shown by a client which output
 
 The simulation environment created for enabling the core server parts to be executed and later be validated has an active and a passive part. The so called active part takes care about storing a transaction into the ledger and the passive part contains various pre-prepared locations which are needed to satisfy the different requirement constraints.
 
-\subsubsection{Locations: }\ Beginning with the passive part the following locations have been defined inside of the non-functional client $initdata$ shown in listing \ref{lst:impl-sim-setup-locs}.
+\subsubsection{Locations: }\ Beginning with the passive part the following locations have been defined inside of the non-functional client $initdata$ shown in Listing \ref{lst:impl-sim-setup-locs}.
 
 \begin{center}
 \begin{minipage}{0.8\textwidth}
@@ -604,7 +617,7 @@ which then can be transformed again into the "implemented" form and is represent
 	AccT("credit", "SRD", "CC") := {"CC", "DOMU", "MIRROR"}
 \end{lstlisting}
 
-The other location listed in listing \ref{subsec:perm-trans-types} are accommodating important information for groups, members, sessions as well as accounts. Except for the $userGroupTable$ which is just mapping a user to its current operational group all functions implementing a result type of $MAP$. A $MAP$ is similar to a simple set with the difference that each entry of a $MAP$ is a key-value pair.
+The other location listed in Listing \ref{subsec:perm-trans-types} are accommodating important information for groups, members, sessions as well as accounts. Except for the $userGroupTable$ which is just mapping a user to its current operational group all functions implementing a result type of $MAP$. A $MAP$ is similar to a simple set with the difference that each entry of a $MAP$ is a key-value pair.
 
 \begin{center}
 \begin{minipage}{0.8\textwidth}
