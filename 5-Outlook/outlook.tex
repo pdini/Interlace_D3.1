@@ -1,13 +1,25 @@
-\chapter{Outlook and next steps}
+\chapter{Outlook and Next Steps}
 \label{ch:Outlook}
 
 \vspace{-1cm}
 \begin{center}
-Eduard Hirsch and Paolo Dini
+Paolo Dini and Eduard Hirsch
 \end{center}
 
-\todo{
-  transition to distribution,
-  how to test accurate
-  ...
-}
+This report has provided an update on the business logic requirements of the next-generation mutual credit transactional platform, relative to currently available technology (Chapter \ref{ch:UpdatedBLS}). It has provided a detailed explanation of the configuration and setup of the ICEF executable modelling framework for ASIMs and of its implementation language CoreASIM (Chapter \ref{ch:CoreAsimIntro}). In the Appendix, it provided a formalization of the updated requirements. Finally, in Chapter \ref{ch:CoreAsimImplementation} it presented a detailed discussion of the CoreASIM implementation of the specification shown in the Appendix.
+
+The business logic requirements of Chapter \ref{ch:UpdatedBLS} represent an intermediate step between the current centralized system being used by SARDEX and based on a relational database and the blockchain-based platform INTERLACE is tasked with developing. Such an intermediate step is needed both from the point of view of engineering robustness, since migrating to a new platform is difficult and risky, as well as because the the full functionality of the blockchain platform will depend to some extent on the technology features of the framework employed.
+
+The implementation of the business logic as an executable CoreASIM model has also had the added benefit to bring into focus the need for a testing framework for the ICEF, which is currently missing. In the short term, this can be provided by manually composed testing scenarios written in Gherkin\footnote{\url{https://docs.cucumber.io/gherkin/}} and Cucumber,\footnote{\url{https://cucumber.io/}}since they are used by the Hyperledger blockchain development community. In the long term, it would be helpful to develop a ``compiler'' from the ASIM specification directly into Gherkin.
+
+The next step for INTERLACE will be to specify, model (D2.2), and implement (D3.2) a blockchain platform that supports at least part of the business logic presented in this report. We have decided to use Hyperledger Fabric as the most suitable framework for the needs of INTERLACE and of the Sardex circuit. In other words, we will develop a permissioned blockchain with a limited number of nodes. However, the great flexibility and customizability of Hyperledger leaves open the possibility of coupling the permissioned blockchain to a public permissionless blockchain at some point in the future. Whereas this is not likely to be needed for mutual credit transactions within a single circuit, it could be useful to support scalability features for inter-circuit trade.
+
+
+
+
+
+
+
+
+
+

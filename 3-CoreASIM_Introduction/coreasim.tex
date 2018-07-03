@@ -10,13 +10,14 @@ This chapter provides an overview of the technologies used for running the INTER
 
 There are two base environments available -- one based on Docker (henceforth `docker') and one based on Vagrant (henceforth `vagrant'). During project execution, the focus shifted from the vagrant environment, which can be downloaded from GitHub,\footnote{\url{https://github.com/InterlaceProject/ASIMVagrantEnvironment}} to a docker-based version which is explained in Section \ref{sec:quick-start-docker} and is also available on GitHub.\footnote{\url{https://github.com/InterlaceProject/ASIMDockerEnvironment}} Nevertheless, the vagrant setup is still explained for those developers who prefer it.
 
-\section{Quick-Start Vagrant}
+\section{Virtualization Environments}
+
+\subsection{Quick-Start Vagrant}
 \label{sec:quick-start-vagrant}
 
 The vagrant definition provides a running environment for executing the INTERLACE ASIM definitions. During the provisioning process an Ubuntu vagrant box is set up. All the necessary components are installed in that box, which clones and builds the Interaction Computing Execution Framework (ICEF) framework\footnote{\url{https://github.com/biomics/icef}} as well as the ASIM Specification\footnote{\url{https://github.com/InterlaceProject/ASIMSpec}} into the data directory where it is finally ready for use.
 
-\subsection{Prerequisites}
-
+\subsubsection{Prerequisites.\ \ }
 Download and install the following software products:
 \begin{itemize}
 	\item Virtual Box: \url{https://www.virtualbox.org/}
@@ -24,15 +25,13 @@ Download and install the following software products:
 	\item Vagrant: \url{https://www.vagrantup.com/}
 \end{itemize}
 
-\subsection{Clone Environment}
-
+\subsubsection{Clone Environment.\ \ }
 To clone the ASIM vagrant environment from github into a directory git can be utilized:
 \begin{lstlisting}
 	git clone https://github.com/InterlaceProject/ASIMVagrantEnvironment.git
 \end{lstlisting}
 
-\subsection{Execution}
-
+\subsubsection{Execution.\ \ }
 Once all software components are installed and the vagrant definitions are cloned it is possible to call
 \begin{lstlisting}
 	./execute.sh
@@ -47,13 +46,12 @@ Once the execution is started it will run until it is stopped by pressing \textb
 \end{lstlisting}
 from any other console window.
 
-\section{Quick-Start Docker}
+\subsection{Quick-Start Docker}
 \label{sec:quick-start-docker}
 
 The docker project on GitHub\footnote{\url{https://github.com/InterlaceProject/ASIMDockerEnvironment}} is also based on virtualization like the vagrant environment, but emphasizes \textit{Operating System virtualization} instead of \textit{Hardware virtualization} \cite{VirtualMachines2005}.
 
-\subsection{Prerequisites}
-
+\subsubsection{Prerequisites.\ \ }
 \begin{itemize}
 	\item install docker
 	\item install git (including git bash for windows)
@@ -62,7 +60,7 @@ On Linux machines it is important to add the current user to the docker group in
 
 For Windows machines use \textit{git-bash} to execute the commands described in the following sections.
 
-\subsection{Before First Execution}
+\subsubsection{Before First Execution.\ \ }
 
 In order to configure the environment it is necessary to call the following script:
 \begin{lstlisting}
@@ -70,14 +68,35 @@ In order to configure the environment it is necessary to call the following scri
 \end{lstlisting}
 This will generate a docker container image called \textit{asim} where all the necessary frameworks are built and prepared for execution of the specifications. The ICEF framework as well as the ASIM model specifications are cloned outside of the container to simplify development.
 
-\subsection{Execute Specification}
+\subsubsection{Execute Specification.\ \ }
 The container image \textit{asim} created during the configuring step can be started by calling
 \begin{lstlisting}
 	./execute
 \end{lstlisting}
 A container started in this way is called \textit{active\_asim} and runs all the necessary steps, like starting an ICEF manager as well an ICEF brapper to run the ASIM specifications.
 
-Like the vagrant environment, a running execution may be stopped by pressing \textbf{ctrl + c}.
+Like the Vagrant environment, a running execution may be stopped by pressing \textbf{ctrl + c}.
+
+\subsection{Container and Virtual Machine-Based Environments}
+Figure \ref{fig:docker-env-container-vs-vm} shows two virtualization techniques. They have similar approaches to how to isolate and allocate resources. However, they function very differently because a container reaches virtualizsation over splitting an operating system resources and a virtual machine virtualizes hardware on which a whole operating system runs.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=1.0\textwidth, clip, trim=1mm 1mm 1mm 1mm]{Figures/container_vs_vm}
+  \caption{\bf\small Container versus Virtual Machine}
+  \label{fig:docker-env-container-vs-vm}
+\end{figure}
+
+As a consequence, containers can be much smaller, more portable, and in most of the cases also much faster because they are using the system resources more directly and not as wastefully as a virtual machine does.
+
+To be more specific, \textbf{containers} package their libraries and binaries together with an application. Therefore, each container can run in parallel with other containers on the same machine, sharing the OS kernel and each running in an isolated process in user space as if it were a separate OS. Therefore containers have the ability to start instantly, because the operating system they are using is already up and running. Also, they are much smaller as they don't need to carry all the OS-specific software parts.
+
+In contrast, \textbf{virtualized machines} run on an abstraction of the physical hardware which is present in the system. That means that a hypervisor doubles, triples, ... the hardware virtually and allows to install full versions of an operating system compatible with the current system. As each virtualization is a full copy of an OS, images are much larger and boot times most of the time are much slower. Nevertheless, a full operating system might have benefits in some cases over a containerized system.
+
+Coming back to the INTERLACE environments those two approaches reflect the two approaches used for creating the environments. Vagrant is a controlling command line client for hypervisors (virtual machines) and docker is a command line client for a container-based virtualization system with the same name.
+
+INTERLACE development efforts are drawn towards the docker environment because execution and starting of the ASIMSpecs is faster and the project is easier to maintain.
+
 
 \section{Execution Environment Stack}
 \label{sec:exec-env-stack}
@@ -92,10 +111,10 @@ The Ubuntu 16.04 LTS distribution is enhanced and updated according to the needs
 	\item \textbf{curl} $\rightarrow$ Is a tool for querying REST resources and used for downloading packages from various online repositories.
 	\item \textbf{nodejs} $\rightarrow$ Is a JavaScript runtime environment built on Chrome's V8 engine and includes the package manager npm. This bundle is necessary for installing and running the Manager component of ICEF.
 	\item \textbf{build-essential} $\rightarrow$ These packages are needed to compile a debian-based package and provide help for building (compiling, packaging, etc) the project sources.
-	\item \textbf{maven} $\rightarrow$ Is a well-known Java build and packaging tool and used for building the ICEF framework as well as the coreASIM Eclipse plugin.
+	\item \textbf{maven} $\rightarrow$ Is a well-known Java build and packaging tool and used for building the ICEF framework as well as the CoreASIM Eclipse plugin.
 	\item \textbf{vim} $\rightarrow$ Well-known U/Linux editor which acts as helper for quick development or configuration issues inside the environment.
 	\item \textbf{git} $\rightarrow$ Distributed Version-Control System which helps download source repositories from GitHub.
-	\item \textbf{Java 8} $\rightarrow$ Programming Language used for coreASIM's base system implementation; thus, also for running ASIM instances.
+	\item \textbf{Java 8} $\rightarrow$ Programming Language used for CoreASIM's base system implementation; thus, also for running ASIM instances.
 \end{itemize}
 
 \subsection{Provisioning Process}
@@ -147,9 +166,9 @@ In more detail, docker can start the servers immediately and run the script insi
 	\item when the restart is successful the first step is retried.
 \end{enumerate}
 
-If we focus on the first step, which is basically the same in both environments, we can discuss in detail how the process continues. Thus, on the guest system we are first running a so-called \textit{CASIMA}, which is short for coreASIM-Manager \ref{sec:icef-intro}. This manager takes care of ASIM states, scheduling, and also acts as messaging backbone.
+If we focus on the first step, which is basically the same in both environments, we can discuss in detail how the process continues. Thus, on the guest system we are first running a so-called \textit{CASIMA}, which is short for CoreASIM Manager \ref{sec:icef-intro}. This manager takes care of ASIM states, scheduling, and also acts as messaging backbone.
 
-Next, a second service process is started. The service is a wrapper for the coreASIM implementation and its name is Brapper (BIOMICS wrapper). This Brapper service executes enhanced ASIM code named BSL that offers additional language primitives specifically designed during the BIOMICS project to include interaction features for decentralized and distributed computational systems inspired by and modelled on biochemical systems.
+Next, a second service process is started. The service is a wrapper for the CoreASIM implementation and its name is Brapper (BIOMICS wrapper). This Brapper service executes enhanced ASIM code named BSL that offers additional language primitives specifically designed during the BIOMICS project to include interaction features for decentralized and distributed computational systems inspired by and modelled on biochemical systems.
 
 When a Brapper starts, it needs to register with a manager instance. As described in Section \ref{sec:icef-intro}, it is possible to start multiple Brappers. Once a simulation is submitted to the manager, the manager distributes the different simulations, including their ASIMs, to different Brapper services to execute them there, while trying to spread the load equally.
 
@@ -171,11 +190,12 @@ For developing new simulations it is important to have a proper development envi
 
 For the well-known Eclipse IDE, developers of the ICEF framework have adopted the coreASM plugin for supporting the additional language primitives. So when implementing ASIMs using BSL it is highly recommended to use that plugin. It works with the new language elements (BSL) and is provided by the ICEF framework directly, but it needs to be built and imported \textbf{manually} into Eclipse. Thus, for working with ASIM implementations of INTERLACE you ideally DO NOT download the original coreASM plugin package which is available at the marketplace of Eclipse.
 
-\textbf{Importing/Installation of the IDE Eclipse plugin for coreASIM}
+\textbf{Importing/Installation of the IDE Eclipse plugin for CoreASIM}
 \begin{quote}
 \small
 \begin{description}
-	\item[Build Framework.] To add the ASIM plugin to Eclipse the coreASIM plugin needs to be built and installed  manually first because it is not downloadable from the Eclipse marketplace and is only available as a source version delivered with the ICEF framework and as part of the coreASIM engine. Building and installing can be done by calling
+	\item[Build Framework.] To add the ASIM plugin to Eclipse the CoreASIM plugin needs to be built and installed  manually first because it is not downloadable from the Eclipse marketplace and is only available as a source version delivered with the ICEF framework and as part of the CoreASIM engine. Building and installing can be done by calling
+	\textcolor{red}{I saw on github that CoreASM is capitalised (i.e.\ it is not written ``coreASM'', but ``CoreASM''. So I changed also coreASIM to CoreASIM. Is that OK  with you? Regarding the directory names, would it be easier to use ``coreasim''?}
 	\begin{lstlisting}[language=bash]
 		cd icef/coreASIM/org.coreasim.parent && mvn package install
 		cd icef/coreASIM/org.coreasim.eclipse && mvn package install\end{lstlisting}
@@ -185,7 +205,7 @@ For the well-known Eclipse IDE, developers of the ICEF framework have adopted th
 	
 	\item[Import Plugin as Project.] Next, the plugin needs to be imported to the workspace, which can be done in Eclipse using the import wizard. To reach the wizard go to "File" $\rightarrow$ "Import...", search for "Existing Projects into Workspace" and click to get to "Import Project" Window. Then click "Finish" to import the project.
 	
-	\item[Dry-Run Eclipse with coreASIM Plugin.] This optional step can be done to check if the plugin is working correctly. For that it is possible to right-click the imported Eclipse project and go to ``Run As'' $\rightarrow$ "Eclipse Application". Then a second Eclipse instance is started but this time a new tab should appear named ``coreASIM''. In addition, when opening a file with extension \textit{casim} the ASIM definition should be syntax-highlighted.
+	\item[Dry-Run Eclipse with CoreASIM Plugin.] This optional step can be done to check if the plugin is working correctly. For that it is possible to right-click the imported Eclipse project and go to ``Run As'' $\rightarrow$ "Eclipse Application". Then a second Eclipse instance is started but this time a new tab should appear named ``CoreASIM''. In addition, when opening a file with extension \textit{casim} the ASIM definition should be syntax-highlighted.
 
 	\item[Enable the Plugin.] If the (optional) dry-run has been successful the export wizard will export the plugin into the running Eclipse installation by opening "File" $\rightarrow$  "Export" then choosing "Deployable plugins and fragments" in the new Dialog. The window which is opened next will offer to export fragment  \textit{org.coreasim.eclipse} by selecting the checkbox next to it. Before clicking "Finish", the combo box "Install into host" has to be chosen.
 \end{description}
@@ -214,7 +234,7 @@ The interaction framework wraps the original coreASM framework in order to exten
 \begin{quote}
 %\vspace{-1.5cm}
 \small
-\textbf{First}, the interpreter coreASM had to be extended supporting additional language primitives as well as communications features. Here BSL replaces ASM as a new language having a new interpreter coreASIM.
+\textbf{First}, the interpreter coreASM had to be extended supporting additional language primitives as well as communications features. Here BSL replaces ASM as a new language having a new interpreter CoreASIM.
 
 \smallskip
 \textbf{Second}, a space was created where the now so-called Abstract State Interaction Machines (ASIMs) take over and are able to execute in parallel. This environment is called Brapper (short for BIOMICS Wrapper).
@@ -223,7 +243,7 @@ The interaction framework wraps the original coreASM framework in order to exten
 \textbf{Third}, a central server called manager takes care of handling distributed Brapper instances, dealing with message and scheduling issues.
 %\vspace{-1cm}
 \end{quote}
-In terms of technology, the development of coreASIM involved making changes to the Java coreASM implementation. Brappers are written in Java as well but the managers coordinate the Brappers using nodejs and are therefore written in JavaScript.
+In terms of technology, the development of CoreASIM involved making changes to the Java coreASM implementation. Brappers are written in Java as well but the managers coordinate the Brappers using nodejs and are therefore written in JavaScript.
 
 \subsection{Framework Stack}
 We now describe in more detail the aspects of the ICEF framework stack that concern the INTERLACE implementation. Figure \ref{fig:icef-intro-asim} shows the stack at different levels of granularity.
@@ -283,12 +303,12 @@ The implementation idea here is to have a central server which takes over the va
 
 Figure \ref{fig:icef-intro-asim} illustrates on different levels of detail which components and services are active and necessary to get the processes described above to run an ASIM simulation and, in the case of INTERLACE, the model specification.
 
-\subsection{coreASIM}
+\subsection{CoreASIM}
 \label{sec:coreasim-details}
 
 The very core of the ICEF is an engine which was developed by different people at different universities\footnote{\url{https://github.com/CoreASM/coreasm.core/wiki/About\-CoreASM}} and implements a language called ASM. This language is based on Abstract State Machines \cite{BoergerStaerk2003,BoergerRaschke2018}, which is used as a methodology for high-level system engineering, design, and analysis. This engine, called coreASM, was enhanced by the BIOMICS project in order to simulate computer interactions on a logic-based programming language.
 
-The resulting engine is called coreASIM and includes the interaction features that were missing in coreASM \cite{BIOMICSD42}\cite{BIOMICSD52}. CoreASIM replaces the ASM language with the BIOMICS Specification Language (BSL). The changes from the original framework also comprise of:
+The resulting engine is called CoreASIM and includes the interaction features that were missing in coreASM \cite{BIOMICSD42}\cite{BIOMICSD52}. CoreASIM replaces the ASM language with the BIOMICS Specification Language (BSL). The changes from the original framework also comprise of:
 
 \begin{itemize}
 	\item interaction possibilities
@@ -298,7 +318,7 @@ The resulting engine is called coreASIM and includes the interaction features th
 	\item interpreter enhancements
 \end{itemize}
 
-As this document provides an overview only on the coreASIM features, just the most important implementations are described here; namely, the mailbox and the scheduling system.
+As this document provides an overview only on the CoreASIM features, just the most important implementations are described here; namely, the mailbox and the scheduling system.
 
 \textbf{The mailing system} is easy to use and can be described as follows:
 \begin{quote}
@@ -312,7 +332,7 @@ Where the \textit{Element} can be any of the element locations used in the ASIM 
 %\end{minipage}
 \end{quote}
 
-\textbf{The scheduler} has the ability to coordinate different local agents to ensure that they act in a predictable and appropriate way. Like the coreASM scheduler, coreASIM implements a controlling mechanism at a higher level. At the beginning of each running step, a scheduler takes the defined scheduling policy and uses it to determine a set of local agents which will be signalled to run their program. There are different BSL constructs to do so.
+\textbf{The scheduler} has the ability to coordinate different local agents to ensure that they act in a predictable and appropriate way. Like the coreASM scheduler, CoreASIM implements a controlling mechanism at a higher level. At the beginning of each running step, a scheduler takes the defined scheduling policy and uses it to determine a set of local agents which will be signalled to run their program. There are different BSL constructs to do so.
 \begin{quote}
 Here are two examples:
 \begin{lstlisting}[language=bsl]
@@ -359,7 +379,7 @@ Starting from the directory structure in Figure \ref{fig:docker-env-file-struct}
 \subsection{Environment Configuration}
 A crucial step for initializing a proper environment is the so-called provisioning of the docker Environment. The \textit{configure} bash script handles this process. The script is prepared to be executed on Mac, Windows (using git bash), and Linux. It was tested with the docker community edition. It was not yet tested with the boot2docker environment and therefore might have problems during the provisioning process. Figure \ref{fig:docker-env-config-process} shows the configuration process.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
   \centering
   \includegraphics[width=0.8\textwidth, clip, trim=1mm 1mm 1mm 1mm]{Figures/docker_configure}
   \caption{\bf\small Docker Configuration Process}
@@ -370,13 +390,14 @@ Summarizing this process, the script tries to fetch the ASIMSpecs as well as ICE
 
 \textbf{Building the docker container} is a core part of this process, in which the most important tools and packages are installed. These software packages are listed in Section \ref{sec:env-exec-stack-software-stack} in detail. Docker uses a file called \textit{Dockerfile}, listed in Figure \ref{fig:docker-env-file-struct}, to know how the container is provisioned. The file contains several commands which are executed in a playbook-like manner to produce a deterministic system environment.
 
-\subsection{Execute ASIM Specifications}
+\subsection{Execute the ASIM Specifications}
 
-After the environment has been configured the INTERLACE specifications are ready to be executed. This can be done by calling the \textit{execute} script, which starts the prepared docker container and initializes a process illustrated in Figure \ref{fig:docker-env-config-process}.
+After the environment has been configured the INTERLACE specifications are ready to be executed. This can be done by calling the \textit{execute} script, which starts the prepared docker container and initializes a process illustrated in Figure \ref{fig:docker-env-exec-process}.
 
 This process tries to make development as well as instant executing easier by starting a manager, one brapper, and submitting the ICEF definitions using a single script.
 
-\begin{figure}[htbp]
+
+\begin{figure}[H]
   \centering
   \includegraphics[height=0.9\textwidth, clip, trim=1mm 1mm 1mm 1mm]{Figures/docker_execute}
   \caption{\bf\small Docker Execution Process}
@@ -385,22 +406,4 @@ This process tries to make development as well as instant executing easier by st
 
 Note on service locations: In directory \textit{scripts} of Figure \ref{fig:docker-env-file-struct} a file called \textit{asimrc} can be found which acts as a central setup file for configuration and execution and contains the main service locations in the containerized Ubuntu system.
 
-\subsection{Container and Virtual Machine-Based Environments}
-Figure \ref{fig:docker-env-container-vs-vm} shows two virtualization techniques. They have similar approaches to how to isolate and allocate resources. However, they function very differently because a container reaches virtualizsation over splitting an operating system resources and a virtual machine virtualizes hardware on which a whole operating system runs.
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=1.0\textwidth, clip, trim=1mm 1mm 1mm 1mm]{Figures/container_vs_vm}
-  \caption{\bf\small Container versus Virtual Machine}
-  \label{fig:docker-env-container-vs-vm}
-\end{figure}
-
-As a consequence, containers can be much smaller, more portable, and in most of the cases also much faster because they are using the system resources more directly and not as wastefully as a virtual machine does.
-
-To be more specific, \textbf{containers} package their libraries and binaries together with an application. Therefore, each container can run in parallel with other containers on the same machine, sharing the OS kernel and each running in an isolated process in user space as if it were a separate OS. Therefore containers have the ability to start instantly, because the operating system they are using is already up and running. Also, they are much smaller as they don't need to carry all the OS-specific software parts.
-
-In contrast, \textbf{virtualized machines} run on an abstraction of the physical hardware which is present in the system. That means that a hypervisor doubles, triples, ... the hardware virtually and allows to install full versions of an operating system compatible with the current system. As each virtualization is a full copy of an OS, images are much larger and boot times most of the time are much slower. Nevertheless, a full operating system might have benefits in some cases over a containerized system.
-
-Coming back to the INTERLACE environments those two approaches reflect the two approaches used for creating the environments. Vagrant is a controlling command line client for hypervisors (virtual machines) and docker is a command line client for a container-based virtualization system with the same name.
-
-INTERLACE development efforts are drawn towards the docker environment because execution and starting of the ASIMSpecs is faster and the project is easier to maintain.
