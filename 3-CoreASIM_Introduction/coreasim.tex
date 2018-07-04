@@ -100,18 +100,18 @@ INTERLACE development efforts are drawn towards the docker environment because e
 
 \section{Execution Environment Stack}
 \label{sec:exec-env-stack}
-Regardless of the virtualization techniques used, a consistent base system is used. Therefore, both docker and vagrant are provisioning a Linux-based operating system. In this case the Ubuntu 16.04 LTS (Long Term Support) distribution is facilitated. That consistent, stable and reliable structure will be important later when considerations about provability as well as testability become relevant; namely, that design always provides the same preconditions and anybody executing or testing against the specification will obtain the same results.
+Regardless of the virtualization techniques used, a consistent base system is used. Therefore, both docker and vagrant are provisioning a Linux-based operating system. In this case the Ubuntu 16.04 LTS (Long Term Support) distribution is used. This consistent, stable, and reliable structure will be important later when considerations about provability as well as testability become relevant; namely, that design always provides the same preconditions and anybody executing or testing against the specification will obtain the same results.
 
 \subsection{Software Stack}
 \label{sec:env-exec-stack-software-stack}
 
-The Ubuntu 16.04 LTS distribution is enhanced and updated according to the needs of an ASIM executing machine as well as to the needs of developers working with that virtual system. To be more specific, the following components are installed during the provisioning process:
+The Ubuntu 16.04 LTS distribution needs to be enhanced and updated consistently with the needs of an ASIM executing machine as well as with the needs of developers working with this virtual system. More specifically, the following components are installed during the provisioning process:
 
 \begin{itemize}
-	\item \textbf{curl} $\rightarrow$ Is a tool for querying REST resources and used for downloading packages from various online repositories.
+	\item \textbf{curl} $\rightarrow$ Is a tool for querying REST resources and is used for downloading packages from various online repositories.
 	\item \textbf{nodejs} $\rightarrow$ Is a JavaScript runtime environment built on Chrome's V8 engine and includes the package manager npm. This bundle is necessary for installing and running the Manager component of ICEF.
 	\item \textbf{build-essential} $\rightarrow$ These packages are needed to compile a debian-based package and provide help for building (compiling, packaging, etc) the project sources.
-	\item \textbf{maven} $\rightarrow$ Is a well-known Java build and packaging tool and used for building the ICEF framework as well as the CoreASIM Eclipse plugin.
+	\item \textbf{maven} $\rightarrow$ Is a well-known Java build and packaging tool and is used for building the ICEF framework as well as the CoreASIM Eclipse plugin.
 	\item \textbf{vim} $\rightarrow$ Well-known U/Linux editor which acts as helper for quick development or configuration issues inside the environment.
 	\item \textbf{git} $\rightarrow$ Distributed Version-Control System which helps download source repositories from GitHub.
 	\item \textbf{Java 8} $\rightarrow$ Programming Language used for CoreASIM's base system implementation; thus, also for running ASIM instances.
@@ -213,7 +213,7 @@ For the well-known Eclipse IDE, developers of the ICEF framework have adopted th
 
 Once these steps have been completed, upon restart Eclipse will offer a new tab in the top menu bar called "CoreASIM".
 
-\textbf{Note on the installation}: When using the \textit{docker}-Environment you could skip the first step \textbf{Build Framework}, because all the necessary build steps are covered by the initial configuration script. Also a separate installation of the Eclipse plugin Development Environment (PDE) might be omitted because it usually comes in a bundle with most standard J2EE installations of Eclipse.
+\textbf{Note on the installation}: When using the \textit{docker}-Environment you could skip the first \textbf{Build Framework} step, because all the necessary build steps are covered by the initial configuration script. Also a separate installation of the Eclipse plugin Development Environment (PDE) might be omitted because it usually comes in a bundle with most standard J2EE installations of Eclipse.
 
 \textbf{Notes on the Docker Environment}
 \label{sec_inner:note-docker}
@@ -279,11 +279,9 @@ Detailed descriptions of parameters and options of the JSON ICEF specifications 
 
 The implementation idea here is to have a central server which takes over the various requests from the clients. A scheduler will take care of what exactly is running, and when. As a second task the scheduler will, as mentioned before, also spawn new clients which send or receive information/requests to other components, but mainly to the server.
 
-\textcolor{blue}{@Eduard: it is not clear whether this centralised client-server architecture is fundamental to the ICEF or whether it is a reflection of the need to replicate some of the Cyclos 4 functionality. If it is fundamental, can you add a note as to how the p2p interactions between ASIMs are still possible? Otherwise it sounds a bit contradictory with how and why this framework was introduced and adopted.}
-
+This centralized client-server architecture is a reflection of the need to replicate some of the functionality of the current platform, which is based on a centralized relational database. Thus, when the centralized database is replaced with a blockchain backend the business logic should remain the same, at least at first, even though ASIMs work independently and a set of interacting ASIMS can be distributed over a network and be running at different locations. 
 
 \textbf{The Submission Process} of the \textit{run.icef} works as follows:
-
 \begin{quote}
 \small
 \begin{description}
