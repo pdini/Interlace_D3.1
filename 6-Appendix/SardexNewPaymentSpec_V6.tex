@@ -6,26 +6,26 @@
 Egon B\"orger, Luca Carboni and Paolo Dini
 \end{center}
 
-We specify here the refinement of the abstract model defined in D2.1 for the Sardex core payment operations Credit, Debit and B2C (in Euro or SRD).\footnote{We skip the account history and balance operations explained in Sect.3.2 of D2.1, because they seem not be be in the focus anymore.} The refinement moves towards what is needed for an executable version of the model, though it still stays at the functional requirements level of abstraction. It is based upon the additional information obtained in the meantime on details of various system components, on specific data concerning groups, accounts and transactions, and on the resulting intended definition of permission features. This information is taken from Ch. 2 of D3.1.\footnote{We refer to the new version (end of June 2018) of this document. The differences of the model described here and its previous version of June 17, 2018 are due to a revised interpretation and definition of the TT function below. The necessity for this revision was found by inspection of the model of June 17.}
+We specify here the refinement of the abstract model defined in Deliverable D2.1 \cite{INTERLACE_D21} for the Sardex core payment operations Credit, Debit and B2C (in Euro or SRD).\footnote{We skip the account history and balance operations explained in Section 3.2 of D2.1, because they seem not to be in the focus anymore.} The refinement moves towards what is needed for an executable version of the model, though it still stays at the functional requirements level of abstraction. It is based upon the additional information obtained in the meantime on details of various system components, on specific data concerning groups, accounts and transactions, and on the resulting intended definition of permission features. This information is taken from Chapter \ref{ch:UpdatedBLS} of this report (D3.1).
+%of D3.1.\footnote{We refer to the new version (end of June 2018) of this document. The differences of the model described here and its previous version of June 17, 2018 are due to a revised interpretation and definition of the TT function below. The necessity for this revision was found by inspection of the model of June 17.}
 
- Sect.~\ref{sect:signature} describes the refinement of the signature elements that were introduced in D2.1. Sect.~\ref{sect:creditops} and Sect.~\ref{sect:debitops} refine the model for the basic credit and debit operations considered in D2.1,  Sect.~\ref{sect:userops} adds the new operations between companies and consumers, called B2C operations. Sect.~\ref{sect:usrops} describes the users' input operations. To simplify the model inspection, in an appendix (Sect.~\ref{sect:appendixModel}) we put all rules of the model together in a nutshell (without the explanatory text which is to be found in the preceding sections where the rules are introduced).  Unexplained terminology and notation are used with the meanings explained in D2.1.
+Section \ref{sect:signature} describes the refinement of the signature elements that were introduced in D2.1. Section \ref{sect:creditops} and Section \ref{sect:debitops} refine the model for the basic credit and debit operations considered in D2.1,  Section \ref{sect:userops} adds the new operations between companies and consumers, called B2C operations. Section \ref{sect:usrops} describes the users' input operations. To simplify the model inspection, in a sub-appendix (Section \ref{sect:appendixModel}) we put all rules of the model together in a nutshell (without the explanatory text which is to be found in the preceding sections where the rules are introduced).  Unexplained terminology and notation are used with the meanings explained in D2.1.
 
 \section{Signature Elements}
 \label{sect:signature}
 
-In this section we describe the refined signature that is used for $Credit$, $Debit$ and B2C operations. The complex $transferTypeCheck$ function, defined in D2.1 in abstract terms to specify the $Credit$ and $Debit$ operations, is refined by splitting it into two independent checks (which may be thought of as executed in sequence, as will happen in the implementation).  The first check concerns the involved source and target groups and is again called TransferTypeCheck (see Sect.~\ref{sect:usergroups}). The second check concerns the types of the source and destination accounts involved and is called AccountConnectivityCheck (see Sect.~\ref{sect:accounts}).
+In this section we describe the refined signature that is used for $Credit$, $Debit$ and B2C operations. The complex $transferTypeCheck$ function, defined in D2.1 in abstract terms to specify the $Credit$ and $Debit$ operations, is refined by splitting it into two independent checks (which may be thought of as executed in sequence, as will happen in the implementation).  The first check concerns the involved source and target groups and is again called TransferTypeCheck (see Section \ref{sect:usergroups}). The second check concerns the types of the source and destination accounts involved and is called AccountConnectivityCheck (see Section \ref{sect:accounts}).
 
 This refinement is essentially a data refinement and concerns mainly 
 \begin{itemize}
-	\item user groups with their characteristic attributes (called \emph{group profile metadata}) and the constraints on the groups among which transfers are allowed by the system (called \emph{transfer type constraints}),
-	
+	\item user groups with their characteristic attributes (called \emph{group profile metadata}) and the constraints on the groups among which transfers are allowed by the system (called \emph{transfer type constraints}), and
 	\item accounts with their charateristic attributes (called \emph{account metadata}) and the constraints on types of accounts between which an operation is allowed by the system (called \emph{account connectivity constraints}).
 \end{itemize}
 
 \subsection{User groups: profile metadata and transfer type constraints}
 \label{sect:usergroups} 
 
-{\bf Groups.} Out of the 29 types of users, which appear in the specification of the Sardex system as agents (actors) that interact with the system, following D3.1 the refined model considers the following 9 pairwise disjoint dynamic sets, called \emph{groups}, which are characterized by the indicated specific attributes:
+{\bf Groups.} Out of the 29 types of users, which appear in the specification of the Sardex system as agents (actors) that interact with the system, following Chapter \ref{ch:UpdatedBLS} the refined model considers the following 9 pairwise disjoint dynamic sets, called \emph{groups}, which are characterized by the indicated specific attributes:
 
 \begin{asm}
 Company \mbox{  // set of actors which participate only in B2E and B2B operations}\\
@@ -45,7 +45,7 @@ On\_Hold \mbox{  // set of actors whose privileges have been suspended}\footnote
 
 
 {\bf Notational convention.} To simplify the exposition, we treat singleton sets, like $Mngr=\{mngr\}$, sometimes as set (here $Mngr$) and sometimes as element (here $mngr$), depending on the context, hoping that this slight abuse of language does not create any ambiguity. 
-In general, we write $x$ for elements of $X$ where $X$ is one of the above 9 groups. To prepare the step towards a natural implementation of the model, we treat $Welcome$ and $On\_Hold$ members as potential members of some of the other groups which have however a $Welcome$ resp. $On\_Hold$ flag set. 
+In general, we write $x$ for elements of $X$ where $X$ is one of the above 9 groups. To prepare the step towards a natural implementation of the model, we treat $Welcome$ and $On\_Hold$ members as potential members of some of the other groups which have however a $Welcome$ or a $On\_Hold$ flag set, respectively.
 
 For further reference we define $Group$ as the set of the above nine groups:
 \begin{asm}
@@ -56,11 +56,11 @@ Group= \+
 
 Since by the disjointness constraint each user is assumed to belong to exactly one group, there is a function $group(user)$ which yields the group to which $user$ belongs.
 
-{\bf Group Profile Metadata.} Each group comes with a set of attributes (called metadata) that are characteristic for its members. They include the following five data types which are used in the refined model as `profile metadata' (besides the ususal `identity metadata' described in D3.1 which provide the information on the ID of a group member, its e-mail address, phone numbers, also its legal name, address, gps, fiscal ID (VAT), etc.).
+{\bf Group Profile Metadata.} Each group comes with a set of attributes (called metadata) that are characteristic for its members. They include the following five data types which are used in the refined model as `profile metadata' (besides the usual `identity metadata' described in Chapter \ref{ch:UpdatedBLS}, which provide the information on the ID of a group member, its e-mail address, phone numbers, also its legal name, address, gps, fiscal ID (VAT), etc.).
 \begin{itemize}
 	\item $Company$, $Retail$ (and therefore also $Full$) and $Welcome$ members (but not the $Mngr$) come with a $capacity$, a location whose value represents the maximum yearly SRD volume the member committed to \emph{selling}, with payment in SRD, when it stipulated its contract with the Sardex company. The date of the stipulation of $capacity$ is recorded in a location $capacityDate$.
 	\begin{itemize}
-		\item For a given $account$ (typically in CC, see below Sect.~\ref{sect:accounts}), a derived parameterized location introduced in D3.1 as belonging to AccountMetadata, $availableCapacity(account)$, is defined as follows:\footnote{The defining equation for $availableCapacity$ holds only for non-Welcome members, which---differently from $Welcome$ members (see table 4 in D3.1)--- have a defined $account$; it holds for $Welcome$ members only once they have been assigned an $account$.} 
+		\item For a given $account$ (typically in CC, see below Section \ref{sect:accounts}), a derived parametrized location introduced in Chapter \ref{ch:UpdatedBLS} as belonging to AccountMetadata, $availableCapacity(account)$, is defined as follows:\footnote{The defining equation for $availableCapacity$ holds only for non-$Welcome$ members, which -- differently from $Welcome$ members (see Table \ref{tab:InitialAccountSets}) -- have a defined $account$; it holds for $Welcome$ members only once they have been assigned an $account$.} 
 		\[availableCapacity(account)=capacity-saleVolume(account)\]
 		where the dynamic function $saleVolume(account)$ indicates the current total volume of \underline{sales} per year\footnote{This implies that $availableCapacity(account)$ is implicitly parametrized by the year.} using that $account$.
 	\end{itemize}
@@ -76,38 +76,26 @@ Since by the disjointness constraint each user is assumed to belong to exactly o
 
 A $B2CEuroFee$ is a function which yields the percentage of the total value of the B2C sale, to be paid by the selling $retailer$ to the Sardex company. 
 
-An $InterTradeEuroFee$ can be of two kinds. Either it is a function that simply yields 3\% of the intertrade amount, regardless of the networks involved and their members. Or it is a dynamic function $fee(amount,network1,network2)$ which yields a percentage of the trade $amount$ that may depend on the networks involved. In the current model, only the buyer has to pay the fee, though it is contemplated for a future extension that also the seller will have to pay a fee.
+An $InterTradeEuroFee$ can be of two kinds. Either it is a function that simply yields 3\% of the intertrade amount, regardless of the networks involved and their members. Or it is a dynamic function $fee(amount, network1, network2)$ which yields a percentage of the trade $amount$ that may depend on the networks involved. In the current model, only the buyer has to pay the fee, though it is contemplated for a future extension that also the seller will have to pay a fee.
 
 \item Both $Full$ and $Retail$ members come with two locations: $rewardRate$ and $acceptanceRate$. The $rewardRate$ value is a function which yields the percentage of reward the member offers in SRD currency to consumers engaged in a B2CEur purchase with the member; similarly, the $acceptanceRate$ defines the percent rate of the total value of a consumer purchase at which the member accepts SRD currency.
 
 \end{itemize}
 
-The $transferTypeCheck$ function defined in D2.1 uses a $Match$ predicate which expresses constraints on a) the groups of the account owners for the considered operation and on b) the type of the two involved accounts, in addition to c) constraints on the value of a set of meta-data, which in D2.1 were called custom fields. The constraints on the groups involved are refined here by a function of the following type:
+The $transferTypeCheck$ function defined in D2.1 uses a $Match$ predicate which expresses constraints on a) the groups of the account owners for the considered operation and on b) the type of the two accounts involved, in addition to c) constraints on the value of a set of meta-data, which in D2.1 were called `custom fields'. The constraints on the groups involved are refined here by a function of the following type:
 \begin{asm}
 TT: Operation \times Currency \times Group \rightarrow \{G \mid G \subseteq Group\}
 \end{asm} 
 \noindent where $Operation = \{Credit,Debit\}$ and $Currency =\{SRD,EUR\}$.
-To simplify the exposition, we follow Fig.2.7 of D3.1 and define $TT$ by a case distinction, considering the given pair of the first two arguments, say  $op \in \{Credit,Debit\}$ and $cur \in \{SRD,EUR\}$, formally
-
-\[TT(op,cur,group)=TT^{op,cur}(group).\]   
-
+To simplify the exposition, we follow Figure \ref{fig:stack} and define $TT$ by a case distinction, considering the given pair of the first two arguments, say  $op \in \{Credit,Debit\}$ and $cur \in \{SRD,EUR\}$. Formally,
+\[TT(op,cur,group)=TT^{op,cur}(group).\]
 For each group, say $fromGroup$ of buyers, $TT^{op,cur}(fromGroup)$ defines the set $toGroups$ of groups
-of sellers\footnote{The definition for the previous version 
-	of D3.1 was as follows: For each group, say 
-	$fromGroup$,  $TT^{op,cur}(fromGroup)$ defines the set 
-	$toGroups$ of groups with whose members a member of 
-	$fromGroup$ is allowed to try to perform the indicated 
-	$op$eration in the indicated $cur$rency.} whose members 
-are allowed to receive a transfer (to one of their accounts) from (an account of) a 
-$fromGroup$ member via the operation $op$ in the currency 
-$cur$ (under appropriate constraints we specify below on the 
-amount of the transfer and 
-some metadata of the involved account).\footnote{In D2.1 
-	the names $fromMemberGroup$ and $toMemberGroup$ were 
-	used, see the $Match$ predicate definition there.} We 
-now define the requirements described for these functions in 
-the end-of-June version of D3.1.
-
+of sellers
+%\footnote{The definition for the previous version of D3.1 was as follows: For each group, say $fromGroup$,  $TT^{op,cur}(fromGroup)$ defines the set $toGroups$ of groups with whose members a member of $fromGroup$ is allowed to try to perform the indicated $op$eration in the indicated $cur$rency.}
+whose members are allowed to receive a transfer (to one of their accounts) from (an account of) a 
+$fromGroup$ member via the operation $op$ in the currency $cur$ (under appropriate constraints we specify below on the amount of the transfer and some metadata of the account involved).\footnote{In D2.1 the names $fromMemberGroup$ and $toMemberGroup$ were used, see the $Match$ predicate definition there.} We 
+now define the requirements described for these functions.
+%in the end-of-June version of D3.1.
 
 {\bf Transfer Type Constraints for $TT^{Credit,SRD}$.} A $Credit$ operation in $SRD$ currency can be started only by members of one of the following groups (called source group or $fromGroup$ of the operation):
 \begin{itemize}
@@ -116,7 +104,7 @@ the end-of-June version of D3.1.
 	\item $Consumer\_Verified$.  
 \end{itemize}
 
-For SRD Credit operations the following groups are allowed as target group (read: group of the member receiving the SRD credit, also called $toGroup$\footnote{See Figure 2.7 of D3.1.}):
+For SRD Credit operations the following groups are allowed as target group (read: group of the member receiving the SRD credit, also called $toGroup$\footnote{See Figure \ref{fig:stack}.}):
 \begin{itemize}
 	\item every $Company \cup Full \cup Mngr$ member can trigger an SRD Credit operation to a member of $Company \cup Full \cup Mngr$ or of $Employee$, 
 
@@ -139,7 +127,7 @@ TT^{Credit,SRD}(Consumer\_Verified)=\{Retail,Full\}
 
 Note that this definition, which will be used below for the transfer type check, allows no $Credit$ operation with target group $On\_Hold$. But note that  a $Retail$, $Company$ or $Full$ can have its $creditLimit$ set to 0 (by a broker operation we do not model here) which does not prevent that user from receiving credits for sales.
 
- For ease of reference we say that a group member $MayAllowTransferForCreditOpns$ if it is an element of a group where $TT^{Credit,SRD}$ has a defined value:\footnote{Using the $group(mbr)$ function which denotes the unique group to which $mbr$ belongs, the definition can be equivalently expressed by:
+For ease of reference we say that a group member $MayAllowTransferForCreditOpns$ if it is an element of a group where $TT^{Credit,SRD}$ has a defined value:\footnote{Using the $group(mbr)$ function which denotes the unique group to which $mbr$ belongs, the definition can be equivalently expressed by:
   \begin{asm}
  MayAllowTransferForCreditOpns(mbr) \iff
     group(mbr) \in \{ Company, Full, Mngr, Employee, Consumer\_Verified \}
@@ -159,7 +147,7 @@ A $Debit$ operation in $SRD$ currency can be started only by members of one of t
 	\item $Consumer\_Verified$.  
 \end{itemize}
 
-For SRD Debit operations the following groups are allowed as target group, again called $toGroup$\footnote{See Figure 2.7 of D3.1.}):
+For SRD Debit operations the following groups are allowed as target group, again called $toGroup$\footnote{See Figure \ref{fig:stack}.}):
 \begin{itemize}
 	\item every $Company \cup Full$ member can trigger an SRD Debit operation to (an account of and possibly receive the corresponding credit transfer from that account of) a member of $Company \cup Full \cup Mngr$, 
 	
@@ -196,11 +184,11 @@ T^{Debit,EUR}(Consumer)=T^{Debit,EUR}(Consumer\_Verified)\+
   = \{Retail,Full\}
 \end{asm}
 
-In the present formulation of the model we do not use the function $T^{Debit,EUR}$ because, to simplify the exposition in Sect.~\ref{sect:userops}, we describe the B2C operations there directly, not as instance of the $\ASM{DebitTransferReq}$ rules.
+In the present formulation of the model we do not use the function $T^{Debit,EUR}$ because, to simplify the exposition in Section \ref{sect:userops}, we describe the B2C operations there directly, not as instance of the $\ASM{DebitTransferReq}$ rules.
 
 \vspace{12pt}
 
-{\bf Remark on the refinement.} With the above definition of functions $TT^{op,cur}$, the transfer type part of the $Match$ predicate in D2.1 can be expressed as follows. By definition, the $cur$rency parameter of the $amount$ in question can be computed from the $account$ by the function $cur(account)$ (for accounts see Sect.~\ref{sect:accounts}).
+{\bf Remark on the refinement.} With the above definition of functions $TT^{op,cur}$, the transfer type part of the $Match$ predicate in D2.1 can be expressed as follows. By definition, the $cur$rency parameter of the $amount$ in question can be computed from the $account$ by the function $cur(account)$ (for accounts see Section \ref{sect:accounts}).
 Furthermore, given that each member belongs to exactly one group, from the account parameters $from/to$ we also obtain $group(owner(from/to))$ in the following refinement of the group type constraints, namely $owner(from) \in fromGroup(tt) $ and $owner(to) \in toGroup(tt)$: 
 
 
@@ -228,7 +216,7 @@ There are three types of EUR accounts, which are considered of statistical chara
 \begin{itemize}
 	\item  Income: the set of (statistical) accounts owned by $Retail$ or $Full$ users, which use such an account to collect B2C payments in Euro.
 	
-	\item Prepaid: the set of (statistical) accounts from which the Euro transaction fee for a B2C operation is drawn by $SysAdmin$ on behalf of the $mngr$.\footnote{Differently from $Income$ accounts, any $Prepaid$ account is updated not by the $retail$er, for which it keeps track of its fee prepayments, but by the $mngr$. See Fig.\ 2.8 (B2C Use Case 1/2) of D3.1 and Sect.~\ref{sect:Prepaid} for details.} 
+	\item Prepaid: the set of (statistical) accounts from which the Euro transaction fee for a B2C operation is drawn by $SysAdmin$ on behalf of the $mngr$.\footnote{Differently from $Income$ accounts, any $Prepaid$ account is updated not by the $retail$er, for which it keeps track of its fee prepayments, but by the $mngr$. See Fig.\ 2.8 (B2C Use Case 1/2) of D3.1 and Section \ref{sect:Prepaid} for details.} 
 	Prepaid is owned by $Retail$ or $Full$ members but controlled by $SysAdmin$.
 	
 	\item Bisoo: the set of (statistical) accounts in Euro which are used by $consumer$s to pay into an Income account. Bisoo is owned by $Consumer$ or $Consumer$\_$Verified$ members but controlled by $SysAdmin$.
@@ -257,7 +245,7 @@ Account(full) =
 \\
 Account(employee) = \{cc(employee)\}\\
 Account(consumer) = Account(consumer\_verified)              
-              =\{cc(consumer)\}\footnote{Contrary to D3.1, Table 4, in this model no $Bisoo$ account is assigned since for simplicity we treat $consumer$ provided Euro payments directly as input, using a monitored $Received$ predicate. Then no $Bisoo$ account is needed. See Sect.~\ref{sect:eurob2c}.}
+              =\{cc(consumer)\}\footnote{Contrary to D3.1, Table 4, in this model no $Bisoo$ account is assigned since for simplicity we treat $consumer$ provided Euro payments directly as input, using a monitored $Received$ predicate. Then no $Bisoo$ account is needed. See Section \ref{sect:eurob2c}.}
 \end{asm}
 
 Remark. $Welcome$ members initially have no account yet (formally meaning  $Account(welcome)=\emptyset$). The initial accounts of a 
@@ -297,7 +285,7 @@ $Income$ and $Prepaid$ accounts have, besides  $owner(acc)$ and $curr(acc)$, als
 
 {\bf Account Connectivity Constraints for user-initiated operations.} The account connectivity constraints serve to describe the account type conditions which are part 
 of the $Match$ predicate defined in D2.1. To keep the model as simple as possible, 
-we describe the intended effect of the new B2C operations in Sect.~\ref{sect:eurob2c} separately, so that we can limit ourselves here to formulate the account connectivity refinement only for user-initiated transactions.
+we describe the intended effect of the new B2C operations in Section \ref{sect:eurob2c} separately, so that we can limit ourselves here to formulate the account connectivity refinement only for user-initiated transactions.
 
 The requirements on the types of the accounts that may be involved in an operation state which account types are allowed as $toAcc$ for an operation of a given $fromAcc$. They can be formalized using an account type check $AccT$ analogous to the transfer type check function $TT$ above.
 
@@ -335,7 +323,7 @@ Formally it means that in the definition above one includes the clause
 
 \[AccT^{Debit,EUR}(Income) =\{Bisoo\}.\] 
 
-Since in rule $\ASM{EurB2C}$ below (Sect.~\ref{sect:eurob2c}) we provide a direct formalization of the B2C operation, we can do without the $Bisoo$ account and without any $Debit$ operation in EUR from an $Income$ to a $Bisoo$ account.
+Since in rule $\ASM{EurB2C}$ below (Section \ref{sect:eurob2c}) we provide a direct formalization of the B2C operation, we can do without the $Bisoo$ account and without any $Debit$ operation in EUR from an $Income$ to a $Bisoo$ account.
 
 {\bf Remark on system-initiated Credit/Debit operations.} In D3.1 Fig. 2.13 the $AccT$ function is defined also for system-initiated operations. $AccT$ with first argument $Credit$ is defined by:
 \[AccT^{Credit,SRD}(CC)=\{CC\} \AND AccT^{Credit,EUR}(Topup)=\{Prepaid\} \]
@@ -359,7 +347,7 @@ Channel=Service \cup POS \\
 Service=\{website,mobilePhone\}
 \end{asm}
 
-In the refined model there is also a system-initiated Credit operation in Euro which involves $Topup$ and $Prepaid$ accounts. Since it does not involve the various transfer type checks, it can be modelled in a simpler way (see Sect.~\ref{sect:userops}).
+In the refined model there is also a system-initiated Credit operation in Euro which involves $Topup$ and $Prepaid$ accounts. Since it does not involve the various transfer type checks, it can be modelled in a simpler way (see Section \ref{sect:userops}).
 
 As in D2.1, a $\ASM{CreditTransferReq}$ initiated by a member $mbr$ (which is permitted only in SRD currency) splits into a double exchange of messages between the member and the Sardex system, called preview and perform step.
 
@@ -382,7 +370,7 @@ A user-initiated Credit operation transfers an $amount$ of SRD via a specific $c
 \subsection{$\ASM{CreditPreviewReq}$ program}
 \label{sect:creditpreview}
 
-The various constraints split again in a series of to-be-checked  more detailed conditions. To reflect the transactional nature of the $\ASM{CreditTransferReq}$ steps, we describe the execution of each of its two components as one atomic step. Nevertheless, to simplify the verification of the correctness and completeness of the rules, we formulate the entire check as successive If-Then-Else checks of all its single conditions. As a byproduct we obtain a detailed analysis of the possibilities for error handling procedures one may wish to implement. Thus we define  $\ASM{CreditPreviewReq}$ and $\ASM{CreditPerfomReq}$ using an instance of the $\ASM{IfThenElseCascade}$ pattern (see the Appendix in Sect.~\ref{sect:appendix}). 
+The various constraints split again in a series of to-be-checked  more detailed conditions. To reflect the transactional nature of the $\ASM{CreditTransferReq}$ steps, we describe the execution of each of its two components as one atomic step. Nevertheless, to simplify the verification of the correctness and completeness of the rules, we formulate the entire check as successive If-Then-Else checks of all its single conditions. As a byproduct we obtain a detailed analysis of the possibilities for error handling procedures one may wish to implement. Thus we define  $\ASM{CreditPreviewReq}$ and $\ASM{CreditPerfomReq}$ using an instance of the $\ASM{IfThenElseCascade}$ pattern (see the Appendix in Section \ref{sect:appendix}). 
 
 Furthermore, since it is required that the credit type checks in $\ASM{CreditPreviewReq}$ are repeated for $\ASM{CreditPerformReq}$, we make the nested credit type check pattern explicit as a machine $\ASM{CreditTypeCheck}$ which contains as parameter a final $\ASM{Completion}$ step. The $\ASM{Completion}$ component parameter can then be instantiated specifically for the two rules: for the preview step it comes up to inform the user that the $\ASM{CreditPerformReq}$ can be triggered, whereas for the perform step it specifies the required $\ASM{AccountLimitCheck}$. 
 
@@ -506,12 +494,12 @@ As explained in D2.1, user-initiated Debit operations in SRD are executed in 3 p
     \ASM{DebitLateAckReqAnswCompletion}
 \end{asm}
 
-{\bf Remark on Debit operations in Euro.} In the refined model there are also two Debit operations in Euro. One is system-initiated and involves $Topup$ and $Prepaid$ accounts, the other one is user-initiated  and involves $Bisoo$ and $Income$ accounts. Since these two operations do not need the various transfer type checks, they can be modelled in a simpler way than by treating them as instances of $\ASM{DebitPreviewReq}$ (see Sect.~\ref{sect:userops}).
+{\bf Remark on Debit operations in Euro.} In the refined model there are also two Debit operations in Euro. One is system-initiated and involves $Topup$ and $Prepaid$ accounts, the other one is user-initiated  and involves $Bisoo$ and $Income$ accounts. Since these two operations do not need the various transfer type checks, they can be modelled in a simpler way than by treating them as instances of $\ASM{DebitPreviewReq}$ (see Section \ref{sect:userops}).
 
 \subsection{$\ASM{DebitPreviewReq}$ program (for SRD)}
 \label{sect:debitpreview}
 
-In this section we consider Debit operations in SRD. We treat the Debit operations in EUR separately in Sect.~\ref{sect:userops}.
+In this section we consider Debit operations in SRD. We treat the Debit operations in EUR separately in Section \ref{sect:userops}.
 
 As for Credit operations, the $\ASM{DebitPreviewReq}$ step 
 essentially performs a $\ASM{DebitTypeCheck}$ on the 
