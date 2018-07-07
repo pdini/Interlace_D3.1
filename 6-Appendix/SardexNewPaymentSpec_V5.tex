@@ -6,10 +6,9 @@
 Egon B\"orger, Luca Carboni and Paolo Dini
 \end{center}
 
-We specify here the refinement of the abstract model defined in D2.1 for the Sardex core payment operations Credit, Debit and B2C (in Euro or SRD).\footnote{We skip the account history and balance operations explained in Sect.3.2 of D2.1, because they seem not be be in the focus anymore.} The refinement moves towards what is needed for an executable version of the 
-model, though it still stays at the functional requirements level of abstraction. It is based upon the additional information obtained in the meantime on details of various system components, on specific data concerning groups, accounts and transactions, and on the resulting intended definition of permission features. This information is taken from Ch. 2 of D3.1.
+We specify here the refinement of the abstract model defined in D2.1 for the Sardex core payment operations Credit, Debit and B2C (in Euro or SRD).\footnote{We skip the account history and balance operations explained in Sect.3.2 of D2.1, because they seem not be be in the focus anymore.} The refinement moves towards what is needed for an executable version of the model, though it still stays at the functional requirements level of abstraction. It is based upon the additional information obtained in the meantime on details of various system components, on specific data concerning groups, accounts and transactions, and on the resulting intended definition of permission features. This information is taken from Ch. 2 of D3.1.\footnote{We refer to the new version (end of June 2018) of this document. The differences of the model described here and its previous version of June 17, 2018 are due to a revised interpretation and definition of the TT function below. The necessity for this revision was found by inspection of the model of June 17.}
 
-Sect.~\ref{sect:creditops} and Sect.~\ref{sect:debitops} refine the model for the basic credit and debit operations considered in D2.1,  Sect.~\ref{sect:userops} adds the new operations between companies and consumers, called B2C operations. Sect.~\ref{sect:signature} describes the refinement of the signature elements that were introduced in D2.1. Unexplained terminology and notation are used with the meanings explained in D2.1.
+ Sect.~\ref{sect:signature} describes the refinement of the signature elements that were introduced in D2.1. Sect.~\ref{sect:creditops} and Sect.~\ref{sect:debitops} refine the model for the basic credit and debit operations considered in D2.1,  Sect.~\ref{sect:userops} adds the new operations between companies and consumers, called B2C operations. Sect.~\ref{sect:usrops} describes the users' input operations. To simplify the model inspection, in an appendix (Sect.~\ref{sect:appendixModel}) we put all rules of the model together in a nutshell (without the explanatory text which is to be found in the preceding sections where the rules are introduced).  Unexplained terminology and notation are used with the meanings explained in D2.1.
 
 \section{Signature Elements}
 \label{sect:signature}
@@ -88,14 +87,27 @@ The $transferTypeCheck$ function defined in D2.1 uses a $Match$ predicate which 
 TT: Operation \times Currency \times Group \rightarrow \{G \mid G \subseteq Group\}
 \end{asm} 
 \noindent where $Operation = \{Credit,Debit\}$ and $Currency =\{SRD,EUR\}$.
-To simplify the exposition, we define $TT$ by a case distinction, considering the given pair of the first two arguments, say  $op \in \{Credit,Debit\}$ and $cur \in \{SRD,EUR\}$, formally
+To simplify the exposition, we follow Fig.2.7 of D3.1 and define $TT$ by a case distinction, considering the given pair of the first two arguments, say  $op \in \{Credit,Debit\}$ and $cur \in \{SRD,EUR\}$, formally
 
 \[TT(op,cur,group)=TT^{op,cur}(group).\]   
 
-For each group, say $fromGroup$,  $TT^{op,cur}(fromGroup)$ defines the set $toGroups$ of groups with whose members a member of $fromGroup$ is allowed to try to perform the indicated $op$eration in the indicated $cur$rency.\footnote{In D2.1 the names $fromMemberGroup$ and $toMemberGroup$ were used, see the $Match$ predicate definition there.} We now define the requirements described for these functions in D3.1.
+For each group, say $fromGroup$ of buyers, $TT^{op,cur}(fromGroup)$ defines the set $toGroups$ of groups
+of sellers\footnote{The definition for the previous version 
+	of D3.1 was as follows: For each group, say 
+	$fromGroup$,  $TT^{op,cur}(fromGroup)$ defines the set 
+	$toGroups$ of groups with whose members a member of 
+	$fromGroup$ is allowed to try to perform the indicated 
+	$op$eration in the indicated $cur$rency.} whose members 
+are allowed to receive a transfer (to one of their accounts) from (an account of) a 
+$fromGroup$ member via the operation $op$ in the currency 
+$cur$ (under appropriate constraints we specify below on the 
+amount of the transfer and 
+some metadata of the involved account).\footnote{In D2.1 
+	the names $fromMemberGroup$ and $toMemberGroup$ were 
+	used, see the $Match$ predicate definition there.} We 
+now define the requirements described for these functions in 
+the end-of-June version of D3.1.
 
-%\textcolor{red}{Note we may need to add Channel to the TT definition above (Service or PoS)}\\
-%\textcolor{red}{Fine with me, paolo. But some time ago I asked this question and the answer was that the Channel does not matter...}
 
 {\bf Transfer Type Constraints for $TT^{Credit,SRD}$.} A $Credit$ operation in $SRD$ currency can be started only by members of one of the following groups (called source group or $fromGroup$ of the operation):
 \begin{itemize}
@@ -104,7 +116,7 @@ For each group, say $fromGroup$,  $TT^{op,cur}(fromGroup)$ defines the set $toGr
 	\item $Consumer\_Verified$.  
 \end{itemize}
 
-For SRD Credit operations the following groups are allowed as target group (read: group of the member receiving the SRD credit, also called $toGroup$\footnote{Please see Figure 2.7 of D3.1 for the whole story.}):
+For SRD Credit operations the following groups are allowed as target group (read: group of the member receiving the SRD credit, also called $toGroup$\footnote{See Figure 2.7 of D3.1.}):
 \begin{itemize}
 	\item every $Company \cup Full \cup Mngr$ member can trigger an SRD Credit operation to a member of $Company \cup Full \cup Mngr$ or of $Employee$, 
 
@@ -116,40 +128,72 @@ For SRD Credit operations the following groups are allowed as target group (read
 This requirement is expressed in the refined ASM model by the following function definition:
 
 \begin{asm}
-TT^{Credit,SRD}(Company) =\+
-	 TT^{Credit,SRD}(Full) = \{Company,Full, Mngr,Employee\} \dec\\
-TT^{Credit,SRD}(Mngr)= \{Company,Full,Mngr,Employee\} \\
-TT^{Credit,SRD}(Employee) =\{Company,Retail,Full\} \\
+TT^{Credit,SRD}(Company) \+
+	 = TT^{Credit,SRD}(Full)\\
+	 = TT^{Credit,SRD}(Mngr)\\
+	 =\{Company,Full, Mngr,Employee\} \-
+TT^{Credit,SRD}(Employee) =\{Retail,Company,Full\} \\
 TT^{Credit,SRD}(Consumer\_Verified)=\{Retail,Full\}
 \end{asm}	
 
 
 Note that this definition, which will be used below for the transfer type check, allows no $Credit$ operation with target group $On\_Hold$. But note that  a $Retail$, $Company$ or $Full$ can have its $creditLimit$ set to 0 (by a broker operation we do not model here) which does not prevent that user from receiving credits for sales.
 
- For ease of reference we say that a group member $MayLaunchCreditOpns$ if it is an element of a group where $TT^{Credit,SRD}$ has a defined value:\footnote{In the interest of mathematical clarity, the same statement could be written
+ For ease of reference we say that a group member $MayAllowTransferForCreditOpns$ if it is an element of a group where $TT^{Credit,SRD}$ has a defined value:\footnote{Using the $group(mbr)$ function which denotes the unique group to which $mbr$ belongs, the definition can be equivalently expressed by:
   \begin{asm}
- MayLaunchCreditOpns(mbr) \iff 
+ MayAllowTransferForCreditOpns(mbr) \iff
     group(mbr) \in \{ Company, Full, Mngr, Employee, Consumer\_Verified \}
     \end{asm} }
  \begin{asm}
- MayLaunchCreditOpns(mbr) \iff 
+ MayAllowTransferForCreditOpns(mbr) \iff 
     mbr \in Company \cup Full \cup Mngr \cup Employee \cup Consumer\_Verified
     \end{asm}
 
-{\bf Transfer Type Constraints for $TT^{Debit,SRD}$.} A $Debit$ operation in $SRD$ currency requires that $fromGroup$ and $toGroup$ are both members of either $Company$ or $Retail$ or $Full$ or $MNGR$. This requirement is expressed in the refined ASM model by the following function definition:
+{\bf Transfer Type Constraints for $TT^{Debit,SRD}$.} 
+
+
+A $Debit$ operation in $SRD$ currency can be started only by members of one of the following groups (called again source group or $fromGroup$ of the operation):
+\begin{itemize}
+	\item $Retail$, $Company$, and therefore also $Full$ and in particular $Mngr$,
+	\item $Employee$,
+	\item $Consumer\_Verified$.  
+\end{itemize}
+
+For SRD Debit operations the following groups are allowed as target group, again called $toGroup$\footnote{See Figure 2.7 of D3.1.}):
+\begin{itemize}
+	\item every $Company \cup Full$ member can trigger an SRD Debit operation to (an account of and possibly receive the corresponding credit transfer from that account of) a member of $Company \cup Full \cup Mngr$, 
+	
+	\item  Every $Retail$ member can trigger an SRD Debit operation to the $mngr$
+	
+	\item every $Employee$  member can trigger an SRD Debit operation to a member of \newline $Retail \cup Company \cup Mngr$,
+	
+	\item every $Consumer\_Verified$ member can trigger an SRD Debit operation to a member of \newline $Retail \cup Full$,
+	\item the $mngr$  can trigger an SRD Debit operation to a member of $Company \cup Full$.
+\end{itemize}
+This requirement is expressed in the refined ASM model by the following function definition:
+
 \begin{asm}
-  TT^{Debit,SRD}(X)= \{X\} ~~~~~~~~~~ 
-             	\FORALL X \in \{Company,Retail,Full,MNGR\}
-\end{asm}
-Correspondingly we define the domain predicate of $ TT^{Debit,SRD}$:
+	TT^{Debit,SRD}(Company) \+
+	= TT^{Debit,SRD}(Full)\\
+	=\{Company,Full, Mngr\} \-
+	TT^{Debit,SRD}(Retail)=Mngr \\
+	TT^{Debit,SRD}(Employee) =\{Retail,Company,Mngr\} \\
+	TT^{Debit,SRD}(Consumer\_Verified)=\{Retail,Full\}\\
+	TT^{Debit,SRD}(Mngr)=\{Company,Full\}
+\end{asm}	
+
+
+Correspondingly we define the domain predicate of $TT^{Debit,SRD}$:
 \begin{asm}
 \label{debitdomaindef}
-MayLaunchDebitOpns(mbr) \iff mbr \in Company \cup Full \cup Mngr \cup Employee
+MayAllowTransferForDebitOpns(mbr) \iff\+
+ mbr \in Retail  \cup Company \cup Full \cup Employee \cup Consumer\_Verified \cup Mngr 
 \end{asm}
 
-{\bf Transfer Type Constraints for operations in Euro.} In the Sardex system, no $Credit$ operations are allowed in EUR currency, so that no function $TT^{Credit,EUR}$ is needed.\footnote{In D3.1 it is stated that the function does exist but that it is completely $\UNDEF$ined.} A EUR $Debit$ operation can be triggered only by a $Retail$ (and therefore also by a $Full$) member $fromGroup$ with the same $toGroup$. This requirement is expressed in the refined ASM model by the following definition:
+{\bf Transfer Type Constraints for operations in Euro.} In the Sardex system, no $Credit$ operations are allowed in EUR currency, so that no function $TT^{Credit,EUR}$ is needed.\footnote{In D3.1 it is stated that the function does exist but that it is completely $\UNDEF$ined.} A EUR $Debit$ operation can be triggered only by a $Consumer$ or a $Consumer\_Verified$ member and must have as target group $Retail$ or $Full$. This requirement is expressed in the refined ASM model by the following definition:
 \begin{asm}
-T^{Debit,EUR}(X)=\{X\} ~~~~~~~~~~\FORALL X \in Retail \cup Full  
+T^{Debit,EUR}(Consumer)=T^{Debit,EUR}(Consumer\_Verified)\+
+  = \{Retail,Full\}
 \end{asm}
 
 In the present formulation of the model we do not use the function $T^{Debit,EUR}$ because, to simplify the exposition in Sect.~\ref{sect:userops}, we describe the B2C operations there directly, not as instance of the $\ASM{DebitTransferReq}$ rules.
@@ -257,7 +301,7 @@ we describe the intended effect of the new B2C operations in Sect.~\ref{sect:eur
 
 The requirements on the types of the accounts that may be involved in an operation state which account types are allowed as $toAcc$ for an operation of a given $fromAcc$. They can be formalized using an account type check $AccT$ analogous to the transfer type check function $TT$ above.
 
-The essential requirement for user-initiated Credit or Debit operations is two-fold:
+The essential requirement for user-initiated Credit or Debit operations is two-fold (see Fig.2.12 of D3.1):
 
 \begin{itemize}
 	\item A $Credit$ operation in SRD that starts at a $fromAcc$ in $CC \cup Domu \cup Mirror$ has as allowed $toAcc$ a $CC$ account; in the case of $fromAcc \in CC$, also a $Domu$ or $Mirror$ account is permitted as $toAcc$.
@@ -266,23 +310,22 @@ The essential requirement for user-initiated Credit or Debit operations is two-f
 
 One can formalize the above requirements by defining the function 
 \begin{asm}
-AccT\colon Operation \times Currency \times AccountType \rightarrow \{ \textcolor{red}{Acct} \mid \textcolor{red}{Acct} \subseteq AccountType\}
+AccT\colon Operation \times Currency \times AccountType \rightarrow \{Acct \mid Acct \subseteq AccountType\}
 \end{asm} 
 
 \noindent again by a case distinction $
 AccT(op,cur,accountType)=AccT^{op,cur}(accountType)$ where: 
 
 \begin{asm}
-\begin{array}{ll}
-AccT^{Credit,SRD}(X) =\{ CC , Domu ,Mirror \} & \IF X \in CC \\
-AccT^{Credit,SRD}(X) =\{CC\} & \IF X \in Domu \cup Mirror \\
-AccT^{Debit,SRD}(X) =\{CC\} & \IF X \in CC
-\end{array}
+AccT^{Credit,SRD}(CC) =\{ CC , Domu ,Mirror \}   \\
+AccT^{Credit,SRD}(Domu) =AccT^{Credit,SRD}(Mirror)=\{CC\} \\
+AccT^{Debit,SRD}(CC) =\{CC\} 
 \end{asm}
 
- As above, for ease of reference we say that an account $MayStartCreditOpns$ if it is an element of an account type where $AccT^{Credit,SRD}$ has a defined value: 
+ As above, for ease of reference we say that an account $MayStartCredit/DebitOpns$ if it is an element of an account type where $AccT^{Credit/Debit,SRD}$ has a defined value: 
 \begin{asm}
-MayStartCreditOpns(\textcolor{red}{acct}) \IFF \textcolor{red}{acct} \in CC \cup Domu \cup Mirror 
+MayStartCreditOpns(acct) \IFF acct\in CC \cup Domu \cup Mirror\footnote{For the reason explained in the nest remark we exlude $Income$ accounts from this definition.} \\
+MayStartDebitOpns(acct) \IFF acct\in CC\footnote{Remember that we model here only Debit operations in SRD, not in EUR.}
 \end{asm}
 
 
@@ -294,7 +337,7 @@ Formally it means that in the definition above one includes the clause
 
 Since in rule $\ASM{EurB2C}$ below (Sect.~\ref{sect:eurob2c}) we provide a direct formalization of the B2C operation, we can do without the $Bisoo$ account and without any $Debit$ operation in EUR from an $Income$ to a $Bisoo$ account.
 
-{\bf Remark on system-initiated Credit/Debit operations.} In D3.1 the $AccT$ function is defined also for system-initiated operations. $AccT$ with first argument $Credit$ is defined by:
+{\bf Remark on system-initiated Credit/Debit operations.} In D3.1 Fig. 2.13 the $AccT$ function is defined also for system-initiated operations. $AccT$ with first argument $Credit$ is defined by:
 \[AccT^{Credit,SRD}(CC)=\{CC\} \AND AccT^{Credit,EUR}(Topup)=\{Prepaid\} \]
 
 $AccT$ with first argument $Debit$ is defined by:
@@ -350,12 +393,11 @@ make the nested credit type check pattern explicit as a machine $\ASM{CreditType
 
 \begin{asm}
 \ASM{CreditTypeCheck}(transfer,mbr,\ASM{Completion})  =\+
-  \IF mbr =owner(from) \AND MayLaunchCreditOpns(mbr) 
-  \mbox{  // check transfer type}\+
+  \IF mbr =owner(from) \AND MayAllowTransferForCreditOpns(mbr) \+
    \THEN ~ \IF ~ \FORSOME g \in TT^{Credit,SRD}(group(mbr)) 
-      ~~ owner(to) \in g  \+
-        \THEN  ~ \IF MayStartCreditOpns(from) \mbox{  // check account   
-	     connectivity}\+
+      ~~ owner(to) \in g   \mbox{  // check transfer type}\+
+        \THEN  ~ \IF MayStartCreditOpns(from) 
+        \mbox{  // check account connectivity}\+
              \THEN ~ \IF ~ accountType(to) \in 
                   AccT^{Credit,SRD}(accountType(from))\+
                   \THEN ~ \ASM{Completion}(transfer) \\
@@ -374,7 +416,7 @@ Now we can define $\ASM{CreditPreviewReq}$ as a $\ASM{CreditTypeCheck}$ instance
 \begin{asm}
 \ASM{CreditPreviewReq}((channel,from,to,amount),mbr)  =\+
   \LET transfer=(credit,channel,from,to,amount)\\
-  \IF Received(CreditPreviewReq(transfer),\FROM mbr) \THEN \+   
+  \IF Received(CreditPreviewReq(transfer),\FROM mbr)\footnote{Given the account $owner$ function, one could omit here the $mbr$ parameter and write instead $owner(from)$.} \THEN \+   
       \ASM{CreditTypeCheck}(transfer,mbr,\ASM{PermitPerformReq})\\
       \ASM{Consume}(CreditPreviewReq(transfer)) \-
 \WHERE \+
@@ -388,7 +430,7 @@ Now we can define $\ASM{CreditPreviewReq}$ as a $\ASM{CreditTypeCheck}$ instance
 
 
 Similarly, the $\ASM{CreditPerformReq}$ rule uses an instance of  $\ASM{CreditTypeCheck}$ where the parameter $\ASM{Completion}$  is instantiated to a rule
-$\ASM{CreditAccountLimitsCheck}$. In other words, to execute $\ASM{CreditPerformReq}$, first the $\ASM{CreditTypeCheck}$ is executed once more, but if it succeeds, to complete the operation, instead of $\ASM{Send} (YouMayTriggerPerformReq(transfer),\TO owner(from)$, a rule $\ASM{CreditAccountLimitsCheck}$ is called to $TryToCompleteCreditOpn$. That rule specifies the check of the various constraints on the $amount$ of the Credit operation, i.e.\ it refines the $balancecheck$ function of D2.1. Like $\ASM{CreditTypeCheck}$, it is an $\ASM{IfThenElseCascade}$ pattern instance and also comes with a $\ASM{Completion}$ parameter. For $\ASM{CreditPerformReq}$ this parameter is instantiated by a $\ASM{CompleteTransaction}$ component.
+$\ASM{CreditAccountLimitsCheck}$. In other words, to execute $\ASM{CreditPerformReq}$, first the $\ASM{CreditTypeCheck}$ is executed once more, but if it succeeds, to complete the operation, instead of $\ASM{Send} (YouMayTriggerPerformReq(transfer),\TO owner(from))$, a rule $\ASM{CreditAccountLimitsCheck}$ is called to $\ASM{TryToCompleteCreditOpn}$. That rule specifies the check of the various constraints on the $amount$ of the Credit operation, i.e.\ it refines the $balancecheck$ function of D2.1. Like $\ASM{CreditTypeCheck}$, it is an $\ASM{IfThenElseCascade}$ pattern instance and also comes with a $\ASM{Completion}$ parameter. For $\ASM{CreditPerformReq}$ this parameter is instantiated by a $\ASM{CompleteTransaction}$ component.
 
 \begin{asm}
 \ASM{CreditPerformReq}((channel,from,to,amount),mbr)  =\+
@@ -398,7 +440,7 @@ $\ASM{CreditAccountLimitsCheck}$. In other words, to execute $\ASM{CreditPerform
    \ASM{Consume}(CreditPerformReq(transfer))\-
 \WHERE \+
   \ASM{TryToCompleteCreditOpn}(transfer)=\+
-     \ASM{CreditAccountLimitsCheck}(transfer,\ASM{CompleteTransaction}(Credit,transfer))
+     \ASM{CreditAccountLimitsCheck}(transfer,\ASM{CompleteTransaction}(transfer))
 \end{asm}
 
 $\ASM{CreditAccountLimitsCheck}$ checks the following data for the given $amount$:
@@ -439,12 +481,12 @@ CanBeCashedBy(to,amount) \IFF
 The $\ASM{CompleteTransaction}$ component still remains rather abstract, as in D2.1, until we obtain more information on the $Ledger$ and the used  $transaction$ function (which records the information on the $transfer$ that is appended to the $Ledger$, including a time stamp which we describe by a 0-ary system function $now$). However, by the knowledge of the transfer and account type functions $TT, accountType$ we can refine what in D2.1 was called the transfer type check result $ttResult$, namely the triple consisting of the group the $owner(to)$ belongs to and of the $accountType$ of the source and target accounts.
 
 \begin{asm}
-\ASM{CompleteTransaction}(Credit,transfer)=\+   
-   \ASM{Append}(transaction(Credit,transfer,ttResult,now),Ledger)\\
-   \ASM{Send}(Confirmed(Credit,transfer),\TO owner(from))\\
+\ASM{CompleteTransaction}(transfer)=\+  
+\LET (credit,channel,from,to,amount)=transfer \\ 
+   \ASM{Append}(transaction(transfer,ttResult,now),Ledger)\\
+   \ASM{Send}(Confirmed(transfer),\TO owner(from))\\
    saleVolume(to):=saleVolume(to)+amount\footnote{We treat the dynamic function $saleVolume$ as belonging to AccountMetaData, apparently in accordance with D3.1.} \-
 \WHERE \+
- transfer = (channel,from,to,amount)\\
  ttResult= (group(owner(to)),accountType(from),accountType(to) )
 \end{asm}
 
@@ -458,50 +500,69 @@ The $\ASM{CompleteTransaction}$ component still remains rather abstract, as in D
 \section{Debit Operation} 
 \label{sect:debitops}
 
-As explained in D2.1, user-initiated Debit operations in SRD are executed in 3 phases: in addition to the $\ASM{DebitPreviewReq}$ and the $\ASM{DebitPerformReq}$ steps, where the system and the $creditor$ interact with each other similarly to the interaction for Credit operations, there is an interaction between the system and the $debitor$ where the system asks for an acknowledgement from the $debitor$ before performing the $\ASM{DebitAckCompletion}$ (or in case of failure a $\ASM{DebitRejectCompletion}$) step. Therefore we have:
+As explained in D2.1, user-initiated Debit operations in SRD are executed in 3 phases: in addition to the $\ASM{DebitPreviewReq}$ and the $\ASM{DebitPerformReq}$ steps, where the system and the $creditor$ interact with each other similarly to the interaction for Credit operations, there is an interaction between the system and the $debitor$ where the system asks for an acknowledgement from the $debitor$ before performing the $\ASM{DebitAckReqAnswCompletion}$ (or in case of failure a $\ASM{DebitLateAckReqAnswCompletion}$) step. Therefore we have:
 
 \begin{asm}
 \ASM{DebitTransferReq}=\+
    \ASM{DebitPreviewReq} \\
    \ASM{DebitPerformReq} \\
-   \ASM{DebitAckCompletion}\\
-    \ASM{DebitRejectCompletion}
+   \ASM{DebitAckReqAnswCompletion}\\
+    \ASM{DebitLateAckReqAnswCompletion}
 \end{asm}
 
 {\bf Remark on Debit operations in Euro.} In the refined model there are also two Debit operations in Euro. One is system-initiated and involves $Topup$ and $Prepaid$ accounts, the other one is user-initiated  and involves $Bisoo$ and $Income$ accounts. Since these two operations do not need the various transfer type checks, they can be modelled in a simpler way than by treating them as instances of $\ASM{DebitPreviewReq}$ (see Sect.~\ref{sect:userops}).
 
-\subsection{$\ASM{DebitPreviewReq}$ program}
+\subsection{$\ASM{DebitPreviewReq}$ program (for SRD)}
 \label{sect:debitpreview}
 
-As for Credit operations, the $\ASM{DebitPreviewReq}$ step essentially performs a $\ASM{DebitTypeCheck}$ on the $creditor$ and $debitor$ groups and on the permitted type of the involved accounts. 
+In this section we consider Debit operations in SRD. We treat the Debit operations in EUR separately in Sect.~\ref{sect:userops}.
+
+As for Credit operations, the $\ASM{DebitPreviewReq}$ step 
+essentially performs a $\ASM{DebitTypeCheck}$ on the 
+$creditor$ and $debitor$ groups and on the permitted type of 
+the involved accounts. But the arguments of $TT$ are interchanged: for a Debit operation $TT$ is applied to  $group(debitor)$ and yields the allowed creditor groups, to one of which the $creditor$ must belong. By Fig. 2.3 of D3.1, the account connectivity check for SRD-Debit operations checks whether the accounts $from,to$ to-be-used for the intended Debit operation are both of type CC. In case the outcome of the two checks is positive, $\ASM{DebitPreviewReq}$ calls as completion a $\ASM{PermitPerformReq}$ component which enables the $creditor$ to proceed to the $\ASM{DebitPerformReq}$ phase. 
+
 
 \begin{asm}
-\ASM{DebitPreviewReq}(transfer,creditor)  =\+
+\ASM{DebitPreviewReq}((channel,from,to,amount),creditor)  =\+
+  \LET transfer=(debit,channel,from,to,amount)\\
   \IF Received(DebitPreviewReq(transfer),\FROM creditor) \THEN \+   
-      \ASM{DebitTypeCheck}(transfer,creditor,\ASM{PermitPerformReq})\\
+      \ASM{DebitTypeCheck}
+          (transfer,creditor,\ASM{PermitPerformReq})\\
       \ASM{Consume}(DebitPreviewReq(transfer)) \-
 \WHERE \+
-transfer=(debitor,channel,amount)\\
-\ASM{PermitPerformReq}(debit,transfer,creditor)=\+
-\ASM{Send}
-(YouMayTriggerPerformReq(debit,transfer),\TO  creditor)\footnote{Note that this message,  by its parameters, differs from the message with same name $YouMayTriggerPerformReq$ used in the rule $\ASM{CreditPreviewReq}$.}
+\ASM{PermitPerformReq}(transfer)=\+
+\ASM{Send}(YouMayTriggerPerformReq(transfer)
+\footnote{This message,  by its parameter $debit$, differs 
+	from the message with same name $YouMayTriggerPerformReq$ used in the rule $\ASM{CreditPreviewReq}$ where the corresponding parameter is $credit$.}
+,\TO  owner(to)\footnote{$creditor$, the sender of the 
+	request, can be retrieved from $transfer$ by the account $owner$ function via $creditor=owner(to)$, which is the seller who will receive the transfer of SRD from the buyer $owner(from)$.}) 
 \end{asm}
 
-The $\ASM{DebitTypeCheck}$ machine follows the same pattern as $\ASM{CreditTypeCheck}$. However, it needs no account connectivity check because the $\ASM{DebitAccountLimitsCheck}$ component uses directly the correct accounts  $cc(creditor)$ and $cc(debitor)$, which are the only ones permitted for a Debit operation in SRD.
+The $\ASM{DebitTypeCheck}$ machine follows the same pattern as $\ASM{CreditTypeCheck}$, notably with interchanged arguments for $TT^{Debit,SRD}$. 
 
 
 \begin{asm}
 \ASM{DebitTypeCheck}(transfer,creditor,\ASM{Completion})  =\+
-\IF MayLaunchDebitOpns(creditor) \mbox{  // check transfer type}\+
-  \THEN ~ \IF  ~ \FORSOME g \in TT^{Debit,SRD}(group(creditor)) 
-          ~~ debitor \in g \footnote{By the definition of the function $TT^{Debit,SRD}$ on Page \pageref{debitdomaindef}, this condition is equivalent to $debitor \in group(creditor)$.} \+
-       \THEN  ~ \ASM{Completion}(debit,transfer,creditor) \\
+\LET (debit,channel,from,to,amount) = transfer \\
+\LET debitor=owner(from)\\
+\IF creditor=owner(to) \AND MayAllowTransferForDebitOpns(debitor) 
+      \+
+  \THEN~ \IF~\FORSOME g \in TT^{Debit,SRD}(group(debitor))
+        ~~ creditor \in g \mbox{  // check transfer type}
+         \+
+  \THEN ~ \IF MayStartDebitOpns(to)    \mbox{  // check accont connectivity $to \in CC$}\+
+     \THEN ~\IF accountType(from) \in AccT^{Debit,SRD}(accountType(to))
+             \mbox{ // i.e. $from \in CC$}\+
+       \THEN  ~ \ASM{Completion}(transfer) \\
         \ELSE ~ \ASM{Send}
-        (ErrMsg(DebitTargetGroupViolation(transfer)),\TO creditor) \- 
+        (ErrMsg(DebitTargetAccountViolation(transfer)),\TO creditor) \- 
+   \ELSE ~ \ASM{Send}
+   (ErrMsg(DebitSourceAccountViolation(transfer)),\TO creditor)  \-
   \ELSE ~ \ASM{Send}
-  (ErrMsg(DebitSourceGroupViolation(transfer)),\TO creditor)\-
- \WHERE \+
-   transfer = (debitor,channel,amount) 
+  (ErrMsg(DebitTransferTypeViolation(transfer)),\TO creditor) \-
+ \ELSE ~ \ASM{Send}
+  (ErrMsg(NotAccountOwnerToReceiveDebit(transfer)),\TO creditor)
 \end{asm}
 
 
@@ -517,126 +578,159 @@ To define $\ASM{DebitPerformReq}$, we reuse the scheme applied for $\ASM{CreditP
    \ASM{DebitTypeCheck}(transfer,creditor,\ASM{TryToCompleteDebitOpn})\\
    \ASM{Consume}(DebitPerformReq(transfer))\-
 \WHERE \+
-transfer=(debitor,channel,amount)\\
-\ASM{TryToCompleteDebitOpn}(debit,transfer,creditor)=\+
-\ASM{DebitAccountLimitsCheck}(transfer,creditor,\ASM{RequestDebitAck}(transfer,creditor))
+transfer=(debit,channel,from,to,amount)\\
+\ASM{TryToCompleteDebitOpn}(transfer)=\+
+\ASM{DebitAccountLimitsCheck}
+   (transfer,\ASM{RequestDebitAck}(transfer))
 \end{asm}
 
-$\ASM{DebitAccountLimitsCheck}$ is structurally similar to the $\ASM{CreditAccountLimitsCheck}$ (and uses its definitions for the three check predicates), but it has a different parameter to be called in case the check is successful, namely to $\ASM{RequestDebitAck}$nowledgement from the $debitor$ (see below) before completing the transaction by a $\ASM{DebitAckCompletion}$ or a $\ASM{DebitRejectCompletion}$. 
+$\ASM{DebitAccountLimitsCheck}$ is structurally similar to the $\ASM{CreditAccountLimitsCheck}$ (and uses its definitions for the three check predicates), but it has a different parameter to be called in case the check is successful, namely to $\ASM{RequestDebitAck}$nowledgement from the $debitor$ (see below) before completing the transaction either successfully, by a $\ASM{DebitAckReqAnswCompletion}$, or in the failure case by a $\ASM{DebitLateAckReqAnswCompletion}$. 
 
 This leads to the following definition. To prevent confusion we use a new name 
-$\ASM{NextStep}$ for the parameter. Note that $\ASM{DebitAccountLimitsCheck}$ 
-directly involves the correct CC-accounts of $creditor$ and $debitor$, which are 
-the only ones permitted for a user-initiated Debit operation in SRD (as defined by $AccT^{Debit,SRD}$ above). Note also that for privacy reasons, the definition of the content of an $ErrMsg(param)$ (which has to be defined separately) may have to hide some of the information the system knows in case of the given $param$eters.
-
+$\ASM{NextStep}$ for the parameter. Note that for privacy reasons, the definition of the content of an $ErrMsg(param)$ (which has to be defined separately) may have to hide some of the information the system knows in case of the given $param$eters.
+%\newpage
 
 \begin{asm}
-\ASM{DebitAccountLimitsCheck}(transfer,creditor,\ASM{NextStep})=\+
+\ASM{DebitAccountLimitsCheck}
+               (transfer,\ASM{NextStep})= \+
+  \LET (debit,channel,from,to,amount)=transfer \\
+  \LET debitor=owner(from). creditor=owner(to)\\
   \IF CanBeSpentBy(cc(debitor),amount) \+
     \THEN ~ \IF CanBeCashedBy(cc(creditor),amount) \+
        \THEN ~ \IF HasSellCapacityFor(amount,cc(creditor)) \+
            \THEN ~ \ASM{NextStep} \\
-           \ELSE 
-           ~ \ASM{Send}(ErrMsg(CapacityViolation(transfer)),\TO creditor)\-
-       \ELSE 
-       ~ \ASM{Send}(ErrMsg(UpperLimitViolation(transfer)),\TO creditor)\-
+           \ELSE~\ASM{Send}
+           (ErrMsg(SellCapacityViolation(transfer)),
+                               \TO creditor\-
+       \ELSE~\ASM{Send}
+       (ErrMsg(UpperLimitViolation(transfer)),\TO creditor\-
    \ELSE 
-    ~ \ASM{Send}(ErrMsg(AvailBalanceViolation(transfer)),\TO creditor)\dec\-
- \WHERE \+
-    transfer=(debitor,channel,amount)
+    ~ \ASM{Send}(ErrMsg(AvailBalanceViolation(transfer)),\TO creditor
 \end{asm}
 
 
 The machine  $\ASM{RequestDebitAck}$ completes the transaction without further 
-ado in case  the $amount$ is $Small$ (less than 100), namely by appending it to the $Ledger$ (using the system location for the current date, denoted $today$). For every other $amount$, $\ASM{RequestAck}$ creates a $OneTimePassword$ $otp$ (using the current system time, denoted by $now$), records its birthtime (the beginning of its lifetime), records the $otp$ with the transaction (including the computed transfer type) as a $PendingTransaction$ and sends the $otp$  with an agreement request to the $debitor$. To execute $\ASM{DebitAckCompletion}$ a $DebitAckMsg$ must arrive; if such a message does not arrive within the lifetime of $otp$, $\ASM{DebitRejectCompletion}$ will be executed.
+ado in case  the $amount$ is $Small$ (less than 100), namely 
+by appending it to the $Ledger$ (using the system location 
+for the current system time, denoted $now$). For every other 
+$amount$, $\ASM{RequestAck}$ creates a $OneTimePassword$ 
+$otp$ (using the current system time, denoted by $now$), 
+records its birthtime (the beginning of its lifetime), 
+records the $otp$ with the transaction (including the 
+computed transfer type) as a $PendingTransaction$ and sends 
+the $otp$  with an agreement request to the $debitor$. To 
+execute $\ASM{DebitAckReqAnswCompletion}$ a $DebitAckMsg$ must 
+arrive; if such a message does not arrive within the 
+lifetime of $otp$, $\ASM{DebitLateAckReqAnswCompletion}$ will be 
+executed.
 
 \begin{asm}
-\ASM{RequestDebitAck}(transfer,creditor)=\+
+\ASM{RequestDebitAck}(transfer)=\+
+\LET (debit,channel,from,to,amount)=transfer \\
+\LET debitor=owner(from), creditor=owner(to)\\
 \IF Small(amount) 
 \mbox{  // case where no acknowledgement from $debitor$ is requested}\+
-   \THEN ~ \ASM{CompleteTransaction}(Debit,transfer,creditor) \-
+   \THEN ~ \ASM{CompleteTransaction}(transfer) \-
    \ELSE \+
        \LET otp= \NEW(OneTimePassword)\\
-       \LET pendingTransact=(otp,transfer,creditor)\+
+       \LET pendingTransact=(otp,transfer)\+
           birthTime(otp):=now \mbox{ // current system time}\\
           \ASM{Insert}(pendingTransact,PendingTransaction)\\ 
           status(pendingTransact):=pending \\
           \ASM{Send}(ConfirmationReq(pendingTransact),\TO debitor)\footnote{There is no need to keep the $channel$ parameter because the confirmation request can be sent through any channel, not necessarily the one through which the Debit request arrived, and also the acknowledgement can arrive via any channel.}
        \dec\-
 \WHERE \+
-transfer=(debitor,channel,amount)\\
 Small(amount) \IFF amount < 1000 \\
- \ASM{CompleteTransaction}(Debit,transfer,creditor)\footnote{This machine differs slightly from the one with the same name used in $\ASM{CreditPerformReq}$, as can be seen from its parameters.} =\+     
-   \ASM{Append}(transaction(Debit,transfer,creditor,today),Ledger)\\
-   \ASM{Send}(Confirmed(Debit,transfer),\TO debitor)\\
-   \ASM{Send}(Confirmed(Debit,transfer),\TO creditor)\\
-   saleVolume(creditor):=saleVolume(creditor)+amount
+ \ASM{CompleteTransaction}(transfer)\footnote{This machine is structurally the same but differs from the one with the same name used in $\ASM{CreditPerformReq}$ by the debit parameter (instead of credit).} =\+     
+   \ASM{Append}(transaction(transfer,ttResult,now),Ledger)\\
+   \ASM{Send}(Confirmed(transfer),\TO debitor)\\
+   \ASM{Send}(Confirmed(transfer),\TO creditor)\\
+   saleVolume(creditor):=saleVolume(creditor)+amount \-
+ttResult=(group(creditor),CC,CC)
 \end{asm}
 
 
 \subsection{ $\ASM{DebitAck/RejectCompletion}$ programs}
 \label{sect:debitackreject}
 
-When the $otp$ is acknowledged (i.e.\ resent) by the $debitor$ but too late, an error message informing that the $otp$ expired is sent to the debitor and the creditor and the message is discarded.
+\subsubsection{Debit completion when debitor answers $ConfirmationReq$}\label{sect:debitack}
 
-If the acknowledgement is received within the $lifetimeForOTPs$ foreseen for one-time passwords, the system will $\ASM{CompleteTransaction}$ and update the transaction status from $pending$ to $performed$, but only after a new $\ASM{FinalDebitAccountLimitsCheck}$ succeeded. $\ASM{DebitAccountLimitsCheck}$  refined in this way guarantees that in case of failure the Debit operation is rejected. Therefore in every case the $status$ of the pending transaction is changed to either $performed$ or $rejected$ so that the one-time password can be deleted,  preventing a later application of the $\ASM{DebitRejectCompletion}$ rule (which has to be applied in case of an $Expired(otp)$).
+Case 1. When, for a pending transaction $t$, the $ConfirmationReq(t)$ is answered by the $debitor$ but too late, an error message informing that the $otp$ expired is sent to the debitor and the creditor and the message is discarded. In this case, the $\ASM{DebitLateAckReqAnswCompletion}$ rule below will delete the $otp$ and update $status(t)$ to $rejected$.
+
+Case 2. The $ConfirmationReq(t)$ is answered by the $debitor$ in time, i.e. within the $lifetimeForOTPs$ foreseen for one-time passwords, but negatively by a $DebitRejectMsg$. \textcolor{red}{I have inserted this case. I cannot believe that in this case nothing happens, as had been stated explicitly as requirement for the old rule DebitAckReqAnswCompletion (footnote 24 of the version 17.6.2018). That must have been a misunderstanding of ack msg, as if ack means to accept.} In this case the $otp$ is deleted and the pending transaction made $rejected$.
+
+Case 3. The $ConfirmationReq(t)$ is answered by the $debitor$ in time and positively by a $DebitAckMsg$. Then the system will $\ASM{CompleteTransaction}$ and update the transaction status from $pending$ to $performed$, but only after a new $\ASM{FinalDebitAccountLimitsCheck}$ succeeded. Refining the machine $\ASM{DebitAccountLimitsCheck}$ in this way guarantees that, in case of failure, the Debit operation is rejected. Therefore in every case the $status$ of the pending transaction is changed to either $performed$ or $rejected$ so that the one-time password can be deleted,  preventing a later application of the $\ASM{DebitLateAckReqAnswCompletion}$ rule (which will be applied in case of an $Expired(otp)$).
 
 
 \begin{asm}  
-\ASM{DebitAckCompletion} =\+           
-\IF Received(DebitAckMsg(pendingTransact),\FROM debitor) \THEN \\
- \LET pendingTransact= (otp,debitor,channel,amount,creditor)\footnote{Using the $\LET$ clause here relies on the assumption (which can be checked to be true for the model) that $DebitAckMsg$es are formed with the expected correct parameters.}\+
+\ASM{DebitAckReqAnswCompletion} =\+           
+\IF Received(AnswerMsg(pendingTransact),\FROM debitor)\+
+\AND AnswerMsg(pendingTransact) \in \+
+ \{DebitAckMsg(pendingTransact),DebitRejectMsg(pendingTransact)\} \THEN \dec \-
+\LET (otp, (debit,channel,from,to,amount))=pendingTransact \footnote{Using the $\LET$ clause here relies on the assumption (which can be checked to be true for the model) that $DebitAckMsg$es are formed with the expected correct parameters.}\\
+ \LET debitor=owner(from), creditor=owner(to)\+
   \IF Expired(otp) \THEN \+
     \ASM{Send}(ErrMsg(ExpiredOtpFor(DebitAck,amount,creditor)),\TO debitor) \\
-    \ASM{Send}(ErrMsg(ExpiredOtpFor(DebitAck,amount,creditor)),\TO creditor)\- 
+    \ASM{Send}(ErrMsg(ExpiredOtpFor(DebitAck,amount,creditor)),\TO creditor)\-
+   \ELSE ~\IF   
+      Received(DebitRejectMsg(pendingTransact),\FROM debitor) \THEN \+
+          \ASM{Delete}(otp,OneTimePassword) \\
+          status(t):=rejected\\
+          \ASM{Send}(RejectMsg(debit,amount,debitor),\TO creditor)\-         
   \ELSE ~\IF pendingTransact  \in PendingTransaction \AND
-    status(pendingTransact) =pending\footnote{Otherwise just discard the message, nothing else happens to the $otp$ or the pending transaction. In D2.1 the possibility to send out an error message was considered.}  \+
+    status(pendingTransact) =pending\footnote{Otherwise, following the requirements, the message is just discarded, nothing else happens to the $otp$ or the pending transaction. In D2.1 the possibility to send out an error message was considered.}  \+
        \THEN \+
           \ASM{FinalDebitAccountLimitsCheck}\+
-              ~~~~~~ (pendingTransact,\ASM{CompleteTransaction}(Debit,pendingTransact))\-
+              ~~~~~~ (pendingTransact,\ASM{CompleteTransaction}(pendingTransact))\-
                 \ASM{Delete}(otp,OneTimePassword)\dec\dec\-  
-\ASM{Consume}(DebitAckMsg(pendingTransact)) \dec\-
+\ASM{Consume}(DebitAckMsg(pendingTransact)) \dec\dec\-
 \WHERE \+
 Expired(otp) \IFF now-birthtime(otp) > lifetimeForOTPs\\
-\ASM{CompleteTransaction}(Debit,pendingTransact)=\+
-  \LET pendingTransact=(otp,debitor,channel,amount,creditor)\+
-  \ASM{CompleteTransaction}(Debit, debitor,channel,amount,creditor)\\
+\ASM{CompleteTransaction}(pendingTransact)=\+
+   \ASM{CompleteTransaction}(debit,channel,from,to,amount)\\
   status(pendingTransact) :=performed
 \end{asm}
 
-The $\ASM{FinalDebitAccountLimitsCheck}$ refines the  $\ASM{DebitAccountLimitsCheck}$ by inserting into the failure cases a clause which rejects the Debit request. Using the $\LET$ clause in the definition relies on the assumption (which can be checked to be true for the model) that each time the submachine $\ASM{FinalDebitAccountLimitsCheck}$ is called in the program, it is called with the expected correct parameters.
+The $\ASM{FinalDebitAccountLimitsCheck}$ refines the  $\ASM{DebitAccountLimitsCheck}$ by inserting into the failure cases a clause which makes the pending Debit transaction rejected and informs the creditor about the reason for rejection. Using the $\LET$ clause in the definition relies on the assumption (which can be checked to be true for the model) that each time the submachine $\ASM{FinalDebitAccountLimitsCheck}$ is called in the program, it is called with the expected correct parameters.
 
 \begin{asm}
 \ASM{FinalDebitAccountLimitsCheck}(pendingTransact,\ASM{NextStep})=\+
-  \LET pendingTransact= (otp,debitor,channel,amount,creditor)\\
+ \LET (otp, transfer)=pendingTransact\\ 
+ \LET = (debit,channel,from,to,amount)=transfer\\
+  \LET debitor=owner(from), creditor=owner(to)\+
   \IF CanBeSpentBy(cc(debitor),amount) \+
     \THEN ~ \IF CanBeCashedBy(cc(creditor),amount) \+
       \THEN ~ \IF HasSellCapacityFor(amount,cc(creditor)) \+
          \THEN ~ \ASM{NextStep} \\
-         \ELSE \+
-           \ASM{Send}(ErrMsg(CapacityViolation(transfer)),\TO creditor)\\
-            status(pendingTransact):=rejected \dec\-
-     \ELSE \+
-    \ASM{Send}(ErrMsg(UpperLimitViolation(transfer)),\TO creditor)\\
-     status(pendingTransact):=rejected \dec\-
-  \ELSE \+
-   \ASM{Send}(ErrMsg(AvailBalanceViolation(transfer)),\TO creditor)\\
-  status(pendingTransact):=rejected
+         \ELSE ~ \ASM{RejectTransactionBecauseOf}
+               (SellCapacityViolation,pendingTransact) \-
+     \ELSE ~ \ASM{RejectTransactionBecauseOf}
+     (UpperLimitViolation,pendingTransact) \-
+  \ELSE ~  \ASM{RejectTransactionBecauseOf}
+    (AvailBalanceViolation,pendingTransact) \dec\-
+\WHERE \+
+\ASM{RejectTransactionBecauseOf}(reason,pendingTransact)  =\+
+   \ASM{Send}(ErrMsg(reason(transfer)),\TO creditor)\\
+   status(pendingTransact):=rejected  
 \end{asm}
 
 
-In case the $debitor$ does not confirm the Debit request within the $lifetime$ foreseen for OTPs, the Sardex system will reject the $\ASM{DebitPerformReq}$ (by changing the status of the pending transaction to $rejected$) and inform the $creditor$ about it.
+\subsubsection{Debit rejection upon missing debitor's answer to $ConfirmationReq$}\label{sect:debitreject}
+
+In case the $debitor$ does not confirm the Debit request within the $lifetime$ foreseen for OTPs, the Sardex system will reject the $\ASM{DebitPerformReq}$ (by changing the status of the pending transaction to $rejected$) and inform the $creditor$ about it.\footnote{We use Hilbert's $\iota$ operator notation $\iota x(P)$ to describe the unique element $x$ which satisfies a property $P$, obviously to be used only if there is exactly one such element.}
 
 \begin{asm}  
-\ASM{DebitRejectExec} =\+           
-  \IF otp \in OneTimePassword \AND Expired(otp)  \THEN \+
-  \LET pendingT=\iota t' (t'  \in PendingTransaction \AND 
-       t'=(otp,debitor,channel,amount,creditor))\+
+\ASM{DebitLateAckReqAnswCompletion} =\+           
+  \IF otp \in OneTimePassword \AND Expired(otp)  \THEN  \+
+  \LET t=\iota t' (t'  \in PendingTransaction \AND 
+       t'=(otp,transfer)) \mbox{ // NB. $otp$ is unique}\\
+   \LET (debit,channel,from,to,amount)=transfer \+
        \ASM{Delete}(otp,OneTimePassword) \\
-      \IF status(pendingT)=pending \THEN \+
-         status(pendingT):=rejected\\
-         \ASM{Send}(RejectMsg(Debit,amount,creditor),\TO creditor)\\  
-         \ASM{Send}(OtpExpired(Debit,amount,creditor),\TO debitor)  
+      \IF status(t)=pending \THEN \+
+         status(t):=rejected\\
+         \ASM{Send}(RejectMsg(Debit,amount,debitor),\TO creditor)\\  
+         \ASM{Send}(OtpExpired(Debit,amount,creditor),\TO debitor)  \dec \-
+  \WHERE debitor=owner(from), creditor=owner(to)
 \end{asm}
 
 \section{New B2C operations}
@@ -784,25 +878,26 @@ Users can $\ASM{Send}$ requests which appear as input for the INTERLACE network 
 For Credit/Debit Perform requests the only relevant additional constraint is that they can be sent only after an ok-message for the corresponding Preview request has been received. We use a function $kind$ to extract from a $transfer$ parameter its $credit$ or $debit$ component, respectively.\footnote{In the following ASMs the keyword `sardex' stands for `INTERLACE network server'.}
 
 \begin{asm}
-\IF Received(YouMayProceedWith(transfer),\FROM sardex) \THEN \+
+\IF Received(YouMayTriggerPerformReq(transfer),\FROM sardex) \THEN \+
 \IF kind(transfer)=credit \THEN \+
 \ASM{Send}(CreditPerformReq(transfer), \TO  sardex) \-
 \IF kind(transfer)=debit \THEN \+
 \ASM{Send}(DebitPerformReq(transfer), \TO  sardex)  \-
-\ASM{Consume}(YouMayProceedWith(transfer))
+\ASM{Consume}(YouMayTriggerPerformReq(transfer))
 \end{asm}
 
 In case of a Debit operation a debitor has to confirm a received debit request by $\ASM{Send}$ing a $DebitAckMsg$; otherwise a $DebitRejectMsg$ is sent to the INTERLACE network server.
 \begin{asm}
-\IF Received(ConfirmationReq(amount,creditor,otp),\FROM sardex) \THEN \+
-\IF Agreed(amount,creditor,otp)\+
-\THEN ~ \ASM{Send}(DebitAckMsg(amount,creditor,otp), \TO sardex) \\
-\ELSE ~ \ASM{Send}(DebitRejectMsg(amount,creditor,otp), \TO sardex)\-
-\ASM{Consume}(ConfirmationReq(amount,creditor,otp))
+\IF Received(ConfirmationReq(otp,transfer),\FROM sardex) \THEN \+
+\LET (debit,channel,from,to,amount)=transfer \\
+\IF Agreed(amount,owner(to),otp)\+
+\THEN ~ \ASM{Send}(DebitAckMsg(otp,transfer), \TO sardex) \\
+\ELSE ~ \ASM{Send}(DebitRejectMsg(otp,transfer), \TO sardex)\-
+\ASM{Consume}(ConfirmationReq(otp,transfer))
 \end{asm}
 
 
-\section{Sub-Appendix 1: Complete Model}
+\section{Sub-Appendix: Sardex Business Logic in a Nutshell}
 \label{sect:appendixModel}
 
 We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed by the Sardex system with the following program $\ASM{SardexModel}$. Obviously these rules could be split and assigned to different agents, e.g. the last two ones to the $SysAdmin$ and the first two to an independent agent (who by those rules reacts to triggers by the users, but the rules themselves are not under user control).
@@ -821,8 +916,8 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
   \ASM{DebitTransferReq}=\+
      \ASM{DebitPreviewReq} \\
      \ASM{DebitPerformReq} \\
-     \ASM{DebitAckCompletion}\\
-     \ASM{DebitRejectCompletion}\-
+     \ASM{DebitAckReqAnswCompletion}\\
+     \ASM{DebitLateAckReqAnswCompletion}\-
   \ASM{MngrOps} =\+    
      	\ASM{RechargePrepaid}\\
      	\ASM{RecordFeePayment}\\
@@ -854,29 +949,27 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
  \ASM{Consume}(CreditPerformReq(transfer))\-
  \WHERE \+
  \ASM{TryToCompleteCreditOpn}(transfer)=\+
- \ASM{CreditAccountLimitsCheck}(transfer,\ASM{CompleteTransaction}(Credit,transfer))
+ \ASM{CreditAccountLimitsCheck}(transfer,\ASM{CompleteTransaction}(transfer))
  \end{asm}
  
  \subsubsection{Credit check subcomponents for account types and account limits} 
  
  \begin{asm}
- \ASM{CreditTypeCheck}(transfer,mbr,\ASM{Completion})  =\+
- \IF mbr =owner(from) \AND MayLaunchCreditOpns(mbr) 
- \mbox{ ~~~~~~~~~~// check transfer type}\+
- \THEN ~ \IF ~ \FORSOME g \in TT^{Credit,SRD}(group(mbr)) 
- ~~ owner(to) \in g  \+
- \THEN  ~ \IF MayStartCreditOpns(from) 
- \mbox{  ~~~~~~~~~~~~~~~ // check account   
- 	connectivity}\+
- \THEN ~ \IF ~ accountType(to) \in 
- AccT^{Credit,SRD}(accountType(from))\+
- \THEN ~ \ASM{Completion}(transfer) \\
- \ELSE ~ \ASM{Send}(ErrMsg(CreditTargetAccountViolation(transfer)),\TO mbr) \-
- \ELSE ~ \ASM{Send}(ErrMsg(CreditSourceAccountViolation(transfer)),\TO mbr)\-
- \ELSE ~ \ASM{Send}(ErrMsg(CreditTargetGroupViolation(transfer)),\TO mbr) \- 
- \ELSE ~  \ASM{Send}(NotAccountOwnerOrCreditSourceGroupViolation(transfer),\TO mbr)\-
- \WHERE \+
- transfer = (credit, channel, from, to, amount)   
+ 	\ASM{CreditTypeCheck}(transfer,mbr,\ASM{Completion})  =\+
+ 	\IF mbr =owner(from) \AND MayAllowTransferForCreditOpns(mbr) \+
+ 	\THEN ~ \IF ~ \FORSOME g \in TT^{Credit,SRD}(group(mbr)) 
+ 	~~ owner(to) \in g   \mbox{  // check transfer type}\+
+ 	\THEN  ~ \IF MayStartCreditOpns(from) 
+ 	\mbox{  // check account connectivity}\+
+ 	\THEN ~ \IF ~ accountType(to) \in 
+ 	AccT^{Credit,SRD}(accountType(from))\+
+ 	\THEN ~ \ASM{Completion}(transfer) \\
+ 	\ELSE ~ \ASM{Send}(ErrMsg(CreditTargetAccountViolation(transfer)),\TO mbr) \-
+ 	\ELSE ~ \ASM{Send}(ErrMsg(CreditSourceAccountViolation(transfer)),\TO mbr)\-
+ 	\ELSE ~ \ASM{Send}(ErrMsg(CreditTargetGroupViolation(transfer)),\TO mbr) \- 
+ 	\ELSE ~  \ASM{Send}(NotAccountOwnerOrCreditSourceGroupViolation(transfer),\TO mbr)\dec\dec\-
+ 	\WHERE \+
+ 	transfer = (credit, channel, from, to, amount)   
  \end{asm}
  
  \begin{asm}
@@ -901,157 +994,181 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
 
  \subsubsection{Credit transaction completion subcomponent}
  \begin{asm}
- \ASM{CompleteTransaction}(Credit,transfer)=\+   
- \ASM{Append}(transaction(Credit,transfer,ttResult,now),Ledger)\\
- \ASM{Send}(Confirmed(Credit,transfer),\TO owner(from))\\
- saleVolume(to):=saleVolume(to)+amount\footnote{We treat the dynamic function $saleVolume$ as belonging to AccountMetaData, apparently in accordance with D3.1.} \-
- \WHERE \+
- transfer = (channel,from,to,amount)\\
- ttResult= (group(owner(to)),accountType(from),accountType(to) )
+ 	\ASM{CompleteTransaction}(transfer)=\+  
+ 	\LET (credit,channel,from,to,amount)=transfer \\ 
+ 	\ASM{Append}(transaction(transfer,ttResult,now),Ledger)\\
+ 	\ASM{Send}(Confirmed(transfer),\TO owner(from))\\
+ 	saleVolume(to):=saleVolume(to)+amount\footnote{We treat the dynamic function $saleVolume$ as belonging to AccountMetaData, apparently in accordance with D3.1.} \-
+ 	\WHERE \+
+ 	ttResult= (group(owner(to)),accountType(from),accountType(to) )
  \end{asm}
  
  \subsection{The Debit operation components}
  
 
 \begin{asm}
-\ASM{DebitPreviewReq}  =\+
-\LET  transfer=(debitor,channel,amount)\+
-  \IF Received(DebitPreviewReq(transfer),\FROM creditor) \THEN \+   
-    \ASM{DebitTypeCheck}(transfer,creditor,\ASM{PermitPerformReq})\\
-    \ASM{Consume}(DebitPreviewReq(transfer)) \-
-  \WHERE \+
-     \ASM{PermitPerformReq}(debit,transfer,creditor)=\+
-        \ASM{Send}
-        (YouMayTriggerPerformReq(debit,transfer),\TO  creditor)
+	\ASM{DebitPreviewReq}  =\+
+	\LET transfer=(debit,channel,from,to,amount)\\
+	\IF Received(DebitPreviewReq(transfer),\FROM creditor) \THEN \+   
+	\ASM{DebitTypeCheck}
+	(transfer,creditor,\ASM{PermitPerformReq})\\
+	\ASM{Consume}(DebitPreviewReq(transfer)) \-
+	\WHERE \+
+	\ASM{PermitPerformReq}(transfer)=\+
+	\ASM{Send}
+	  (YouMayTriggerPerformReq(transfer),\TO  owner(to)) 
 \end{asm}
  
 
- 
- \begin{asm}
- \ASM{DebitPerformReq} =\+
- \LET  transfer=(debitor,channel,amount)\+
-    \IF Received(DebitPerformReq(transfer),\FROM creditor) \THEN \+  
-       \ASM{DebitTypeCheck}(transfer,creditor,\ASM{TryToCompleteDebitOpn})\\
-       \ASM{Consume}(DebitPerformReq(transfer))\-
-    \WHERE \\
- \ASM{TryToCompleteDebitOpn}(debit,transfer,creditor)=\+
- \ASM{DebitAccountLimitsCheck}(transfer,creditor,\ASM{RequestDebitAck}(transfer,creditor))
- \end{asm}
- 
+\begin{asm}
+	\ASM{DebitPerformReq}  =\+
+	\LET 	transfer=(debit,channel,from,to,amount)\\
+	\IF Received(DebitPerformReq(transfer),\FROM creditor) \THEN \+  
+	\ASM{DebitTypeCheck}(transfer,creditor,\ASM{TryToCompleteDebitOpn})\\
+	\ASM{Consume}(DebitPerformReq(transfer))\-
+	\WHERE \+
+	\ASM{TryToCompleteDebitOpn}(transfer)=\+
+	\ASM{DebitAccountLimitsCheck}
+	(transfer,\ASM{RequestDebitAck}(transfer))
+\end{asm}
+
  \subsubsection{Debit check subcomponents for account types and account limits}
- 
-  \begin{asm}
- \ASM{DebitTypeCheck}(transfer,creditor,\ASM{Completion})  =\+
- \IF MayLaunchDebitOpns(creditor) 
- \mbox{~~~~~~~~~~~~~~~~~~~~~~~~  // check transfer type}\+
- \THEN ~ \IF debitor \in group(creditor) \+
- \THEN  ~ \ASM{Completion}(debit,transfer,creditor) \\
- \ELSE ~ \ASM{Send}
- (ErrMsg(DebitTargetGroupViolation(transfer)),\TO creditor) \- 
- \ELSE ~ \ASM{Send}
- (ErrMsg(DebitSourceGroupViolation(transfer)),\TO creditor)\-
- \WHERE \+
- transfer = (debitor,channel,amount) 
- \end{asm}
- 
  \begin{asm}
- \ASM{DebitAccountLimitsCheck}(transfer,creditor,\ASM{NextStep})=\+
- \IF CanBeSpentBy(cc(debitor),amount) \+
- \THEN ~ \IF CanBeCashedBy(cc(creditor),amount) \+
- \THEN ~ \IF HasSellCapacityFor(amount,cc(creditor)) \+
- \THEN ~ \ASM{NextStep}\\
- \ELSE 
- ~ \ASM{Send}(ErrMsg(CapacityViolation(transfer)),\TO creditor)\-
- \ELSE 
- ~ \ASM{Send}(ErrMsg(UpperLimitViolation(transfer)),\TO creditor)\-
- \ELSE 
- ~ \ASM{Send}(ErrMsg(AvailBalanceViolation(transfer)),\TO creditor)\dec\-
- \WHERE \+
- transfer=(debitor,channel,amount)
+ 	\ASM{DebitTypeCheck}(transfer,creditor,\ASM{Completion})  =\+
+ 	\LET (debit,channel,from,to,amount) = transfer \\
+ 	\LET debitor=owner(from)\\
+ 	\IF creditor=owner(to) \AND MayAllowTransferForDebitOpns(debitor) 
+ 	\+
+ 	\THEN~ \IF~\FORSOME g \in TT^{Debit,SRD}(group(debitor))
+ 	~~ creditor \in g \mbox{  // check transfer type}
+ 	\+
+ 	\THEN ~ \IF MayStartDebitOpns(to)    \mbox{  // check accont connectivity $to \in CC$}\+
+ 	\THEN ~\IF accountType(from) \in AccT^{Debit,SRD}(accountType(to))
+ 	\mbox{ // i.e. $from \in CC$}\+
+ 	\THEN  ~ \ASM{Completion}(transfer) \\
+ 	\ELSE ~ \ASM{Send}
+ 	(ErrMsg(DebitTargetAccountViolation(transfer)),\TO creditor) \- 
+ 	\ELSE ~ \ASM{Send}
+ 	(ErrMsg(DebitSourceAccountViolation(transfer)),\TO creditor)  \-
+ 	\ELSE ~ \ASM{Send}
+ 	(ErrMsg(DebitTransferTypeViolation(transfer)),\TO creditor) \-
+ 	\ELSE ~ \ASM{Send}
+ 	(ErrMsg(NotAccountOwnerToReceiveDebit(transfer)),\TO creditor)
  \end{asm}
- 
+
+ \begin{asm}
+ 	\ASM{DebitAccountLimitsCheck}
+ 	(transfer,\ASM{NextStep})= \+
+ 	\LET (debit,channel,from,to,amount)=transfer \\
+ 	\LET debitor=owner(from). creditor=owner(to)\\
+ 	\IF CanBeSpentBy(cc(debitor),amount) \+
+ 	\THEN ~ \IF CanBeCashedBy(cc(creditor),amount) \+
+ 	\THEN ~ \IF HasSellCapacityFor(amount,cc(creditor)) \+
+ 	\THEN ~ \ASM{NextStep} \\
+ 	\ELSE~\ASM{Send}
+ 	(ErrMsg(SellCapacityViolation(transfer)),
+ 	\TO creditor\-
+ 	\ELSE~\ASM{Send}
+ 	(ErrMsg(UpperLimitViolation(transfer)),\TO creditor\-
+ 	\ELSE 
+ 	~ \ASM{Send}(ErrMsg(AvailBalanceViolation(transfer)),\TO creditor
+ \end{asm}
   
  \begin{asm}
- \ASM{FinalDebitAccountLimitsCheck}(pendingTransact,\ASM{NextStep})=\+
- \LET pendingTransact= (otp,transfer,creditor)\\
- \LET transfer = (debitor,channel,amount)\\
- \IF CanBeSpentBy(cc(debitor),amount) \+
- \THEN ~ \IF CanBeCashedBy(cc(creditor),amount) \+
- \THEN ~ \IF HasSellCapacityFor(amount,cc(creditor)) \+
- \THEN ~ \ASM{NextStep} \\
- \ELSE \+
- \ASM{Send}(ErrMsg(CapacityViolation(transfer)),\TO creditor)\\
- status(pendingTransact):=rejected \dec\-
- \ELSE \+
- \ASM{Send}(ErrMsg(UpperLimitViolation(transfer)),\TO creditor)\\
- status(pendingTransact):=rejected \dec\-
- \ELSE \+
- \ASM{Send}(ErrMsg(AvailBalanceViolation(transfer)),\TO creditor)\\
- status(pendingTransact):=rejected
+ 	\ASM{FinalDebitAccountLimitsCheck}(pendingTransact,\ASM{NextStep})=\+
+ 	\LET (otp, transfer)=pendingTransact\\ 
+ 	\LET = (debit,channel,from,to,amount)=transfer\\
+ 	\LET debitor=owner(from), creditor=owner(to)\+
+ 	\IF CanBeSpentBy(cc(debitor),amount) \+
+ 	\THEN ~ \IF CanBeCashedBy(cc(creditor),amount) \+
+ 	\THEN ~ \IF HasSellCapacityFor(amount,cc(creditor)) \+
+ 	\THEN ~ \ASM{NextStep} \\
+ 	\ELSE ~ \ASM{RejectTransactionBecauseOf}
+ 	(SellCapacityViolation,pendingTransact) \-
+ 	\ELSE ~ \ASM{RejectTransactionBecauseOf}
+ 	(UpperLimitViolation,pendingTransact) \-
+ 	\ELSE ~  \ASM{RejectTransactionBecauseOf}
+ 	(AvailBalanceViolation,pendingTransact) \dec\-
+ 	\WHERE \+
+ 	\ASM{RejectTransactionBecauseOf}(reason,pendingTransact)  =\+
+ 	\ASM{Send}(ErrMsg(reason(transfer)),\TO creditor)\\
+ 	status(pendingTransact):=rejected  
  \end{asm}
+ 
  
  \subsubsection{Debit acknowledgement subcomponent}
  
  \begin{asm}
- \ASM{RequestDebitAck}(transfer,creditor)=\+
- \IF Small(amount) 
- \mbox{ ~~~~~~~~~~~~~  //case where no acknowledgement from $debitor$ is requested}\+
- \THEN ~ \ASM{CompleteTransaction}(Debit,transfer,creditor) \-
- \ELSE \+
- \LET otp= \NEW(OneTimePassword)\\
- \LET pendgTransact=(otp,transfer,creditor)\+
- birthTime(otp):=now \mbox{ // current system time}\\
- \ASM{Insert}(pendgTransact,PendingTransaction)\\ 
- status(pendgTransact):=pending \\
- \ASM{Send}(ConfirmationReq(pendgTransact),\TO debitor)
- \dec\-
- \WHERE \+
- transfer=(debitor,channel,amount)\\
- Small(amount) \IFF amount < 1000 \\
- \ASM{CompleteTransaction}(Debit,transfer,creditor) =\+     
- \ASM{Append}(transaction(Debit,transfer,creditor,today),Ledger)\\
- \ASM{Send}(Confirmed(Debit,transfer),\TO debitor)\\
- \ASM{Send}(Confirmed(Debit,transfer),\TO creditor)\\
- salesVolume(creditor):=salesVolume(creditor)+amount
+ 	\ASM{RequestDebitAck}(transfer)=\+
+ 	\LET (debit,channel,from,to,amount)=transfer \\
+ 	\LET debitor=owner(from), creditor=owner(to)\\
+ 	\IF Small(amount) 
+ 	\mbox{  // case where no acknowledgement from $debitor$ is requested}\+
+ 	\THEN ~ \ASM{CompleteTransaction}(transfer) \-
+ 	\ELSE \+
+ 	\LET otp= \NEW(OneTimePassword)\\
+ 	\LET pendingTransact=(otp,transfer)\+
+ 	birthTime(otp):=now \mbox{ // current system time}\\
+ 	\ASM{Insert}(pendingTransact,PendingTransaction)\\ 
+ 	status(pendingTransact):=pending \\
+ 	\ASM{Send}(ConfirmationReq(pendingTransact),\TO debitor)
+ 	\dec\-
+ 	\WHERE \+
+ 	Small(amount) \IFF amount < 1000 \\
+ 	\ASM{CompleteTransaction}(transfer) =\+     
+ 	\ASM{Append}(transaction(transfer,ttResult,now),Ledger)\\
+ 	\ASM{Send}(Confirmed(transfer),\TO debitor)\\
+ 	\ASM{Send}(Confirmed(transfer),\TO creditor)\\
+ 	saleVolume(creditor):=saleVolume(creditor)+amount \-
+ 	ttResult=(group(creditor),CC,CC)
  \end{asm}
  
- \subsubsection{Debit completion components (accept/reject)}
+ \subsubsection{Debit completion components (accept/reject transaction)}
  
  
+ 
+\begin{asm}  
+	\ASM{DebitAckReqAnswCompletion} =\+           
+	\IF Received(AnswerMsg(pendingTransact),\FROM debitor)\+
+	\AND AnswerMsg(pendingTransact) \in \+
+	\{DebitAckMsg(pendingTransact),DebitRejectMsg(pendingTransact)\} \THEN \dec \-
+	\LET (otp, (debit,channel,from,to,amount))=pendingTransact \\
+	\LET debitor=owner(from), creditor=owner(to)\+
+	\IF Expired(otp) \THEN \+
+	\ASM{Send}(ErrMsg(ExpiredOtpFor(DebitAck,amount,creditor)),\TO debitor) \\
+	\ASM{Send}(ErrMsg(ExpiredOtpFor(DebitAck,amount,creditor)),\TO creditor)\-
+	\ELSE ~\IF   
+	Received(DebitRejectMsg(pendingTransact),\FROM debitor) \THEN \+
+	\ASM{Delete}(otp,OneTimePassword) \\
+	status(t):=rejected\\
+	\ASM{Send}(RejectMsg(debit,amount,debitor),\TO creditor)\-         
+	\ELSE ~\IF pendingTransact  \in PendingTransaction \AND
+	status(pendingTransact) =pending  \+
+	\THEN \+
+	\ASM{FinalDebitAccountLimitsCheck}\+
+	~~~~~~ (pendingTransact,\ASM{CompleteTransaction}(pendingTransact))\-
+	\ASM{Delete}(otp,OneTimePassword)\dec\dec\-  
+	\ASM{Consume}(DebitAckMsg(pendingTransact)) \dec\dec\-
+	\WHERE \+
+	Expired(otp) \IFF now-birthtime(otp) > lifetimeForOTPs\\
+	\ASM{CompleteTransaction}(pendingTransact)=\+
+	\ASM{CompleteTransaction}(debit,channel,from,to,amount)\\
+	status(pendingTransact) :=performed
+\end{asm}
+
  
  \begin{asm}  
- \ASM{DebitAckCompletion} =\+           
- \IF Received(DebitAckMsg(pendgTransact),\FROM debitor) \THEN \\
- \LET pendingTransact= (otp,debitor,channel,amount,creditor)\footnote{Using the $\LET$ clause here uses the assumption (which can be checked to be true for the model) that $DebitAckMsg$es are formed with the expected correct parameters.}\+
- \IF Expired(otp) \THEN \+
- \ASM{Send}(ErrMsg(ExpiredOtpFor(DebitAck,amount,creditor)),\TO debitor) \\
- \ASM{Send}(ErrMsg(ExpiredOtpFor(DebitAck,amount,creditor)),\TO creditor)\- 
- \ELSE ~\IF pendgTransact  \in PendingTransaction \AND
- status(pendgTransact) =pending\footnote{Otherwise just discard the message, nothing else happens to the $otp$ or the pending transaction. In D2.1 the possibility to send out an error message considered.}  \+
- \THEN \+
- \ASM{FinalDebitAccountLimitsCheck}\+
- ~~~~~~ (pendingTransact,\ASM{CompleteTransaction}(Debit,pendingTransact))\-
- \ASM{Delete}(otp,OneTimePassword)\dec\dec\-  
- \ASM{Consume}(DebitAckMsg(pendgTransact)) \dec\-
- \WHERE \+
- Expired(otp) \IFF now-birthtime(otp) > lifetimeForOTPs\\
- \ASM{CompleteTransaction}(Debit,pendingTransact)=\+
- \LET pendingTransact=(otp,debitor,channel,amount,creditor)\+
- \ASM{CompleteTransaction}(Debit, debitor,channel,amount,creditor)\\
- status(pendingTransact) :=performed
- \end{asm}
- 
- 
- \begin{asm}  
- \ASM{DebitRejectExec} =\+           
- \IF otp \in OneTimePassword \AND Expired(otp)  \THEN \+
- \LET pendingT=\iota t' (t'  \in PendingTransaction \AND 
- t'=(otp,debitor,channel,amount,creditor))\+
- \ASM{Delete}(otp,OneTimePassword) \\
- \IF status(pendingT)=pending \THEN \+
- status(pendingT):=rejected\\
- \ASM{Send}(RejectMsg(Debit,amount,creditor),\TO creditor)\\  
- \ASM{Send}(OtpExpired(Debit,amount,creditor),\TO debitor)  
+ 	\ASM{DebitLateAckReqAnswCompletion} =\+           
+ 	\IF otp \in OneTimePassword \AND Expired(otp)  \THEN  \+
+ 	\LET t=\iota t' (t'  \in PendingTransaction \AND 
+ 	t'=(otp,transfer)) \mbox{ // NB. $otp$ is unique}\\
+ 	\LET (debit,channel,from,to,amount)=transfer \+
+ 	\ASM{Delete}(otp,OneTimePassword) \\
+ 	\IF status(t)=pending \THEN \+
+ 	status(t):=rejected\\
+ 	\ASM{Send}(RejectMsg(Debit,amount,debitor),\TO creditor)\\  
+ 	\ASM{Send}(OtpExpired(Debit,amount,creditor),\TO debitor)  \dec \-
+ 	\WHERE debitor=owner(from), creditor=owner(to)
  \end{asm}
  
  \subsection{The B2C operations}
@@ -1146,10 +1263,9 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
  \end{asm}
   
   
-  
-  
-  
-  
+ \end{document}
+
+
 
 \section{Sub-Appendix 2: $\ASM{IfThenElseCascade}$ Pattern}
 \label{sect:appendix}
@@ -1157,10 +1273,10 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
 The pattern, used for $\ASM{CreditPreviewRew}$ and $\ASM{CreditPerformRew}$, is obtained by an iteration of the following machine $\ASM{IfThenElse}$:
 
 \begin{asm}
-\ASM{IfThenElse}(Cond,M,N)=\+ 
-\IF Cond \+
-\THEN M \\
-\ELSE N
+	\ASM{IfThenElse}(Cond,M,N)=\+ 
+	\IF Cond \+
+	\THEN M \\
+	\ELSE N
 \end{asm}
 
 This machine is applied to conditions $Cond_i$ and machines $\ASM{Yes}_i$ and $\ASM{No}_i$  where $\ASM{Yes}_i$ is again an $\ASM{IfThenElse}$:
@@ -1171,8 +1287,8 @@ the pattern machine $\ASM{IfThenElseCascade}(IFE)$ can be defined recursively as
 
 
 \begin{asm}
-\ASM{IfThenElseCascade}((IFE_i)_{1 \leq i \leq n+1})=\+
-\ASM{IfThenElse}(Cond_1,\ASM{IfThenElseCascade}(IFE_i)_{2 \leq i \leq n+1},\ASM{No}_1)     
+	\ASM{IfThenElseCascade}((IFE_i)_{1 \leq i \leq n+1})=\+
+	\ASM{IfThenElse}(Cond_1,\ASM{IfThenElseCascade}(IFE_i)_{2 \leq i \leq n+1},\ASM{No}_1)     
 \end{asm}
 
 
