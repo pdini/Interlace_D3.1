@@ -421,7 +421,7 @@ For INTERLACE, and of course for any other software project, it is important to 
 Such clients are called ``dynamic'' due to their limited lifespan and as explained in Section \ref{sec:impl-agents} are not intended to be started right at the beginning of the INTERLACE simulation but, rather, on an on-demand basis. Thus, their lifespan is meant to be restricted to the duration of their specific task.
 
 \textcolor{red}{I really do not understand what you mean in this paragraph. Are you saying that test ASIMs are ``devices'' that act like users? What is a user-device-action?}
-To perform tasks similar to a user-device-action, an additional layer has been introduced which was not part of the requirements definitions. This layer, explained in detail in Section \ref{sec:impl-login-layer} \textcolor{red}{missing/wrong reference}, adds a pseudo-login possibility and holds session-like information for each client created by the scheduler. Thus, in terms of network topology the name of an ASIM is defined as the address of a device and the (member-)name of a user can be looked up inside a session table.
+To perform tasks similar to a user-device-action, an additional layer has been introduced which was not part of the requirements definitions. This layer, explained in detail in Section \ref{subsec:impl-login-layer}, adds a pseudo-login possibility and holds session-like information for each client created by the scheduler. Thus, in terms of network topology the name of an ASIM is defined as the address of a device and the (member-)name of a user can be looked up inside a session table.
 
 \begin{figure}[htbp]
   \centering

@@ -379,16 +379,12 @@ A user-initiated Credit operation transfers an $amount$ of SRD via a specific $c
 \end{itemize}
 
 
-\subsection{ $\ASM{CreditPreviewReq}$ program}
+\subsection{$\ASM{CreditPreviewReq}$ program}
 \label{sect:creditpreview}
 
-The various constraints split again in a series of to-be-checked  more detailed 
-conditions. 
-To reflect the transactional nature of the $\ASM{CreditTransferReq}$ steps, we describe the execution of each of its two components as one atomic step. Nevertheless, to simplify the verification of the correctness and completeness of the rules, we formulate the entire
-check as successive If-Then-Else checks of all its single conditions. As a byproduct we obtain a detailed analysis of the possibilities for error handling procedures one may wish to implement. Thus we define  $\ASM{CreditPreviewReq}$ and $\ASM{CreditPerfomReq}$ using an instance of the $\ASM{IfThenElseCascade}$ pattern (see the Appendix in Sect.~\ref{sect:appendix}). 
+The various constraints split again in a series of to-be-checked  more detailed conditions. To reflect the transactional nature of the $\ASM{CreditTransferReq}$ steps, we describe the execution of each of its two components as one atomic step. Nevertheless, to simplify the verification of the correctness and completeness of the rules, we formulate the entire check as successive If-Then-Else checks of all its single conditions. As a byproduct we obtain a detailed analysis of the possibilities for error handling procedures one may wish to implement. Thus we define  $\ASM{CreditPreviewReq}$ and $\ASM{CreditPerfomReq}$ using an instance of the $\ASM{IfThenElseCascade}$ pattern (see the Appendix in Sect.~\ref{sect:appendix}). 
 
-Furthermore, since it is required that the credit type checks in $\ASM{CreditPreviewReq}$ are repeated for $\ASM{CreditPerformReq}$, we 
-make the nested credit type check pattern explicit as a machine $\ASM{CreditTypeCheck}$ which contains as parameter a final $\ASM{Completion}$ step. The $\ASM{Completion}$ component parameter can then be instantiated specifically for the two rules: for the preview step it comes up to inform the user that the $\ASM{CreditPerformReq}$ can be triggered, whereas for the perform step it specifies the required $\ASM{AccountLimitCheck}$. 
+Furthermore, since it is required that the credit type checks in $\ASM{CreditPreviewReq}$ are repeated for $\ASM{CreditPerformReq}$, we make the nested credit type check pattern explicit as a machine $\ASM{CreditTypeCheck}$ which contains as parameter a final $\ASM{Completion}$ step. The $\ASM{Completion}$ component parameter can then be instantiated specifically for the two rules: for the preview step it comes up to inform the user that the $\ASM{CreditPerformReq}$ can be triggered, whereas for the perform step it specifies the required $\ASM{AccountLimitCheck}$. 
 
 
 \begin{asm}
@@ -873,7 +869,7 @@ When a $retail$er has to pay the fee for a $\ASM{EurB2C}$ operation it performs 
 \end{asm}
 \section{User Operations}
 \label{sect:usrops}
-Users can $\ASM{Send}$ requests which appear as input for the INTERLACE network server. To\\ $\ASM{Send}(CreditPreviewReq(transfer))$ or to $\ASM{Send}(DebitPreviewReq(transfer))$ is conditioned only by a correct definition of the $transfer$ parameter, definition the user supplies by filling in the corresponding  fields on the screen. The same holds mutatis mutandis for $\ASM{Send}(AccountHistReq(histParams))$ and $\ASM{Send}(BalanceReq(acc))$. The functionality is clear so that we do not model further this editing process.
+Users can $\ASM{Send}$ requests which appear as input for the INTERLACE network server. Whether $\ASM{Send}(CreditPreviewReq(transfer))$ or $\ASM{Send}(DebitPreviewReq(transfer))$ is invoked is conditioned only by a correct definition of the $transfer$ parameter, which is a definition the user supplies by filling in the corresponding  fields on the screen. The same holds, \emph{mutatis mutandis}, for $\ASM{Send}(AccountHistReq(histParams))$ and $\ASM{Send}(BalanceReq(acc))$. The functionality is clear so that we do not model further this editing process.
 
 For Credit/Debit Perform requests the only relevant additional constraint is that they can be sent only after an ok-message for the corresponding Preview request has been received. We use a function $kind$ to extract from a $transfer$ parameter its $credit$ or $debit$ component, respectively.\footnote{In the following ASMs the keyword `sardex' stands for `INTERLACE network server'.}
 
@@ -897,7 +893,7 @@ In case of a Debit operation a debitor has to confirm a received debit request b
 \end{asm}
 
 
-\section{Sub-Appendix: Sardex Business Logic in a Nutshell}
+\section{Sub-Appendix 1: Sardex Business Logic in a Nutshell}
 \label{sect:appendixModel}
 
 We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed by the Sardex system with the following program $\ASM{SardexModel}$. Obviously these rules could be split and assigned to different agents, e.g. the last two ones to the $SysAdmin$ and the first two to an independent agent (who by those rules reacts to triggers by the users, but the rules themselves are not under user control).
@@ -1261,10 +1257,6 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
  \IF CloseToZero(balance(prepaid_{retail}))  \THEN \+
  \ASM{Send}(PrepaymentAlertMsg(lowPrepaidBalance),\TO retail)
  \end{asm}
-  
-  
- \end{document}
-
 
 
 \section{Sub-Appendix 2: $\ASM{IfThenElseCascade}$ Pattern}
