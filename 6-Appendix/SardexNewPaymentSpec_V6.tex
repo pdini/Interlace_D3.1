@@ -133,7 +133,7 @@ For ease of reference we say that a group member $MayAllowTransferForCreditOpns$
     group(mbr) \in \{ Company, Full, Mngr, Employee, Consumer\_Verified \}
     \end{asm} }
  \begin{asm}
- MayAllowTransferForCreditOpns(mbr) \iff 
+ MayAllowTransferForCreditOpns(mbr) \iff \\ \qquad\qquad\qquad\qquad\qquad\qquad\qquad
     mbr \in Company \cup Full \cup Mngr \cup Employee \cup Consumer\_Verified
     \end{asm}
 
@@ -146,17 +146,13 @@ A $Debit$ operation in $SRD$ currency can be started only by members of one of t
 	\item $Employee$,
 	\item $Consumer\_Verified$.  
 \end{itemize}
-
-For SRD Debit operations the following groups are allowed as target group, again called $toGroup$\footnote{See Figure \ref{fig:stack}.}):
+For SRD Debit operations the following groups are allowed as target groups (again called $toGroup$\footnote{See Figure \ref{fig:stack}.}):
 \begin{itemize}
-	\item every $Company \cup Full$ member can trigger an SRD Debit operation to (an account of and possibly receive the corresponding credit transfer from that account of) a member of $Company \cup Full \cup Mngr$, 
-	
-	\item  Every $Retail$ member can trigger an SRD Debit operation to the $mngr$
-	
-	\item every $Employee$  member can trigger an SRD Debit operation to a member of \newline $Retail \cup Company \cup Mngr$,
-	
-	\item every $Consumer\_Verified$ member can trigger an SRD Debit operation to a member of \newline $Retail \cup Full$,
-	\item the $mngr$  can trigger an SRD Debit operation to a member of $Company \cup Full$.
+	\item Every $Company \cup Full \cup Mngr$ can initiate an SRD Debit operation that draws on a member of $Company \cup Full$ (and the latter could initiate a corresponding credit transfer to the former, for the same effect).
+	\item The $mngr$ can initiate an SRD Debit operation that draws on any member of $Retail$.
+	\item Every member of $Retail \cup Company \cup Full$ can initiate an SRD Debit operation that draws on any $Employee$.
+	\item Every member of $Retail \cup Full$ can initiate an SRD Debit operation that draws on any member of $Consumer\_Verified$.
+	\item Every member of $Company \cup Full$ can initiate an SRD Debit operation that draws on $mngr$.
 \end{itemize}
 This requirement is expressed in the refined ASM model by the following function definition:
 
@@ -165,7 +161,7 @@ This requirement is expressed in the refined ASM model by the following function
 	= TT^{Debit,SRD}(Full)\\
 	=\{Company,Full, Mngr\} \-
 	TT^{Debit,SRD}(Retail)=Mngr \\
-	TT^{Debit,SRD}(Employee) =\{Retail,Company,Mngr\} \\
+	TT^{Debit,SRD}(Employee) =\{Retail,Company,Full\} \\
 	TT^{Debit,SRD}(Consumer\_Verified)=\{Retail,Full\}\\
 	TT^{Debit,SRD}(Mngr)=\{Company,Full\}
 \end{asm}	
@@ -178,7 +174,7 @@ MayAllowTransferForDebitOpns(mbr) \iff\+
  mbr \in Retail  \cup Company \cup Full \cup Employee \cup Consumer\_Verified \cup Mngr 
 \end{asm}
 
-{\bf Transfer Type Constraints for operations in Euro.} In the Sardex system, no $Credit$ operations are allowed in EUR currency, so that no function $TT^{Credit,EUR}$ is needed.\footnote{In D3.1 it is stated that the function does exist but that it is completely $\UNDEF$ined.} A EUR $Debit$ operation can be triggered only by a $Consumer$ or a $Consumer\_Verified$ member and must have as target group $Retail$ or $Full$. This requirement is expressed in the refined ASM model by the following definition:
+{\bf Transfer Type Constraints for operations in Euro.} In the Sardex system, no $Credit$ operations are allowed in EUR currency, so that no function $TT^{Credit,EUR}$ is needed.\footnote{Table \ref{tab:TTs} includes the function but shows that it is completely $\UNDEF$ined.} A EUR $Debit$ operation can be triggered only by a $Consumer$ or a $Consumer\_Verified$ member and must have as target group $Retail$ or $Full$. This requirement is expressed in the refined ASM model by the following definition:
 \begin{asm}
 T^{Debit,EUR}(Consumer)=T^{Debit,EUR}(Consumer\_Verified)\+
   = \{Retail,Full\}
@@ -212,20 +208,17 @@ Note that the transfer type check is independent of the $channel$ used for a tra
 	\item Domu:  the set of Sardex credit accounts for larger operations, in SRD
 \end{itemize}
 
-There are three types of EUR accounts, which are considered of statistical character:
+There are three types of EUR accounts, which are considered to be of statistical character:
 \begin{itemize}
-	\item  Income: the set of (statistical) accounts owned by $Retail$ or $Full$ users, which use such an account to collect B2C payments in Euro.
-	
-	\item Prepaid: the set of (statistical) accounts from which the Euro transaction fee for a B2C operation is drawn by $SysAdmin$ on behalf of the $mngr$.\footnote{Differently from $Income$ accounts, any $Prepaid$ account is updated not by the $retail$er, for which it keeps track of its fee prepayments, but by the $mngr$. See Fig.\ 2.8 (B2C Use Case 1/2) of D3.1 and Section \ref{sect:Prepaid} for details.} 
-	Prepaid is owned by $Retail$ or $Full$ members but controlled by $SysAdmin$.
-	
+	\item  Income: the set of (statistical) accounts owned by $Retail$ or $Full$ users, which use such an account to record their collection of B2C payments in Euro.
+	\item Prepaid: the set of (statistical) accounts from which the Euro transaction fee for a B2C operation is drawn by $SysAdmin$ on behalf of the $mngr$.\footnote{Differently from $Income$ accounts, any $Prepaid$ account is updated not by the $retail$er, for which it keeps track of its fee prepayments, but by the $mngr$. See Figure \ref{fig:B2C1} (B2C Use Case 1/2) and Section \ref{sect:Prepaid} for details.} Prepaid is owned by $Retail$ or $Full$ members but controlled by $SysAdmin$.	
 	\item Bisoo: the set of (statistical) accounts in Euro which are used by $consumer$s to pay into an Income account. Bisoo is owned by $Consumer$ or $Consumer$\_$Verified$ members but controlled by $SysAdmin$.
 \end{itemize}
 
 There are two special $mngr$ account types:
 \begin{itemize}
 	\item Mirror: type of account in circuit currency (SRD, VTX, etc.) used for inter-circuit purchases. There is one mirror account per circuit so that, formally, each Mirror account is implicitly parametrized by a circuit.	
-	\item Topup: a (statistical) account in Euro, which is $mngr$-owned and $SysAdmin$-controlled\footnote{Following D3.1, Fig.\ 2.8 (B2C Use Case 1/2).}  and used to recharge a $retail$er's Prepaid account upon receipt of a payment in Euro.
+	\item Topup: a (statistical) account in Euro, which is $mngr$-owned and $SysAdmin$-controlled\footnote{See Figure \ref{fig:B2C1} (B2C Use Case 1/2).}  and used to recharge a $retail$er's Prepaid account upon receipt of a (real) payment in Euro (through normal banking channels).
 \end{itemize}
 
 We treat each account type as the set of accounts of that type and say that $accountType(acc)$ is $X$ if $acc \in X$, where $X$ is one of the seven account types above.\footnote{In D2.1 the names $creditAccount$, $domuAccount$, $feeAccount$ were used instead of $CC$, $Domu$, $Prepaid$.} We also write $x$ for elements of $X$, where $X$ is one of the above 7 account types. For the singleton set $Topup=\{topup\}$ we use the same notational convention as explained above for $Mngr=\{mngr\}$. For the set of the above 7 account types we write:
@@ -235,17 +228,17 @@ Initially, accounts are assigned to users satisfying the following constraints o
 }
 
 \begin{asm}
-Account(company) =\{ cc(company), domu(company),prepaid(company)\}  \\
-Account(retail) = \{ cc(retail), prepaid(retail) , income(retail)\}\\
-Account(full) =
-\{cc(full),domu(full), prepaid(full), income(full)\}\\ 
+Account(company) = \{ cc(company), domu(company), prepaid(company) \} \\
+\textcolor{red}{Account(company) = \{ cc(company), domu(company)\} } \\
+Account(retail) = \{ cc(retail), prepaid(retail) , income(retail) \} \\
+Account(full) = \{cc(full),domu(full), prepaid(full), income(full) \} \\ 
 \\
- Account(mngr) =\{cc(mngr), topup \} \cup 
-    \{mirror(circuit) \mid circuit \in Circuit\}\\
+ Account(mngr) = \{cc(mngr), topup \} \cup 
+    \{mirror(circuit) \mid circuit \in Circuit\} \\
 \\
-Account(employee) = \{cc(employee)\}\\
+Account(employee) = \{cc(employee)\} \\
 Account(consumer) = Account(consumer\_verified)              
-              =\{cc(consumer)\}\footnote{Contrary to D3.1, Table 4, in this model no $Bisoo$ account is assigned since for simplicity we treat $consumer$ provided Euro payments directly as input, using a monitored $Received$ predicate. Then no $Bisoo$ account is needed. See Section \ref{sect:eurob2c}.}
+              = \{cc(consumer)\}\footnote{Contrary to Table \ref{tab:InitialAccountSets}, in this model no $Bisoo$ account is assigned since for simplicity we treat $consumer$-provided Euro payments directly as input, using a monitored $Received$ predicate. Then no $Bisoo$ account is needed. See Section \ref{sect:eurob2c}.}
 \end{asm}
 
 Remark. $Welcome$ members initially have no account yet (formally meaning  $Account(welcome)=\emptyset$). The initial accounts of a 
@@ -260,7 +253,7 @@ In addition, for each $acc$ount in $CC \cup Domu \cup Mirror$ there are the foll
 \begin{itemize}
 	\item $balance$ (a Real number, modelled as 2-digit decimal)
 	
-	\item $creditLimit$ (a non-negative number)\footnote{D3.1 describes also a $creditLimitDate$ location, indicating the date at which the credit limit was set. We skip such locations because no operation has been specified which uses them, so that there is no rule in the model which involves them.}
+	\item $creditLimit$ (a non-negative number)\footnote{Table \ref{tab:AccountMetaData1} includes also a $creditLimitDate$ location, indicating the date at which the credit limit was set. We skip such locations because no operation has been specified which uses them, so that there is no rule in the model which involves them.}
 	
 	\item $availableBalance$, a derived location required to be non-negative and defined by:
 	\[availableBalance=balance+creditLimit.\]
@@ -268,16 +261,18 @@ In addition, for each $acc$ount in $CC \cup Domu \cup Mirror$ there are the foll
 
 In addition, $CC$ and $Mirror$ (but not $Domu$) accounts have the following  location:
 \begin{itemize}
-\item $upperLimit$ denoting the upper balance limit, a positive number
+\item $upperLimit$ denoting the upper balance limit, a positive number.
 \end{itemize}
-In connection with $balance$ and $saleVolume$ there are three predicates which trigger an alert when the monitored item reaches its (low or high) bound:
+In connection with $balance$ and $saleVolume$, there are three predicates which trigger an alert when the monitored item reaches its (low or high) bound:
+
+\textcolor{red}{Question pending on the type of these predicates (Boolean? Integer? ... )}
 \begin{asm}
 lowBalanceAlert \IFF creditLimit+balance<lowBalanceAlert \+
    \mbox{ // small amount of money left in the account to buy something with}\-
 highBalanceAlert \IFF upperLimit - balance<highBalanceAlert \+
         \mbox{ // small amount of space (measured in money unit) left for further sales}\-
 highVolumeAlert \IFF capacity-saleVolume<highVolumeAlert \+
-           \mbox{ // almost reached yearly commited sale volume}
+           \mbox{ // almost reached yearly committed sale volume}
 \end{asm}
 
 $Income$ and $Prepaid$ accounts have, besides  $owner(acc)$ and $curr(acc)$, also the $balance$ location. Note that a $Prepaid$ account has no $creditLimit$; otherwise stated, its credit limit is always 0.
@@ -289,7 +284,7 @@ we describe the intended effect of the new B2C operations in Section \ref{sect:e
 
 The requirements on the types of the accounts that may be involved in an operation state which account types are allowed as $toAcc$ for an operation of a given $fromAcc$. They can be formalized using an account type check $AccT$ analogous to the transfer type check function $TT$ above.
 
-The essential requirement for user-initiated Credit or Debit operations is two-fold (see Fig.2.12 of D3.1):
+The essential requirement for user-initiated Credit or Debit operations is two-fold (see Figure \ref{fig:User_Acct_Connectivity}):
 
 \begin{itemize}
 	\item A $Credit$ operation in SRD that starts at a $fromAcc$ in $CC \cup Domu \cup Mirror$ has as allowed $toAcc$ a $CC$ account; in the case of $fromAcc \in CC$, also a $Domu$ or $Mirror$ account is permitted as $toAcc$.
@@ -301,38 +296,34 @@ One can formalize the above requirements by defining the function
 AccT\colon Operation \times Currency \times AccountType \rightarrow \{Acct \mid Acct \subseteq AccountType\}
 \end{asm} 
 
-\noindent again by a case distinction $
-AccT(op,cur,accountType)=AccT^{op,cur}(accountType)$ where: 
+\noindent again by a case distinction $AccT(op,cur,accountType)=AccT^{op,cur}(accountType)$, where: 
 
 \begin{asm}
 AccT^{Credit,SRD}(CC) =\{ CC , Domu ,Mirror \}   \\
 AccT^{Credit,SRD}(Domu) =AccT^{Credit,SRD}(Mirror)=\{CC\} \\
-AccT^{Debit,SRD}(CC) =\{CC\} 
+AccT^{Debit,SRD}(CC) =\{CC\}.
 \end{asm}
 
  As above, for ease of reference we say that an account $MayStartCredit/DebitOpns$ if it is an element of an account type where $AccT^{Credit/Debit,SRD}$ has a defined value: 
 \begin{asm}
-MayStartCreditOpns(acct) \IFF acct\in CC \cup Domu \cup Mirror\footnote{For the reason explained in the nest remark we exlude $Income$ accounts from this definition.} \\
-MayStartDebitOpns(acct) \IFF acct\in CC\footnote{Remember that we model here only Debit operations in SRD, not in EUR.}
+MayStartCreditOpns(acct) \IFF acct\in CC \cup Domu \cup Mirror\footnote{For the reason explained in the next remark we exlude $Income$ accounts from this definition.} \\
+MayStartDebitOpns(acct) \IFF acct\in CC.\footnote{Remember that we model here only Debit operations in SRD, not in EUR.}
 \end{asm}
 
 
 {\bf Remark on Bisoo.}
-In D3.1 also $Debit$ operations in EUR from an $Income$ to a $Bisoo$ account are allowed. 
-Formally it means that in the definition above one includes the clause
-
-\[AccT^{Debit,EUR}(Income) =\{Bisoo\}.\] 
-
+In Section \ref{subsec:perm-acc-con} also $Debit$ operations in EUR from an $Income$ to a $Bisoo$ account are allowed. Formally this means that in the definition above one includes the clause
+\[AccT^{Debit,EUR}(Income) =\{Bisoo\}.\]
 Since in rule $\ASM{EurB2C}$ below (Section \ref{sect:eurob2c}) we provide a direct formalization of the B2C operation, we can do without the $Bisoo$ account and without any $Debit$ operation in EUR from an $Income$ to a $Bisoo$ account.
 
-{\bf Remark on system-initiated Credit/Debit operations.} In D3.1 Fig. 2.13 the $AccT$ function is defined also for system-initiated operations. $AccT$ with first argument $Credit$ is defined by:
-\[AccT^{Credit,SRD}(CC)=\{CC\} \AND AccT^{Credit,EUR}(Topup)=\{Prepaid\} \]
+{\bf Remark on system-initiated Credit/Debit operations.} In Figure \ref{fig:SysAdmin_Acct_Connectivity} the $AccT$ function is defined also for system-initiated operations. $AccT$ with first argument $Credit$ is defined by:
+\[AccT^{Credit,SRD}(CC)=\{CC\}  \qquad  \AND  \qquad  AccT^{Credit,EUR}(Topup)=\{Prepaid\} \]
 
 $AccT$ with first argument $Debit$ is defined by:
 \[AccT^{Debit,EUR}(Topup)=\{Prepaid\}\]
+\[ \textcolor{red}{AccT^{Debit,EUR}(Prepaid)=\{Topup\}} \]
 
 {\bf Remark on the refinement.} With the above definitions one can redefine the account connectivity constraint part of the $Match$ predicate of D2.1, namely $sourceType(tt)=accountType(from)$ and $destType(tt)=accountType(to)$, as follows:
-
 \begin{asm}
 \LET transfer = (op,channel,from, to,amount,metaData) \+
 AccTMatch(transfer) \IFF ~~   accountType(to) \in AccT(op,cur(from),accountType(from))

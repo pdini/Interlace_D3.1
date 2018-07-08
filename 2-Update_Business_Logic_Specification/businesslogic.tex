@@ -629,9 +629,10 @@ Figure \ref{fig:SysAdmin_Acct_Connectivity} shows a similar connectivity functio
 \subsection{Group Transactability Functions}
 \textbf{\small Note: this section has no bearing on the implementation, it is included to help interpret Figure \ref{fig:stack}.}
 
-Figures \ref{fig:GTF1}-\ref{fig:GTF4} show a visualization of the interactions relevant to ``2-Group'' layer of Figure \ref{fig:stack}, filtered by the Account Connectivity constraints. In other words, the effect of the Transfer Types test together with the Account Connectivity test results in what we call the Group Transactability Function (GTF). Since there are 4 combinations of currency and channel, there are 4 different GTFs. There is no need to use them as an additional test, since they do not add anything new to Tests 1 and 2 of Figure \ref{fig:transactabilitywkflow}. However, it is still useful to include them here as another visualization of these first two tests of the Permissioning workflow.
+Figures \ref{fig:GTF1}-\ref{fig:GTF4} show a visualization of the interactions relevant to ``2-Group'' layer of Figure \ref{fig:stack}, filtered by the Account Connectivity constraints. In other words, the effect of the Transfer Types test together with the Account Connectivity test results in what we call the Group Transactability Function (GTF). Since there are 4 combinations of currency and channel, there are 4 different GTFs. There is no need to use them as an additional test, since they do not add anything new to Tests 1 and 2 of Figure \ref{fig:transactabilitywkflow}. However, it is still useful to include them here as another visualization of these first two tests of the Permissioning workflow. For the mathematically-minded reader, it may be interesting to note that the Debit adjacency matrices for the GTFs are the Transpose of the Debit adjacency matrices for the UTFs. Another potentially useful visualization of the UTF and GTF matrices would be as 16 directed graphs over the 9 nodes representing the groups.
 
 \begin{figure}[H]
+\vspace{-0.5cm}
 \centering
 \includegraphics[width=16cm]{Figures/GTF1}
 \caption{\small\textbf{Group Transactability Function 1}}
@@ -639,22 +640,20 @@ Figures \ref{fig:GTF1}-\ref{fig:GTF4} show a visualization of the interactions r
 \end{figure}
 
 \begin{figure}[H]
-\vspace{-0.3cm}
+\vspace{-1cm}
 \centering
 \includegraphics[width=16cm]{Figures/GTF2}
 \caption{\small\textbf{Group Transactability Function 2}}
 \label{fig:GTF2}
 \end{figure}
-\vspace{-1cm}
-%\newpage
 
 \begin{figure}[H]
-%\vspace{-0.5cm}
+\vspace{-0.5cm}
 \centering
 \includegraphics[width=16cm]{Figures/GTF3}
 \caption{\small\textbf{Group Transactability Function 3}}
 \label{fig:GTF3}
-\vspace{-1cm}
+%\vspace{-1cm}
 \end{figure}
 
 \begin{figure}[H]
