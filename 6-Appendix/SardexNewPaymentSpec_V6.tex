@@ -228,8 +228,7 @@ Initially, accounts are assigned to users satisfying the following constraints o
 }
 
 \begin{asm}
-Account(company) = \{ cc(company), domu(company), prepaid(company) \} \\
-\textcolor{red}{Account(company) = \{ cc(company), domu(company)\} } \\
+Account(company) = \{ cc(company), domu(company), prepaid(company) \}\footnote{Please see note after Table \ref{tab:InitialAccountSets} for the accounts of $company$.} \\
 Account(retail) = \{ cc(retail), prepaid(retail) , income(retail) \} \\
 Account(full) = \{cc(full),domu(full), prepaid(full), income(full) \} \\ 
 \\
@@ -310,18 +309,27 @@ MayStartCreditOpns(acct) \IFF acct\in CC \cup Domu \cup Mirror\footnote{For the 
 MayStartDebitOpns(acct) \IFF acct\in CC.\footnote{Remember that we model here only Debit operations in SRD, not in EUR.}
 \end{asm}
 
+\textcolor{red}{@Egon: I think you may need to rework the following paragraph, since Figure 2.13b has now changed (Bisoo --> Income is now a SysAdmin Credit operation)}
 
 {\bf Remark on Bisoo.}
 In Section \ref{subsec:perm-acc-con} also $Debit$ operations in EUR from an $Income$ to a $Bisoo$ account are allowed. Formally this means that in the definition above one includes the clause
 \[AccT^{Debit,EUR}(Income) =\{Bisoo\}.\]
 Since in rule $\ASM{EurB2C}$ below (Section \ref{sect:eurob2c}) we provide a direct formalization of the B2C operation, we can do without the $Bisoo$ account and without any $Debit$ operation in EUR from an $Income$ to a $Bisoo$ account.
 
-{\bf Remark on system-initiated Credit/Debit operations.} In Figure \ref{fig:SysAdmin_Acct_Connectivity} the $AccT$ function is defined also for system-initiated operations. $AccT$ with first argument $Credit$ is defined by:
-\[AccT^{Credit,SRD}(CC)=\{CC\}  \qquad  \AND  \qquad  AccT^{Credit,EUR}(Topup)=\{Prepaid\} \]
 
+
+{\bf Remark on system-initiated Credit/Debit operations.} In Figure \ref{fig:SysAdmin_Acct_Connectivity} the $AccT$ function is defined also for system-initiated operations. $AccT$ with first argument $Credit$ is defined by:
+\textcolor{red}{@Egon: the Bisoo --> Income operation is now here:}
+%Old:
+%\[AccT^{Credit,SRD}(CC)=\{CC\}  \qquad  \AND  \qquad  AccT^{Credit,EUR}(Topup)=\{Prepaid\} \]
+%New:
+\begin{align*}
+	AccT^{Credit,SRD}(CC) &= \{CC\}  \\ 
+	AccT^{Credit,EUR}(Topup) &= \{Prepaid\} \\
+	AccT^{Credit,EUR}(Bisoo) &= \{Income\}
+\end{align*}
 $AccT$ with first argument $Debit$ is defined by:
-\[AccT^{Debit,EUR}(Topup)=\{Prepaid\}\]
-\[ \textcolor{red}{AccT^{Debit,EUR}(Prepaid)=\{Topup\}} \]
+\[ AccT^{Debit,EUR}(Prepaid)=\{Topup\} \]
 
 {\bf Remark on the refinement.} With the above definitions one can redefine the account connectivity constraint part of the $Match$ predicate of D2.1, namely $sourceType(tt)=accountType(from)$ and $destType(tt)=accountType(to)$, as follows:
 \begin{asm}
@@ -354,16 +362,16 @@ A user-initiated Credit operation transfers an $amount$ of SRD via a specific $c
 \begin{itemize}
 	\item if the account owners belong to groups of permitted types, as specified by the transfer type check function $TT^{Credit,SRD}$, 
 	\item if the involved accounts $from,to$ are of permitted types, as specified by  the account connectivity check function $AccT^{Credit,SRD}$, 
-	\item if the $amount$ satisfies the constraints on the various limits, as specified by the $AccountLimitCheck$.
+	\item if the $amount$ satisfies the constraints on the various applicable limits, as specified by the $AccountLimitCheck$.
 \end{itemize}
 
 
 \subsection{$\ASM{CreditPreviewReq}$ program}
 \label{sect:creditpreview}
 
-The various constraints split again in a series of to-be-checked  more detailed conditions. To reflect the transactional nature of the $\ASM{CreditTransferReq}$ steps, we describe the execution of each of its two components as one atomic step. Nevertheless, to simplify the verification of the correctness and completeness of the rules, we formulate the entire check as successive If-Then-Else checks of all its single conditions. As a byproduct we obtain a detailed analysis of the possibilities for error handling procedures one may wish to implement. Thus we define  $\ASM{CreditPreviewReq}$ and $\ASM{CreditPerfomReq}$ using an instance of the $\ASM{IfThenElseCascade}$ pattern (see the Appendix in Section \ref{sect:appendix}). 
+The various constraints split again in a series of to-be-checked  more detailed conditions. To reflect the transactional nature of the $\ASM{CreditTransferReq}$ steps, we describe the execution of each of its two components as one atomic step. Nevertheless, to simplify the verification of the correctness and completeness of the rules, we formulate the entire check as successive If-Then-Else checks of all its single conditions. As a byproduct we obtain a detailed analysis of the possibilities for error handling procedures one may wish to implement. Thus we define  $\ASM{CreditPreviewReq}$ and $\ASM{CreditPerfomReq}$ using an instance of the $\ASM{IfThenElseCascade}$ pattern (see Sub-Appendix \ref{sect:appendix}). 
 
-Furthermore, since it is required that the credit type checks in $\ASM{CreditPreviewReq}$ are repeated for $\ASM{CreditPerformReq}$, we make the nested credit type check pattern explicit as a machine $\ASM{CreditTypeCheck}$ which contains as parameter a final $\ASM{Completion}$ step. The $\ASM{Completion}$ component parameter can then be instantiated specifically for the two rules: for the preview step it comes up to inform the user that the $\ASM{CreditPerformReq}$ can be triggered, whereas for the perform step it specifies the required $\ASM{AccountLimitCheck}$. 
+Furthermore, since it is required that the credit type checks in $\ASM{CreditPreviewReq}$ be repeated for $\ASM{CreditPerformReq}$, we make the nested credit type check pattern explicit as a machine $\ASM{CreditTypeCheck}$ which contains as parameter a final $\ASM{Completion}$ step. The $\ASM{Completion}$ component parameter can then be instantiated specifically for the two rules: for the preview step it comes up to inform the user that the $\ASM{CreditPerformReq}$ can be triggered, whereas for the perform step it specifies the required $\ASM{AccountLimitCheck}$. 
 
 
 \begin{asm}
@@ -404,7 +412,7 @@ Now we can define $\ASM{CreditPreviewReq}$ as a $\ASM{CreditTypeCheck}$ instance
 \label{sect:creditperform}
 
 
-Similarly, the $\ASM{CreditPerformReq}$ rule uses an instance of  $\ASM{CreditTypeCheck}$ where the parameter $\ASM{Completion}$  is instantiated to a rule
+Similarly, the $\ASM{CreditPerformReq}$ rule uses an instance of  $\ASM{CreditTypeCheck}$, where the parameter $\ASM{Completion}$  is instantiated to a rule
 $\ASM{CreditAccountLimitsCheck}$. In other words, to execute $\ASM{CreditPerformReq}$, first the $\ASM{CreditTypeCheck}$ is executed once more, but if it succeeds, to complete the operation, instead of $\ASM{Send} (YouMayTriggerPerformReq(transfer),\TO owner(from))$, a rule $\ASM{CreditAccountLimitsCheck}$ is called to $\ASM{TryToCompleteCreditOpn}$. That rule specifies the check of the various constraints on the $amount$ of the Credit operation, i.e.\ it refines the $balancecheck$ function of D2.1. Like $\ASM{CreditTypeCheck}$, it is an $\ASM{IfThenElseCascade}$ pattern instance and also comes with a $\ASM{Completion}$ parameter. For $\ASM{CreditPerformReq}$ this parameter is instantiated by a $\ASM{CompleteTransaction}$ component.
 
 \begin{asm}
@@ -424,7 +432,7 @@ $\ASM{CreditAccountLimitsCheck}$ checks the following data for the given $amount
 	
 	\item the $upperLimit$ of the target account $to$ (as already formulated in D2.1), where by the account connectivity check $to$ is known to be a member of $CC \cup  Mirror \cup Domu$, but by the account metadata definition cannot be an element of $Domu$ (accounts without $upperLimit$ location), 
 	 
-	 \item the $availableCapacity$ of the target account, where by the account metadata definition the target account (which by the account connectivity check is known to be an element of $CC \cup  Mirror \cup Domu$) must not be a $Domu$ account (because those accounts have no $availableCapacity$ location).
+	 \item the $availableCapacity$ of the target account, where by the account metadata definition the target account (which by the account connectivity check is known to be an element of $CC \cup Mirror \cup Domu$) must not be a $Domu$ account (because $Domu$ accounts have no $availableCapacity$ location).
  \end{itemize} 
 
 {\bf Remark on $creditPercent$.} The main use of the $creditPercent$ location is for statistical purposes, namely to compare the average EUR volume moved by the SRD volume in a given year. However, this feature is not currently implemented and will not be implemented in the CoreASIM model either.
@@ -449,7 +457,7 @@ transfer=(credit,channel,from,to,amount)\\
 CanBeSpentBy(from,amount) \IFF availableBalance(from) \geq amount \\
 CanBeCashedBy(to,amount) \IFF  
     to \not \in Domu \AND balance(to)+amount \leq upperLimit(to) \\
- HasSellCapacityFor(amount,to) \IFF  to \not \in Domu \AND   amount \leq availableCapacity(to)\footnote{Here we treat $availableCapacity$ as belonging to AccountMetaData, as stated in D3.1.}
+ HasSellCapacityFor(amount,to) \IFF  to \not \in Domu \AND   amount \leq availableCapacity(to)\footnote{Here we treat $availableCapacity$ as belonging to AccountMetaData, as shown in Table \ref{tab:AccountMetaData1}.}
 \end{asm}
 
 
@@ -460,16 +468,12 @@ The $\ASM{CompleteTransaction}$ component still remains rather abstract, as in D
 \LET (credit,channel,from,to,amount)=transfer \\ 
    \ASM{Append}(transaction(transfer,ttResult,now),Ledger)\\
    \ASM{Send}(Confirmed(transfer),\TO owner(from))\\
-   saleVolume(to):=saleVolume(to)+amount\footnote{We treat the dynamic function $saleVolume$ as belonging to AccountMetaData, apparently in accordance with D3.1.} \-
+   saleVolume(to):=saleVolume(to)+amount\footnote{We treat the dynamic function $saleVolume$ as belonging to AccountMetaData, in accordance with Table \ref{tab:AccountMetaData1}.} \-
 \WHERE \+
  ttResult= (group(owner(to)),accountType(from),accountType(to) )
 \end{asm}
 
-
-
-{\bf Historical remark.} At the time of writing the model in D2.1, the understanding was that the (at the time otherwise not further specified) $custFlds$ parameter, which now would be renamed to $metadata$, plays a role for the $\ASM{CreditPreviewReq}$ rule. We now know that for the behavior of this rule only the group and account type properties are relevant so that the parameter can be skipped. Similarly for $\ASM{CreditPerformReq}$.
-
-
+{\bf Historical remark.} At the time of writing the description of the model in D2.1, the understanding was that the (at the time otherwise not further specified) $custFlds$ parameter, which now would be renamed $metadata$, plays a role for the $\ASM{CreditPreviewReq}$ rule. We now know that for the behaviour of this rule only the group and account type properties are relevant so that the parameter can be skipped. Similarly for $\ASM{CreditPerformReq}$.
 
 
 \section{Debit Operation} 

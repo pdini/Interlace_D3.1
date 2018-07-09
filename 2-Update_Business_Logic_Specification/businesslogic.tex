@@ -7,7 +7,7 @@ Paolo Dini, Luca Carboni, Giuseppe Littera, Egon B\"orger and Chrystopher Nehani
 \end{center}
 
 \section{Context and Overview}
-The business logic specification provided in Deliverable D2.1 \cite{INTERLACE_D21} concerns user-initiated transactions. Although this is a subset of all possible operations (initiated by the users or by the System, which we refer to as $SysAdmin$) that a mutual credit system platform must support, it is a viable starting point for testing an initial executable CoreASIM model. D2.1 did not provide all the details of the transaction request operations, it left their specification at a fairly abstract level. This chapter provides the next step in the iterative refinement of the specification in the form of a detailed description of the Permissioning workflow, whose implementation as part of the CoreASIM model is then described in Chapter \ref{ch:CoreAsimImplementation}. The description of the Permissioning iterative refinement relies on graphical and tabular depictions of the variables and functions involved. As this reflects the process that was used to build a shared understanding within the INTERLACE team itself, it is hoped that it will also make it easier for newcomers to the INTERLACE open source community to understand the implementation and the logic behind it. Finally, the refined requirements presented in this chapter are also formalized completely in the Appendix to this report, which could be seen as an iteration on Chapter 3 of D2.1.
+The business logic specification provided in Deliverable D2.1 \cite{INTERLACE_D21} concerns user-initiated transactions. Although this is a subset of all possible operations (initiated by the users or by the System, which we refer to as $SysAdmin$) that a mutual credit system platform must support, it is a viable starting point for Ftesting an initial executable CoreASIM model. D2.1 did not provide all the details of the transaction request operations, it left their specification at a fairly abstract level. This chapter provides the next step in the iterative refinement of the specification in the form of a detailed description of the Permissioning workflow, whose implementation as part of the CoreASIM model is then described in Chapter \ref{ch:CoreAsimImplementation}. The description of the Permissioning iterative refinement relies on graphical and tabular depictions of the variables and functions involved. As this reflects the process that was used to build a shared understanding within the INTERLACE team itself, it is hoped that it will also make it easier for newcomers to the INTERLACE open source community to understand the implementation and the logic behind it. Finally, the refined requirements presented in this chapter are also formalized completely in the Appendix to this report, which could be seen as an iteration on Chapter 3 of D2.1.
 
 At the highest level the INTERLACE transactional platform is a dynamic information system that interacts with a database at the backend and with live users at the front-end. As already discussed in D2.1, the transaction engine relies on many categories of concepts that, together, constitute the domain model of the system. According to the Abstract State Machine (ASM) methodology \cite{BoergerStaerk2003,BoergerRaschke2018}, these have been subdivided into Abstract State Interaction Machines (ASIMs) 
 \cite{BIOMICSD42,BIOMICSD52} comprised of rules, programs, and various kinds of functions. Whereas concepts such as `user' or `transaction amount' are immediately clear, many more concepts and data structures are needed to specify and model the system. Before we get into the details, it helps to introduce three high-level perspectives through which the transaction engine can be characterized as an abstract machine and as a social construct: privacy (private-public dichotomy), dynamics (frequency domain), and transaction workflow already mentioned (time domain).
@@ -310,7 +310,7 @@ $MNGR$ 		& $\{ CC, Topup^*, MIRROR \}$ \\
 \vspace{-1cm}
 \end{table}
 
-The Prepaid account shown for $Company$ does not relate to B2C operations but to inter-circuit trade, which also involves a euroFee. A user cannot start as $On$\_$Hold$, it will start as one of the other groups. For legal reasons an account cannot be taken away once it has been assigned to a user. Therefore, since any user can be suspended and become $On$\_$Hold$, this group could have different combinations of accounts (with the exception of the MNGR account).
+\textbf{Note: The Prepaid account shown for $Company$ does not relate to B2C operations but to inter-circuit trade, which also involves a euroFee.} A user cannot start as $On$\_$Hold$, it will start as one of the other groups. For legal reasons an account cannot be taken away once it has been assigned to a user. Therefore, since any user can be suspended and become $On$\_$Hold$, this group could have different combinations of accounts (with the exception of the MNGR account).
 
 \section{Transactability Workflow}
 \subsection{Identity MetaData}
@@ -581,12 +581,12 @@ Figure \ref{fig:User_Acct_Connectivity} shows the account connectivity function 
 \vspace{-0.5cm}
 \centering
 \includegraphics[width=15cm]{Figures/SysAdmin_Acct_Connectivity}
-\caption{\small\textbf{Account connectivity for system-initiated transactions: Not a test, hard-wired. }}
+\caption{\small\textbf{Account connectivity for system-initiated and child transactions: Not a test, hard-wired. }}
 \label{fig:SysAdmin_Acct_Connectivity}
 \vspace{-1cm}
 \end{figure}
 
-Figure \ref{fig:SysAdmin_Acct_Connectivity} shows a similar connectivity function for accounts that are controlled by $SysAdmin$. In this case, however, this function does not imply a transactability test since the permissions are hard-wired and SysAdmin does not need to test for transactability.
+Figure \ref{fig:SysAdmin_Acct_Connectivity} shows a similar connectivity function for accounts that are controlled by $SysAdmin$. In this case, however, this function does not imply a transactability test since the permissions are hard-wired and $SysAdmin$ does not need to test for transactability.
 
 \subsection{User Transactability Functions}
 \textbf{\small Note: this section has no bearing on the implementation, it is included to help interpret Figure \ref{fig:stack}.}\\ Figures \ref{fig:UTF1}-\ref{fig:UTF4} show a visualization of the interactions relevant to the ``1-User'' layer of Figure \ref{fig:stack}, filtered by the Account Connectivity constraints.
