@@ -29,7 +29,7 @@ There are small differences between the available ASIM agents. They can be categ
 	\item dynamic agents
 	\item non-functional agents
 \end{itemize}
-\textit{Full agents} are started right away \st{from the beginning} \textcolor{red}{when the ICEF is launched}. They process requests or handle other duties over the environment's lifetime. \textit{Dynamic agents} are created during a specific phase of a test and destroyed after that test has been completed. \textit{Non-functional agents} are never started directly and are \st{facilitated for} \textcolor{red}{structured to facilitate their} integration into another agent. They host initialization code or helper functions in order to compensate for the missing modularization feature of the ASIM-BSL language.
+\textit{Full agents} are started right away when the ICEF simulation is launched. They process requests or handle other duties over the environment's lifetime. \textit{Dynamic agents} are created during a specific phase of a test and destroyed after that test has been completed. \textit{Non-functional agents} are never started directly and are structured to facilitate their integration into another agent. They host initialization code or helper functions in order to compensate for the missing modularization feature of the ASIM-BSL language.
 
 To get more familiar with the actual ASIM realization an extract of available agents is listed in Table \ref{tab:model-agents}. They may act as a template for extending the scenarios for additional use cases or tests. They cover the core payment functionality, thus credit as well as debit operations.
 
@@ -117,7 +117,7 @@ As mentioned at the beginning of this chapter, two main agents, scheduler and se
 	controlled nextTest: TEST_STATE -> TEST_STATE
 \end{lstlisting}
 
-The universe \textit{TEST\_STATE} defines the available test list. \textit{currentTest} is \st{set from} \textcolor{red}{an element of} the universe \textit{TEST\_STATE} and defines the currently executed test. Finally, \textit{nextTest} is a function which takes as parameter the current test as type \textit{TEST\_STATE} and gives you as result the next test in the queue which is of the same type. To initialize the predefined locations the following commands are executed:
+The universe \textit{TEST\_STATE} defines the available test list. \textit{currentTest} is an element of the universe \textit{TEST\_STATE} and defines the currently executed test. Finally, \textit{nextTest} is a function which takes as parameter the current test as type \textit{TEST\_STATE} and gives you as result the next test in the queue which is of the same type. To initialize the predefined locations the following commands are executed:
 \begin{lstlisting}[language=bsl]
 	currentTest := START
 	nextTest(START) := TEST_CREDIT
@@ -129,7 +129,7 @@ During the execution of the scheduler's main program it is possible to transitio
 \end{lstlisting}
 applying the current test to the nextTest function. This can be done until the return value of the function is \textit{undef}, implying that no other test is left.
 
-For \st{the} \textcolor{red}{each} \textit{current test}, a functional location is \st{applied} \textcolor{red}{used} which returns a list of client agents for a given test state. The functional location can be defined as follows:
+For each \textit{current test}, a functional location is used which returns a list of client agents for a given test state. The functional location can be defined as follows:
 \begin{lstlisting}[language=bsl]
 	controlled nextClient: TEST_STATE -> LIST
 \end{lstlisting}
@@ -139,7 +139,7 @@ That \textit{nextClient} function needs to be set up during the initialization p
 	nextClient(TEST_CREDIT) := [ CreditRequestClient ]
 	nextClient(TEST_DEBIT)  := [ DebitAcknowledgeClient, DebitRequestClient ],
 \end{lstlisting}
-showing that we have one client for a credit request test and two clients for a debit request. Also important to remember is that rules for a client agent are initially defined in a separate file but, as noted already, they are included in the scheduler later by just appending the code. Thus, each tested client is absolutely required to have unique names for the \textit{initialization}, the \textit{program} and the \textit{policy} \st{rule} \textcolor{red}{rules} \textbf{over all} included files!
+showing that we have one client for a credit request test and two clients for a debit request. Also important to remember is that rules for a client agent are initially defined in a separate file but, as noted already, they are included in the scheduler later by just appending the code. Thus, each tested client is absolutely required to have unique names for the \textit{initialization}, the \textit{program} and the \textit{policy} rules \textbf{over all} included files!
 
 \textbf{Next}, the missing parts are added up to get the full picture on how the clients are started. In particular, how the base rules for a dynamic client are defined and how they are eventually instantiated and handled during runtime. Listing \ref{lst:impl-sched-core} illustrates the management of the different clients.
 
@@ -182,9 +182,13 @@ showing that we have one client for a credit request test and two clients for a 
 \end{center}
 
 In this listing we can identify three parts:
+
 \begin{enumerate}
-\item The definition of three functions that take a $CLIENT$ as parameter and return a $FUNCTION$ can be observed, namely $initBy$, $withProg$, and $andPol$. This $FUNCTION$ return type can be any rule we have defined inside of the scheduler or inside of the dynamic clients which are included to \textcolor{red}{(in? by? "to" does not sound right here)} the scheduler.
-\item For client $CreditRquestClient$ these three function values are set. So for example it is possible to apply \textcolor{red}{(what do you mean by "apply"?)} $initBy(CreditRequestClient) := InitCreditRequestClient$ and afterwards to call function $InitCreditRequestClient$ by using  $initBy(CreditRequestClient)()$.
+\item The definition of three functions that take a $CLIENT$ as parameter and return a $FUNCTION$ can be observed, namely $initBy$, $withProg$, and $andPol$. This $FUNCTION$ return type can be any rule we have defined inside of the scheduler or inside of the dynamic clients which are included into the scheduler.
+\item For client $CreditRquestClient$ these three function values need to be set. So for example it is possible to define an $init$ rule called $InitCreditRequestClient$ for $CreditRequestClient$ like this: \\
+\hspace*{1cm}$initBy(CreditRequestClient) := InitCreditRequestClient$\\
+and afterwards to call function $InitCreditRequestClient$ by using:\\
+\hspace*{1cm}$initBy(CreditRequestClient)()$.
 \item During the iterative execution of the $Program$ rule the actual starting of the client is processed. If a valid test has been selected, $nextClient(currentTest)$ provides a list of clients valid during that particular test. The $forall$ loop walks through that list and uses the corresponding iteration to instantiate the chosen client. This instantiation is done by calling the $createASIM$ command and passing the start-up rule ($initializedBy$), the main program rule ($withProgram$), and the scheduling policy ($andPolicy$).
 \end{enumerate}
 
@@ -195,7 +199,7 @@ In line 27 of Listing \ref{lst:impl-sched-core} the count of active clients is s
 	destroyASIM clientName
 \end{lstlisting}
 
-After the $activeClients$ \st{count} \textcolor{red}{counter} has been reduced to $0$ again, all clients have terminated and the next test can be covered. To conclude, it is possible to say that the $activeClients$ \textcolor{red}{counter} is used as a structure similar to semaphores, which takes care that no new clients are issued as long as it has a value bigger than $0$, and the scheduler is therefore in something similar to a paused state. Certainly, is it not really paused but in a ``busy wait loop''.
+After the $activeClients$ counter has been reduced to $0$ again, all clients have terminated and the next test can be covered. To conclude, it is possible to say that the $activeClients$ counter is used as a structure similar to semaphores, which takes care that no new clients are issued as long as it has a value bigger than $0$, and the scheduler is therefore in something similar to a paused state. Certainly, is it not really paused but in a ``busy wait loop''.
 
 \end{quote}
 
@@ -216,9 +220,7 @@ Rule $initData$ in the $initdata$ client consolidates the rest of the initializa
 
 After the start-up phase has been completed, the server goes into listening mode, in which the main program $DispatchMessages$ is called iteratively. In this mode, all relevant messages received by the server are taken care of. In Listing \ref{lst:impl-msg-dispatch} the dispatch process of server can be viewed in detail. All inbox messages of the current engine tick are fetched using the $inboxOf$ in addition to the $forall$ statement. The message reference $m$ as named in the loop is used to retrieve subject, message, and sender of the current post box entry $m$.
 
-Messages that are not recognized as having an accurate message type are discarded. The message type is defined by the message subject and is compared to one of the predefined entries in the universe definition $MESSAGE\_REQUESTS$. For real-world use it is essential to introduce some kind of additional message signing to \st{ensure} \textcolor{red}{verify} by whom the message has been sent.
-
-\textcolor{red}{\bf @Eduard: you used CreditReviewReq  instead of CreditPreviewReq below!} 
+Messages that are not recognized as having an accurate message type are discarded. The message type is defined by the message subject and is compared to one of the predefined entries in the universe definition $MESSAGE\_REQUESTS$. For real-world use it is essential to introduce some kind of additional message signing to verify by whom the message has been sent.
 
 \begin{center}
 \begin{minipage}{0.8\textwidth}
@@ -234,7 +236,7 @@ rule DispatchMessages = {
 		//dispatch messages
 		if msgIn != undef and member != undef then
 			case msubject of
-				toString(CreditReviewReq): HandleCreditPreviewReq(msgIn, member)
+				toString(CreditPreviewReq): HandleCreditPreviewReq(msgIn, member)
 				toString(CreditPerformReq): HandleCreditPerformReq(msgIn, member)
 				toString(DebitPreviewReq): HandleDebitPreviewReq(msgIn, member)
 				toString(DebitPerformReq): HandleDebitPerformReq(msgIn, member)
@@ -337,7 +339,7 @@ DebitAckMsg & debitor gives permission to perform the \textbf{debit} transfer & 
 \caption{\small\textbf{Credit/Debit message types overview}\\
 ($^{*}$Credit Request Parameters: from-account, to-account, amount, meta-data, channel, member)\\
 ($^{**}$Debit Request Parameters:  creditor, debtor, amount, meta-data, channel)\\
-($^{***}$One Time \st{Pad} \textcolor{red}{Password}, $^1$optional)}
+($^{***}$One Time Password, $^1$optional)}
 \label{tab:impl-transfer-types}
 \end{centering}
 \vspace{-0.5cm}
@@ -356,7 +358,7 @@ ProceedMessage & answer from server that the CreditPreviewReq has been successfu
 \hline
 DoNotProceedMessage & answer from server that the CreditPreviewReq has NOT  been successful & error message, CRP$^{*}$/DRP$^{**}$\\[3pt]
 \hline
-NoPermitted \ \textcolor{red}{NotPermitted?} & answer from server that the CreditPerformReq has NOT been successful & error message, CRP$^{*}$/DRP$^{**}$ \\[3pt]
+NotPermitted & answer from server that the CreditPerformReq has NOT been successful & error message, CRP$^{*}$/DRP$^{**}$ \\[3pt]
 \hline
 TransferPerformedSuccessful\ & answer from server that the CreditPerformReq has been successful and the transfer has been recorded and confirmed & success message, CRP$^{*}$/DRP$^{**}$ \\[3pt]
 \hline
@@ -372,22 +374,17 @@ Done & Message to Scheduler that the client simulation is done and can be termin
 \vspace{-1cm}
 \end{table}
 
-Let's review the implementation of a credit \st{review} \textcolor{red}{preview} request to a running agent called ``server'' in Listing \ref{lst:impl-msg-send}. When taking a closer look at line 9 it can be observed that the $send$ command is setting a location named $CREDITREQUEST$ for the message content and one called $CreditReviewReq$ is used for defining the message subject.
+Let's review the implementation of a credit preview request to a running agent called ``server'' in Listing \ref{lst:impl-msg-send}. When taking a closer look at line 9 it can be observed that the $send$ command is setting a location named $CREDITREQUEST$ for the message content and one called $CreditPreviewReq$ is used for defining the message subject.
 
-\textcolor{red}{\bf @Eduard: you used CreditReviewReq  instead of CreditPreviewReq above!} 
+$CREDITREQUEST$ is of type of map that is used in the BSL/ASM language as a set of key/value-pairs. That map carries the information required for that message type, implying that for the credit transfer example in Listing \ref{lst:impl-msg-send} the parameters are chosen accordingly (see CRP in Table \ref{tab:impl-transfer-types}). 
 
-$CREDITREQUEST$ is of type \textcolor{red}{of} map that is used in the BSL/ASM language as a set of key/value-pairs. That map carries the information required for that message type, implying that for the credit transfer example in Listing \ref{lst:impl-msg-send} the parameters are chosen accordingly (see CRP in Table \ref{tab:impl-transfer-types}).
+The actual message type is determined by the subject. As mentioned, the $CreditPreviewReq$ content is used for defining the subject. At client level, unfortunately, it is not possible to predefine a universe containing the $CreditPreviewReq$ like it is done in the head section of the server. The reason is that the $createASIM$ command used in the scheduler for spawning dynamic clients does not allow to include a header section: just an init rule, the main program, and the scheduling policy. The consequence is that the message types used for clients are locations of type $STRING$, which are created in the init rule and set up as locations whose names are the same as their values. See line 1 in Listing \ref{lst:impl-msg-send}.
 
-\textcolor{red}{\bf @Eduard: you used CreditReviewReq  instead of CreditPreviewReq below (twice)!} 
-
-The actual message type is determined by the subject. As mentioned, the $CreditReviewReq$ content is used for defining the subject. At client level, unfortunately, it is not possible to predefine a universe containing the $CreditReviewReq$ like it is done in the head section of the server. The reason is that the $createASIM$ command used in the scheduler for spawning dynamic clients does not allow to include a header section: just an init rule, the main program, and the scheduling policy. The consequence is that the message types used for clients are locations of type $STRING$, which are created in the init rule and set up as locations whose names are the same as their values. See line 1 in Listing \ref{lst:impl-msg-send}.
-
-\textcolor{red}{\bf @Eduard: you used CreditReviewReq  instead of CreditPreviewReq below!} 
 \begin{center}
 \begin{minipage}{0.8\textwidth}
 \small
 \begin{lstlisting}[language=bsl_lst,caption={\bf\small send message},label={lst:impl-msg-send} ]
-	CreditReviewReq := "CreditReviewReq"
+	CreditPreviewReq := "CreditPreviewReq"
 	CREDITREQUEST := {
 					"from" -> "accId1",
 					"to" -> "accId2",
@@ -395,14 +392,12 @@ The actual message type is determined by the subject. As mentioned, the $CreditR
 					"amount"  -> 2000,
 					"metadata" -> {"message", "some transfer"}
 				}
-	send CREDITREQUEST  to "server" with subject CreditReviewReq
+	send CREDITREQUEST  to "server" with subject CreditPreviewReq
 \end{lstlisting}
 \end{minipage}
 \end{center}
 
-\textcolor{red}{\bf @Eduard: you used CreditReviewReq  instead of CreditPreviewReq below!}
-
-Concluding, the subject containing the message type is always converted to the $STRING$ type in order to stay consistent. Also the server agent, which uses a universe definition, converts its enumerative representation of message types to $STRING$ by calling $toString(CreditReviewReq)$ when sticking \textcolor{red}{what do you mean by ``sticking''?} to the example of credit \st{review} \textcolor{red}{preview} request.
+Concluding, the subject containing the message type is always converted to the $STRING$ type in order to stay consistent. Also the server agent, which uses a universe definition, converts its enumerative representation of message types to $STRING$ by calling $toString(CreditPreviewReq)$ when sticking \textcolor{red}{what do you mean by ``sticking''?} to the example of credit \st{review} \textcolor{red}{preview} request.
 
 The reason for naming locations exactly after their content is based on a programming principle which says that strings which are static and never change should be represented by an unchangeable variable name or, in ASM/BSL language terms, as a predefined location. This best practices principle has the following benefits:
 

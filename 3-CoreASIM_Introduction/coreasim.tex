@@ -146,17 +146,16 @@ For \textbf{docker}, first all GitHub sources need to be cloned to the host mach
 	           --name active_asim -it asim /$2
 \end{lstlisting}
 
-This line is part of the script \textit{scripts/runDocker.sh}. \$1 here stands for the local directory of the environment and \$2 is normally defaulted to the main execution script started inside the docker container. It is important to note that the \textit{ASIMSpec} folder of the host machine is mounted into\footnote{"Mounted into" refers to the fact that a local folder from a local host computer is available inside the virtualized docker system and accessible there as a mounted directory.} \textit{/home/ASIMSpec} of the docker container and the \textit{icef} directory is mounted into \textit{/home/icef}.
+This line is part of the script $scripts/runDocker.sh$ where "\$1" denotes a bash variable and contains the first command-line parameter of this script. That parameter is used to declare the directory location of the environment. The second command-line parameter "\$2" normally is defaulted to the main execution script ($executeASIMSpec.sh$) and started inside a running docker instance. It is important to note that the \textit{ASIMSpec} folder of the host machine is mounted into\footnote{"Mounted into" refers to the fact that a local folder from a local host computer is available inside the virtualized docker system and accessible there as a mounted directory.} $/home/ASIMSpec$ of the docker container and the $icef$ directory is mounted into $/home/icef$.
 
 \subsection{Execution}
 \label{sec:env-exec-stack-exe}
 
-The execution stack in Figure \ref{fig:icef-intro-asim} shows where an ICEF specification \st{is transmitted} \textcolor{red}{needs to be instantiated} for it to be executed. The details will be covered in Section \ref{sec:icef-intro}. In this part of the document we take a look at which services are started and how.
+The building block view in Figure \ref{fig:icef-intro-asim} shows how an ICEF specification is submitted to the environment where it needs to be instantiated for it to be executed. The details will be covered in Section \ref{sec:icef-intro}. In this part of the document we take a look at which services are started and how.
 
-Due to limitations of the ICEF framework it is currently not possible to cleanly shut down a running ICEF simulation with several running ASIM instances. Therefore both environments have to start and stop all services for every execution in order to guarantee a correct execution set-up.
-\textcolor{red}{Not clear what you mean by both environments: do you mean the docker container and the icef? Maybe add it in parentheses after `both environments'.}
+Due to limitations of the ICEF framework it is currently not possible to cleanly shut down a running ICEF simulation with several running ASIM instances. Therefore the whole environment has to be restarted including all services for every execution in order to guarantee a correct set-up. This is achieved and granted by the docker service which offers a base operating system image that is started for every single execution of the Interlace specification from scratch. That base OS-image is not changed and always starting from the same state when instantiated.
 
-\subsubsection{Start Services Processes}.  Both environments offer a script that needs to be called from the host system (\textit{execute(.sh)}) and one that needs to be called from within the virtualized machine (\textit{executeASIMSpec.sh/executeOnGuest.sh}). Whereas the script on the virtualized system only differs in directory references the outside scripts have to handle different things as one script deals with docker and the other with vagrant.
+\subsubsection{Start Services Processes}. Both environments offer a script that needs to be called from the host system ($execute(.sh)$) and one that needs to be called from within the virtualized machine ($executeASIMSpec.sh/executeOnGuest.sh$). Whereas the script on the virtualized system only differs in directory references the outside scripts have to handle different things as one script deals with docker and the other with vagrant.
 
 In more detail, docker can start the servers immediately and run the script inside the container, whereas vagrant needs to add an additional step if the virtual machine is not up and running yet. Thus, vagrant
 \begin{enumerate}
@@ -188,14 +187,13 @@ The above listing uses a \textit{\$project} variable containing the path of ASIM
 \label{sec:development}
 For developing new simulations it is important to have a proper development environment. There exist many different IDE/Tool/Debugger choices for Java and JavaScript which may be used for the Brapper, Manager, or coreAS(I)M plugin development. However, there are only limited Integrated Development Environment (IDE) choices for implementing AS(I)Ms.
 
-For the well-known Eclipse IDE, developers of the ICEF framework have adopted the coreASM plugin for supporting the additional language primitives. So when implementing ASIMs using BSL it is highly recommended to use that plugin. It works with the new language elements (BSL) and is provided by the ICEF framework directly, but it needs to be built and imported \textbf{manually} into Eclipse. Thus, for working with ASIM implementations of INTERLACE you ideally DO NOT download the original coreASM plugin package which is available at the marketplace of Eclipse.
+For the well-known Eclipse IDE, developers of the ICEF framework have adopted the coreASM plugin for supporting the additional language primitives. So when implementing ASIMs using BSL it is highly recommended to use that plugin. It works with the new language elements (BSL) and is provided by the ICEF framework directly, but it needs to be built and imported \textbf{manually} into Eclipse. Thus, for working with ASIM implementations of INTERLACE you ideally DO NOT download the original CoreASM Plug-in package which is available at the marketplace of Eclipse.
 
 \textbf{Importing/Installation of the IDE Eclipse plugin for CoreASIM}
 \begin{quote}
 \small
 \begin{description}
 	\item[Build Framework.] To add the ASIM plugin to Eclipse the CoreASIM plugin needs to be built and installed  manually first because it is not downloadable from the Eclipse marketplace and is only available as a source version delivered with the ICEF framework and as part of the CoreASIM engine. Building and installing can be done by calling
-	\textcolor{red}{I saw on github that CoreASM is capitalised (i.e.\ it is not written ``coreASM'', but ``CoreASM''. So I changed also coreASIM to CoreASIM. Is that OK  with you? Regarding the directory names, would it be easier to use ``coreasim''?}
 	\begin{lstlisting}[language=bash]
 		cd icef/coreASIM/org.coreasim.parent && mvn package install
 		cd icef/coreASIM/org.coreasim.eclipse && mvn package install\end{lstlisting}
