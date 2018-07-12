@@ -397,21 +397,21 @@ The actual message type is determined by the subject. As mentioned, the $CreditP
 \end{minipage}
 \end{center}
 
-Concluding, the subject containing the message type is always converted to the $STRING$ type in order to stay consistent. Also the server agent, which uses a universe definition, converts its enumerative representation of message types to $STRING$ by calling $toString(CreditPreviewReq)$ when sticking \textcolor{red}{what do you mean by ``sticking''?} to the example of credit \st{review} \textcolor{red}{preview} request.
+Concluding, the subject containing the message type is always converted to a $STRING$ representation in order to stay consistent. Also the server agent, which uses a universe definition, converts its enumerative representation of message types to $STRING$ by calling e.g. $toString(CreditPreviewReq)$. An example is shown in listing \ref{lst:impl-msg-send} for a $CreditPreviewReq$-Message.
 
 The reason for naming locations exactly after their content is based on a programming principle which says that strings which are static and never change should be represented by an unchangeable variable name or, in ASM/BSL language terms, as a predefined location. This best practices principle has the following benefits:
 
 \begin{itemize}
 	\item Typing errors can be immediately found because an IDE\footnote{Integrated Development Environment} usually shows them as unknown or undefined. Whereas a misspelled text might be only found at runtime.
-	\item Known variables/locations can be \st{facilitated during} \textcolor{red}{provided through} syntax completion, thereby simplifying and speeding up the implementation process.
-	\item It is easier to find states which still need to be taken care of on other places. \textcolor{red}{I do not understand what you mean by `on other places'}
+	\item Not only typing errors but also not yet defined locations are marked by the ASIM-Eclipse Plug-in. Thus, in case of Interlace specifications, unrecognised message types can be found quickly and added to the message type space.
+	\item Known variables/locations can be provided through syntax completion, thereby simplifying and speeding up the implementation process.
 	\item Usage of specific types might be restricted under certain conditions.
 \end{itemize}
 
 \subsection{Client Features and Functionalities}
 \label{subsec:impl-client-features}
 
-For INTERLACE, and of course for any other software project, it is important to test the correctness \textcolor{red}{of the model and of the implementation}. This document will not talk about these tests; rather, it covers details of how clients are prepared to support a testing environment. These clients will later be \st{facilitated} \textcolor{red}{programmed} to act like user devices performing a specific action or transfer.
+For INTERLACE, and of course for any other software project, it is important to test the correctness of the model and of the implementation. This document will not talk about these tests; rather, it covers details of how clients are prepared to support a testing environment. These clients will later be programmed to act like user devices performing a specific action or transfer.
 
 Such clients are called ``dynamic'' due to their limited lifespan and as explained in Section \ref{sec:impl-agents} are not intended to be started right at the beginning of the INTERLACE simulation but, rather, on an on-demand basis. Thus, their lifespan is meant to be restricted to the duration of their specific task.
 
@@ -471,7 +471,7 @@ $RECEIVE$ waits for the messages and acts accordingly. When a message has been r
 
 $SEND$ and $RECEIVE$ states could be set alternately, but when the $TERMINATE$ state is applied \textcolor{red}{By `applied' do you mean `requested'?} the process of shutting down the agent has been started. Once the $DONE$ state is reached, even if not stopped yet by the scheduler, the client won't do anything useful anymore.
 
-The DAC\footnote{Debit Acknowledge Client} uses the same states except for the $SEND$ state because it only needs to receive and confirm a transfer by using the given one-time \st{pad} \textcolor{red}{password}. The DAC is an example of the fact that not all of the states need to be covered by a client, which may be relevant when creating new clients.
+The DAC\footnote{Debit Acknowledge Client} uses the same states except for the $SEND$ state because it only needs to receive and confirm a transfer by using the given one-time password. The DAC is an example of the fact that not all of the states need to be covered by a client, which may be relevant when creating new clients.
 
 \subsubsection{Server \& Scheduler States}\ are not technically a part of this section, since it is mainly about the dynamic clients. Nevertheless, a brief explanation of their states is given here to keep them together.
 
@@ -497,7 +497,7 @@ The server agent needs to place many different status messages of different impo
 	\item INFO
 	\item DEBUG
 \end{enumerate}
-These levels denote the different severities that can be \st{applied to} \textcolor{red}{recorded into} the logger and \st{define} \textcolor{red}{necessarily communicate} the maximum severity of a message presented to the executing user. To explain further, $FATAL$ messages should be printed always, whereas $DEBUG$ messages are only of interest for developers who need very detailed information of the current state.
+These levels denote the different severities that can be recorded into the logger and necessarily communicate the maximum severity of a message presented to the executing user. To explain further, $FATAL$ messages should be printed always, whereas $DEBUG$ messages are only of interest for developers who need very detailed information of the current state.
 
 Consequently, the maximum log level can be given at agent start-up inside of the $init$ rule. The rule used to define the level is explained here
 
@@ -519,7 +519,7 @@ When initialized, the logger can be used at any place by calling the $do\_log$ r
 	do_log("List 'Ledger' in unknown state", FATAL)
 \end{lstlisting}
 
-Currently, the logger implementation can only be applied \textcolor{red}{utilized?} meaningfully inside of the server itself, because the implementation is also hosted by the server agent definition file $server.casim$ directly. It would certainly be possible to put the logger into a different file, but the $include$ statement of the $run.icef$ is not supported by the Eclipse plugin. Consequently, if the logger implementation were separated out into an additional file, all occurrences of $do\_log$ calls would be marked as erroneous (even if they were not) and would then turn the coding-assistance tools inside of Eclipse into an unusable environment.
+Currently, the logger implementation can only be utilized meaningfully inside of the server itself, because the implementation is also hosted by the server agent definition file $server.casim$ directly. It would certainly be possible to put the logger into a different file, but the $include$ statement of the $run.icef$ is not supported by the Eclipse plugin. Consequently, if the logger implementation were separated out into an additional file, all occurrences of $do\_log$ calls would be marked as erroneous (even if they were not) and would then turn the coding-assistance tools inside of Eclipse into an unusable environment.
 
 
 \section{Test Scenario}
@@ -537,7 +537,7 @@ When looking at the environment from a testing perspective there are three parts
 	\item Simulation environment
 \end{enumerate}
 
-The "actual system requirement implementations" cover parts that are needed for a possible real-world system. Without these, the system would not be able to function. Therefore, they can be seen as the core part of the application which is entitled \textcolor{red}{[do you mean `supposed'?]} to be tested.
+The "actual system requirement implementations" cover parts that are needed for a possible real-world system. Without these, the system would not be able to function. Therefore, they can be seen as the core part of the application which is supposed to be tested.
 
 Second, code parts have been implemented which are only there for performing and validating a test of a particular scenario use case. Currently these scenarios are credit and debit operation requests sent from virtual clients.
 
@@ -545,8 +545,7 @@ Last, parts of the system had to be implemented in a prototypical and most basic
 
 In Section \ref{subsec:impl-agent-tasks} the main agents are explained, $scheduler$ and $server$. When assembled for execution, they are fully implemented. The $server$ covers the actual system requirement realizations as well as the simulation environment code. To be more specific, the $server$ dispatches the message requests explained in Section \ref{lst:impl-msg-dispatch} and performs read actions to the virtual profile, account, etc. information, together with pushing transactions to a primitive ledger discussed in Section \ref{subsec:impl-sim-env}.
 
-The $scheduler$ mostly contains testing routines but partly also routines that handle the necessary client implementations that are not covered by the requirements. The test routines are responsible for starting and destroying clients. As a short reminder, the $scheduler$ is able to do so because it also contains all the client code. Further, Listing \ref{lst:impl-msg-send} shows the sending of a test credit request issued by the $CreditRequestClient$. This message is processed by a challenge-respond 
-\textcolor{red}{[Do you mean `challenge-response'?]} sequence between the server and the client that imitates a transaction.
+The $scheduler$ mostly contains testing routines but partly also routines that handle the necessary client implementations that are not covered by the requirements. The test routines are responsible for starting and destroying clients. As a short reminder, the $scheduler$ is able to do so because it also contains all the client code. Further, Listing \ref{lst:impl-msg-send} shows the sending of a test credit request issued by the $CreditRequestClient$. This message is processed by a challenge-response sequence between the server and the client that imitates a transaction.
 
 Concluding, a correct execution is currently only shown by a client which outputs a transfer-performed message when done. In case of an error the client would provide a message indicating the cause.
 
@@ -599,7 +598,7 @@ which then can be transformed again into the ``implemented'' form and is represe
 	AccT("credit", "SRD", "CC") := {"CC", "DOMU", "MIRROR"}.
 \end{lstlisting}
 
-The other locations listed in Listing \ref{subsec:perm-trans-types} \textcolor{red}{[I think you mean Listing \ref{lst:impl-sim-setup-locs}]} accommodate important information for groups, members, and sessions as well as accounts. Except for the $userGroupTable$, which just maps a user to its current operational group, all functions implement a result of type $MAP$. A $MAP$ is similar to a simple set with the difference that each entry of a $MAP$ is a key-value pair.
+The other locations listed in Listing \ref{lst:impl-sim-setup-locs} accommodate important information for groups, members, and sessions as well as accounts. Except for the $userGroupTable$, which just maps a user to its current operational group, all functions implement a result of type $MAP$. A $MAP$ is similar to a simple set with the difference that each entry of a $MAP$ is a key-value pair.
 
 \begin{center}
 \begin{minipage}{0.8\textwidth}
@@ -637,13 +636,12 @@ A pending transaction awaiting a correct OTP from a debtor is added to location 
 	Insert(transfer, creditor, PendingTransactions) Ledger).
 \end{lstlisting}
 
-After a transaction has been confirmed by a valid OTP, it is moved, as mentioned, to the actual ledger. Inside the $PendingTransactions$ map the state of that transaction \st{receives state} \textcolor{red}{is changed to}
-$TRANSACTION\_PERFORMED$ but the transaction is not deleted.
+After a transaction has been confirmed by a valid OTP, it is moved, as mentioned, to the actual ledger. Inside the $PendingTransactions$ map the state of that transaction is changed to $TRANSACTION\_PERFORMED$ but the transaction is not deleted.
 
 \subsection{Additional Login Layer}
 \label{subsec:impl-login-layer}
 
-The requirements \st{definitions} \textcolor{red}{specifications} do not define how authentication is handled by the system. Agents in ICEF have predefined names which cannot be changed during runtime. In order to act flexibly and reuse agents, a login layer has been introduced. Thus agents who are actively communicating with the server need to be registered in the $sessionData$ location which is initialized in the $initdata$ function.
+The requirements specifications do not define how authentication is handled by the system. Agents in ICEF have predefined names which cannot be changed during runtime. In order to act flexibly and reuse agents, a login layer has been introduced. Thus agents who are actively communicating with the server need to be registered in the $sessionData$ location which is initialized in the $initdata$ function.
 
 Agents in the current prototypical implementation do not login by themselves by providing a username and password but place their address together with a valid member ID in the $sessionData$ MAP as shown here:
 \begin{lstlisting}[language=bsl]
@@ -655,7 +653,7 @@ Agents in the current prototypical implementation do not login by themselves by 
 \end{lstlisting}
 The address of an agent is defined by ``<name>@<name>'', thus concatenating two occurrences of its own name with an ``@'' symbol. The address is taken during message processing. For example, when looking at the above $sessionData$ setup, it is possible to determine that agent CreditRequestClient's messages are sent by user mbrId1. \textcolor{red}{The syntax seems to suggest that agent CreditRequestClient's messages are sent TO user mbrId1, rather than BY. Can you explain a bit better the semantics of the arrows?}
 
-The member ID represents an alphanumerical string assigned after first registration \textcolor{red}{Is there a second registration? If not, delete `first'; if Yes, then please explain how and why it (the second registration) takes place.} For the INTERLACE implementation this means that an entry also needs to exist in location $profileTable$, in addition to $userGroupTable$, at which point the user has been properly registered and is known to the system. If the user wishes to perform a transaction, for the transaction to be valid an entry in location $accountTable$ should be added for that user, \st{in order to assign and work with an actual account.}  \textcolor{red}{in order to assign an actual account to that user and enable the system to work with it.}
+The member ID represents an alphanumerical string assigned after first registration \textcolor{red}{Is there a second registration? If not, delete `first'; if Yes, then please explain how and why it (the second registration) takes place.} For the INTERLACE implementation this means that an entry also needs to exist in location $profileTable$, in addition to $userGroupTable$, at which point the user has been properly registered and is known to the system. If the user wishes to perform a transaction, for the transaction to be valid an entry in location $accountTable$ should be added for that user, in order to assign an actual account to that user and enable the system to work with it.
 
 At runtime two derived functions are used to read the information of $sessionData$. As shown below, a member ID of an ``active'' user can be determined by calling $activeLogin$. Whether a member is currently logged in may be found out by obtaining the result of $activeClient$.
 
@@ -671,14 +669,14 @@ At runtime two derived functions are used to read the information of $sessionDat
 	client_address := activeClient("mbrId1")
 \end{lstlisting}
 
-One restriction needs to be mentioned though: a client address \st{only can have} \textcolor{red}{can only be associated with} one logged-in member at any one time, and vice versa.
+One restriction needs to be mentioned though: a client address can only be associated with one logged-in member at any one time, and vice versa.
 
 \section{Important Rules and Locations}
 \label{sec:impl-rules}
 
-Next, the emphasis is put on explaining rules and locations not discussed in detail or not mentioned at all in this document yet. All rules and locations in this section can be \st{located} \textcolor{red}{found} in file $server.casim$ or $initdata.casim$, which is added to the server part \st{due to} \textcolor{red}{by means of} the $include$ statement in run.icef.
+Next, the emphasis is put on explaining rules and locations not discussed in detail or not mentioned at all in this document yet. All rules and locations in this section can be found in file $server.casim$ or $initdata.casim$, which is added to the server part by means of the $include$ statement in run.icef.
 
-In the BSL \st{code} \textcolor{red}{language}, the $choose$ keyword is needed to read the content inside a map, 
+In the BSL language, the $choose$ keyword is needed to read the content inside a map, 
 \textcolor{red}{[Not clear what you mean by content ``inside'' a map. If by a map you mean a mathematical function, are you referring to the value of the function? If it is a function that is represented as a table, do you mean the contents of the table? Perhaps you can use more explicit language.]} which makes the code difficult to read in some cases. To simplify this access, we introduced a derived function $v$ for working with $MAP$-type locations:
 \begin{lstlisting}[language=bsl,mathescape=true]
 	$\Rightarrow$ derived v(amap, key).
@@ -694,7 +692,7 @@ The parameter $amap$ can be any $MAP$-type location and the $key$ refers to the 
 \end{lstlisting}
 Finally, if the map or the key is undefined, also the result will be.
 
-The ICEF framework uses a plugin called ``CommunicationPlugin'' to establish a simple communication system. As mentioned in the previous section, a method called $send$ is used to transfer a message \textcolor{red}{between ASIMs}. However, the server implementation usually does not call that method directly but, rather, it calls a rule with the same name starting with an upper-case letter. This $Send$ rule takes as first parameter a message which contains a list of two strings. The two strings are the message content itself and the message subject. In order to abstract the message type from the user, a derived rule called $AssembleMessage$ is provided for creating such a message. The second parameter is the recipient agent's name, not a member with a particular ID: \textcolor{red}{[do you mean to say `not the ID of a particular member'?]}
+The ICEF framework uses a plugin called ``CommunicationPlugin'' to establish a simple communication system. As mentioned in the previous section, a method called $send$ is used to transfer a message between ASIMs. However, the server implementation usually does not call that method directly but, rather, it calls a rule with the same name starting with an upper-case letter. This $Send$ rule takes as first parameter a message which contains a list of two strings. The two strings are the message content itself and the message subject. In order to abstract the message type from the user, a derived rule called $AssembleMessage$ is provided for creating such a message. The second parameter is the recipient agent's name, not a member with a particular ID: \textcolor{red}{[do you mean to say `not the ID of a particular member'?]}
 \begin{lstlisting}[language=bsl,mathescape=true]
 	$\Rightarrow$ derived AssembleMessage(msg, sub)	
 	$\Rightarrow$ rule Send(msg, agent).
@@ -707,7 +705,7 @@ When passing a message before sending, other parts of the implementation may use
 	$\Rightarrow$ derived IncorrectOtpFor(otp, amount, creditor).
 \end{lstlisting}
 
-Continuing further on OTPs, there are three important functions that should be mentioned in addition to the requirement definitions. $RandomHex$ generates a random hexadecimal number. Next, $HexString$ calls $RandomHex$ $n$ times, where $n$ equals the first parameter $length$ \st{resulting in} \textcolor{red}{in the form of} a hexadecimal string. This hexadecimal string generation is used for creating OTPs as well as transaction IDs for appending unique transactions to the ledger:
+Continuing further on OTPs, there are three important functions that should be mentioned in addition to the requirement definitions. $RandomHex$ generates a random hexadecimal number. Next, $HexString$ calls $RandomHex$ $n$ times, where $n$ equals the first parameter $length$ in the form of a hexadecimal string. This hexadecimal string generation is used for creating OTPs as well as transaction IDs for appending unique transactions to the ledger:
 
 \begin{lstlisting}[language=bsl,mathescape=true]
 	$\Rightarrow$ derived RandomHex
@@ -734,27 +732,27 @@ For all attributes used inside these transfer-request maps, derived functions ha
 	fA = "accId1" //is true
 \end{lstlisting}
 
-Next, we examine the ledger and the preliminary storage for pending transactions. Both are maps storing transactions. The difference is that \textcolor{red}{the function} $PendingTransactions$ is using an OTP key to map to a transaction, whereas a finally persisted transaction is mapped using an transaction ID key. \st{One-time pads} \textcolor{red}{OTPs} are created by $OneTimePassword$ and transaction IDs are created by calling $NewTransactionID$.
+Next, we examine the ledger and the preliminary storage for pending transactions. Both are maps storing transactions. The difference is that the function $PendingTransactions$ is using an OTP key to map to a transaction, whereas a finally persisted transaction is mapped using an transaction ID key. OTPs are created by $OneTimePassword$ and transaction IDs are created by calling $NewTransactionID$.
 
 \begin{lstlisting}[language=bsl,mathescape=true]
 	$\Rightarrow$ controlled Ledger: MAP
 	$\Rightarrow$ controlled PendingTransactions: MAP
 \end{lstlisting}
 
-Rule $Insert$ adds a transaction which awaits confirmation \st{to} \textcolor{red}{[either `for' or `from']} a map which needs to be the last parameter. The $server$ stores all these unconfirmed requests in the map $PendingTransactions$, as indicated above.
+Rule $Insert$ adds a new transaction (which is awaiting confirmation) to a map (parameter $pendingTransactions$ of $Insert$). The $server$ stores all these unconfirmed requests in a map called $PendingTransactions$, as defined above.
 
-After a valid and existing OTP has been sent for a transfer in $PendingTransactions$, the transfer needs to undergo some more checks; but, when \st{passed} \textcolor{red}{approved}, it is appended to the Ledger by executing the rule $Append$.
+After a valid and existing OTP has been sent for a transfer in $PendingTransactions$, the transfer needs to undergo some more checks; but, when approved, it is appended to the Ledger by executing the rule $Append$.
 
-$Insert$ and $Append$ are listed here together with $Transactions$ and $NewTransactionID$:\\
-\textcolor{red}{[What's the difference between `trans' and `transfer'?]}
+$Insert$ and $Append$ are listed here together with $Transactions$ and $NewTransactionID$:
+
 \begin{lstlisting}[language=bsl,mathescape=true]
-	$\Rightarrow$ rule Append(trans, ledger)
+	$\Rightarrow$ rule Append(transfer, ledger)
 	$\Rightarrow$ rule Insert(transfer, creditor, pendingTransactions)
 	$\Rightarrow$ derived NewTransactionID(len)
 	$\Rightarrow$ derived Transaction(transfer, mbr, operation, date)
 \end{lstlisting}
 
-Finally, we described a rule that is part of the requirements but is used in a different way. The requirements call for three functions called $FinalDebitAccountLimitsCheck$, $DebitAccountLimitsCheck$, and $CreditAccountLimitsCheck$. These functions are similar and \st{are used in a consolidated way for} \textcolor{red}{are integrated in} the ICEF implementation. $PreviewCheck$ implements this check and needs the member ID $mbr$, the $from$ account $fromA$, the $to$ account $toA$, a $from$ group $fromGroupId$, a $toGroupId$ and, as last parameter, the operation $operation$ as a String. The operation string can be either ``credit'' or ``debit''. This code example shows the rule but also how it is used in the current setup:
+Finally, we described a rule that is part of the requirements but is used in a different way. The requirements call for three functions called $FinalDebitAccountLimitsCheck$, $DebitAccountLimitsCheck$, and $CreditAccountLimitsCheck$. These functions are similar and are integrated in the ICEF implementation. $PreviewCheck$ implements this check and needs the member ID $mbr$, the $from$ account $fromA$, the $to$ account $toA$, a $from$ group $fromGroupId$, a $toGroupId$ and, as last parameter, the operation $operation$ as a String. The operation string can be either ``credit'' or ``debit''. This code example shows the rule but also how it is used in the current setup:
 
 \begin{lstlisting}[language=bsl,mathescape=true]
 	$\Rightarrow$ rule PreviewCheck(mbr, fromA, toA, fromGrpId, toGrpId, operation)
@@ -773,14 +771,14 @@ The result of $PreviewCheck$ is either $undef$, if all checks are successful, or
 \section{Implementation Challenges}
 \label{sec:impl-challenges}
 
-When working with the ICEF framework, some things should be noted. Currently, the ICEF framework is an academic tool and not ready for industry use. Additional effort needs to be expended in order to achieve a fully integrated system for an industry-grade software design process or even a continuous integration process. \textcolor{red}{We now outline some of the still-open issues.}
+When working with the ICEF framework, some things should be noted. Currently, the ICEF framework is an academic tool and not ready for industry use. Additional effort needs to be expended in order to achieve a fully integrated system for an industry-grade software design process or even a continuous integration process. We now outline some of the still-open issues.
 
 \subsection{Issues}
 
 During development the team has been confronted with different issues regarding the ICEF framework but also with the process of moving the specifications to a running ASIM INTERLACE Model:
 \begin{description}
-	\item[Unknown line numbers] Before transmitting a simulation to the ICEF manager, JavaScript code loads all specified .casim files, preparing them for being sent over the network in the form of a consolidated JSON message. This process, together with the added preliminary $include$ syntax, \st{cause} \textcolor{red}{exhibits} a problem with respect to error messages. More precisely, if something goes wrong the error messages do not contain the relevant line number(s) of where the error occurred. Thus, in case of any failure it can be very difficult to locate the actual cause.
-	\item[Error in block] Errors inside a block cause the whole block not to be executed for unknown cases. \textcolor{red}{[Do you mean `for unknown reasons'?]} For example, if a block has $n$ statements and the last one has a problem, all the other $n - 1$ statements might not be executed either, even if a sequential block was used. Given that the error messages do not contain correct line numbers, finding a problem with debug output to the console also does not work appropriately in all cases.
+	\item[Unknown line numbers] Before transmitting a simulation to the ICEF manager, JavaScript code loads all specified .casim files, preparing them for being sent over the network in the form of a consolidated JSON message. This process, together with the added preliminary $include$ syntax, exhibits a problem with respect to error messages. More precisely, if something goes wrong the error messages do not contain the relevant line number(s) of where the error occurred. Thus, in case of any failure it can be very difficult to locate the actual cause.
+	\item[Error in block] Errors inside a block cause the whole block not to be executed for unknown reasons. For example, if a block has $n$ statements and the last one has a problem, all the other $n - 1$ statements might not be executed either, even if a sequential block was used. Given that the error messages do not contain correct line numbers, finding a problem with debug output to the console also does not work appropriately in all cases.
 	\item[Parallel blocks] ASM code and consequently also BSL code allows to write so-called parallel blocks. These blocks start with $par$, end with $endpar$, and contain code which is executed in parallel -- at least theoretically. The important thing to know here is that the order of execution is not guaranteed. This can lead -- and actually led during development -- to unpredictable behaviour and needs to be used with caution!
 	\item[Bugs] As the ICEF framework is still at the alpha stage, a couple of bugs occurred which could be fixed. However, further testing iterations are needed to make the framework stable.
 	\item[Testing] Various testing approaches still need to be investigated, because at the moment only the text output of a simulation can be checked to test if the system is running correctly. These testing approaches will be part of the upcoming research.\footnote{For example, we are likely to adopt Cucumber \url{https://cucumber.io/} and Gherkin \url{https://docs.cucumber.io/gherkin/}, since they are used by the Hyperledger blockchain development community.}
