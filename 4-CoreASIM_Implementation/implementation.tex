@@ -478,7 +478,6 @@ The DAC\footnote{Debit Acknowledge Client} uses the same states except for the $
 
 \underline{The scheduler} mainly has its test states, as mentioned in Section \ref{subsec:impl-agent-tasks}, and transitions from one test to another till there are no tests left. For each test the scheduler has two stages:
 \begin{packed_item1}
-\small
 \item \textbf{First}, in the starting phase all the clients of that particular test are started and counted. Clients which should be part of one test state need to be defined as dynamic and appended to the scheduler by using the $include$ statement in the $run.icef$ definition.
 \item Then, the scheduler in its \textbf{second} phase waits for as many $DONE$ messages as the number of clients that have been issued \textcolor{red}{[do you mean spawned, or instantiated?]}\textcolor{blue}{[what would be the difference here, in both cases a new agent is running?]}. Finally, when the client count is zero, the scheduler goes to the next test and starts that two-phase process again.
 \end{packed_item1}
