@@ -487,7 +487,7 @@ As explained in D2.1, user-initiated Debit operations in SRD are executed in 3 p
 In this section we consider Debit operations in SRD. We treat the Debit operations in EUR separately in Section \ref{sect:userops}.
 
 As for Credit operations, the $\ASM{DebitPreviewReq}$ step essentially performs a $\ASM{DebitTypeCheck}$ on the $creditor$ and $debitor$ groups and on the permitted type of the accounts involved. But the arguments of $TT$ are interchanged: 
-\textcolor{red}{[No: the arguments are NOT interchanged. The argument $fromGroup$ in $TT(fromGroup)$ is the debitor for BOTH Credit and Debit operations.]} 
+\textcolor{red}{[No: the arguments are not interchanged. The argument $fromGroup$ in $TT(fromGroup)$ is the debitor for BOTH Credit and Debit operations.]} 
 for a Debit operation $TT$ is applied to  $group(debitor)$ and yields the allowed creditor groups, to one of which the $creditor$ must belong. By Figure \ref{fig:transactabilitywkflow}, the account connectivity check for SRD-Debit operations checks whether the accounts $from,to$ to be used for the intended Debit operation are both of type CC. If the outcome of the two checks is positive, $\ASM{DebitPreviewReq}$ calls as completion a $\ASM{PermitPerformReq}$ component which enables the $creditor$ to proceed to the $\ASM{DebitPerformReq}$ phase. 
 
 
@@ -775,16 +775,19 @@ A $retail \in Retail \cup Full$ can also execute a $\ASM{SrdB2C}$ operation whic
    \IF Received(SrdB2CMsg(amount,\FROM consumer), \FROM retail) \AND \+
      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~consumer \in Consumer\_Verified\\
  \THEN \+
-      \ASM{PayByReward}(amount,consumer,retail)\\
+      \ASM{PayWithReward}(amount,consumer,retail)\\
       \ASM{Consume}(SrdB2CMsg(amount,\FROM consumer))\dec\dec\-
  \WHERE \+
-\ASM{PayByReward}(amt,consumer,retail)  =\+    
+\ASM{PayWithReward}(amt,consumer,retail)  =\+    
       balance_{consumer}(cc_{consumer}):= 
                 balance_{consumer}(cc_{consumer)}) -amt\\
       balance_{retail}(cc_{retail}):= balance_{retail}(cc_{retail}) + amt
 \end{asm}
 
-$\ASM{PayByReward}$ is described in D3.1 as an instance of the standard Credit (via Service channel) or Debit (via POS channel) operation. 
+$\ASM{PayWithReward}$ is described in Section \ref{b2cOperations} as an instance of the standard Credit (via Service channel) or Debit (via POS channel) operation. 
+
+
+
 
 \subsection{Mngr/SysAdmin fee operations:\\ $\ASM{RechargePrepaid}$, $\ASM{AcceptFee}$, $\ASM{LowPrepaymentAlert}$}
 \label{sect:Prepaid}
@@ -799,7 +802,7 @@ $\ASM{RechargePrepaid}$ rule directly, avoiding the detour via a Credit operatio
 
 For statistical purposes, the fee consumption for each B2C operation performed by a retailer is traced by the $mngr$ by letting the $retail$er `pay the fee  into the $topup$ account'. To do this, $SysAdmin$ moves the amount of Euro  which represents the fee from $prepaid_{retail}$ into $topup$. We describe this in the $\ASM{RecordFeePayment}$ rule below directly, avoiding the detour via a Debit operation performed by the $mngr$ to its auxiliary $topup$ account.
 
-Correspondingly, upon the receipt of a fee prepayment by the retailer through normal banking channels, the prepaid amount is detracted from $topup$.
+Correspondingly, upon the receipt of a fee prepayment by the retailer through normal banking channels, the prepaid amount is detracted from $topup$, consistently with double-entry book-keeping.
 
 In addition, before $prepaid_{retail}$ reaches zero, a $lowBalanceAlert$ is sent to 
 the $retail$er.
@@ -835,9 +838,9 @@ When a $retail$er has to pay the fee for a $\ASM{EurB2C}$ operation it performs 
 \end{asm}
 \section{User Operations}
 \label{sect:usrops}
-Users can $\ASM{Send}$ requests which appear as input for the INTERLACE network server. Whether $\ASM{Send}(CreditPreviewReq(transfer))$ or $\ASM{Send}(DebitPreviewReq(transfer))$ is invoked is conditioned only by a correct definition of the $transfer$ parameter, which is a definition the user supplies by filling in the corresponding  fields on the screen. The same holds, \emph{mutatis mutandis}, for $\ASM{Send}(AccountHistReq(histParams))$ and $\ASM{Send}(BalanceReq(acc))$. The functionality is clear so that we do not model further this editing process.
+Users can $\ASM{Send}$ requests which appear as input for the INTERLACE network server. Whether $\ASM{Send}(CreditPreviewReq(transfer))$ or $\ASM{Send}(DebitPreviewReq(transfer))$ is invoked depends only on the $transfer$ parameter, which the user supplies by filling in the corresponding fields on the screen. The same holds, \emph{mutatis mutandis}, for $\ASM{Send}(AccountHistReq(histParams))$ and $\ASM{Send}(BalanceReq(acc))$. The functionality is clear so that we do not model further this editing process.
 
-For Credit/Debit Perform requests the only relevant additional constraint is that they can be sent only after an ok-message for the corresponding Preview request has been received. We use a function $kind$ to extract from a $transfer$ parameter its $credit$ or $debit$ component, respectively.\footnote{In the following ASMs the keyword `sardex' stands for `INTERLACE network server'.}
+For Credit/Debit Perform requests, the only relevant additional constraint is that they can be sent only after an OK message for the corresponding Preview request has been received. We use a function $kind$ to extract from a $transfer$ parameter its $credit$ or $debit$ component, respectively.\footnote{In the following ASMs the keyword `sardex' stands for `INTERLACE network server'.}
 
 \begin{asm}
 \IF Received(YouMayTriggerPerformReq(transfer),\FROM sardex) \THEN \+
@@ -852,8 +855,8 @@ In case of a Debit operation a debitor has to confirm a received debit request b
 \begin{asm}
 \IF Received(ConfirmationReq(otp,transfer),\FROM sardex) \THEN \+
 \LET (debit,channel,from,to,amount)=transfer \\
-\IF Agreed(amount,owner(to),otp)\+
-\THEN ~ \ASM{Send}(DebitAckMsg(otp,transfer), \TO sardex) \\
+\IF Agreed(amount,owner(to),otp) \THEN\+
+\ASM{Send}(DebitAckMsg(otp,transfer), \TO sardex) \-
 \ELSE ~ \ASM{Send}(DebitRejectMsg(otp,transfer), \TO sardex)\-
 \ASM{Consume}(ConfirmationReq(otp,transfer))
 \end{asm}
@@ -953,7 +956,7 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
  to \not \in Domu \AND balance(to)+amount \leq upperLimit(to) \\
  HasSellCapacityFor(amount,to) \IFF  to \not \in Domu \AND   amount \leq availableCapacity(to)
  \end{asm}
-\newpage
+%\newpage
 
  \subsubsection{Credit transaction completion subcomponent}
  \begin{asm}
@@ -961,7 +964,7 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
  	\LET (credit,channel,from,to,amount)=transfer \\ 
  	\ASM{Append}(transaction(transfer,ttResult,now),Ledger)\\
  	\ASM{Send}(Confirmed(transfer),\TO owner(from))\\
- 	saleVolume(to):=saleVolume(to)+amount\footnote{We treat the dynamic function $saleVolume$ as belonging to AccountMetaData, apparently in accordance with D3.1.} \-
+ 	saleVolume(to):=saleVolume(to)+amount\footnote{We treat the dynamic function $saleVolume$ as belonging to AccountMetaData, as shown in Table \ref{tab:AccountMetaData1}.} \-
  	\WHERE \+
  	ttResult= (group(owner(to)),accountType(from),accountType(to) )
  \end{asm}
@@ -1156,10 +1159,10 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
  \IF Received(SrdB2CMsg(amount,\FROM consumer), \FROM retail) \AND \+
  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~consumer \in Consumer\_Verified\\
  \THEN \+
- \ASM{PayByReward}(amount,consumer,retail)\\
+ \ASM{PayWithReward}(amount,consumer,retail)\\
  \ASM{Consume}(SrdB2CMsg(amount,\FROM consumer))\dec\dec\-
  \WHERE \+
- \ASM{PayByReward}(amt,consumer,retail)  =\+    
+ \ASM{PayWithReward}(amt,consumer,retail)  =\+    
  balance_{consumer}(cc_{consumer}):= 
  balance_{consumer}(cc_{consumer)}) -amt\\
  balance_{retail}(cc_{retail}):= balance_{retail}(cc_{retail}) + amt
