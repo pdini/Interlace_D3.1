@@ -441,12 +441,7 @@ Another main difference between the credit and debit message sequences is, thoug
 
 The sequence diagrams denote optional flows using option boxes. These boxes have a unique, numbered name. An option $OPT$ at the first level has a number (choice $1$ or $2$) as well as an abbreviated name ($DnPM$, $PM$). Sub-options in the second level are alphabetically numbered and also followed by an abbreviated name. Square brackets underneath the option name indicate the current option choice.
 
-\textcolor{red}{It is not clear to me what `to reduce the executed command to a minimum' means. Even if I "fix" it as `to reduce the number of executed commands to a minimum' I am still not entirely clear what you mean. Sure, decreasing the number of commands executed would slow things down, but with a GHz processor what difference does that make?}
-\textcolor{blue}{Usually those solution are called "busy-wait" and really bad programming practice. Because a process which is implementing waiting without a sleep mechanism using a loop takes up !a lot! of processor time and could make the whole system laggy. This does not depend on the speed of the processor, because then it is just repeating the check if he could continue faster and more often.
-  However, in the ASIM universe you are right because for every tick the program of each agent is executed once. The others are not blocked in anyway and the tick interval is somewhere in 100 millisecond range.
-  I thought it might be usefully information for readers that this concept is a little bit different to "normal"  programming. Would you rather skip this paragraph or reformulate it?}
-
-ASIMs currently do not have the possibility to sleep for some time or until an event has occurred. Nevertheless, agents are able to reduce the executed commands in the current tick to a minimum, thereby achieving a similar result. Inside of the sequence diagrams, activated clients are shown by the vertical fully colored bars. Non-active phases are indicated by the vertical dashed lines.
+ASIMs currently do not have the possibility to sleep for some time or until an event has occurred. Consequently, when waiting for a particular incident or circumstance they need to implement a so-called busy-wait. That means that the Program is still executed at each ASIM ``tick'' and not put to sleep by the OS-scheduler. Nevertheless, agents are able to reduce the executed commands in the current tick to a minimum, thereby achieving a similar result. For standard multi-threaded programming this would still be a huge issue and might even cause a whole system to be unusable. For ICEF, however, this is not the case because at each tick every program gets time to finish while others are pausing if they are done faster with their current execution step. Inside of the sequence diagrams, activated clients are shown by the vertical fully colored bars. Non-active phases are indicated by the vertical dashed lines.
 
 The emulated users in the figures are pictured on top of the clients to show that requests are sent by particular members.
 
@@ -479,7 +474,7 @@ The DAC\footnote{Debit Acknowledge Client} uses the same states except for the $
 \underline{The scheduler} mainly has its test states, as mentioned in Section \ref{subsec:impl-agent-tasks}, and transitions from one test to another till there are no tests left. For each test the scheduler has two stages:
 \begin{packed_item1}
 \item \textbf{First}, in the starting phase all the clients of that particular test are started and counted. Clients which should be part of one test state need to be defined as dynamic and appended to the scheduler by using the $include$ statement in the $run.icef$ definition.
-\item Then, the scheduler in its \textbf{second} phase waits for as many $DONE$ messages as the number of clients that have been issued \textcolor{red}{[do you mean spawned, or instantiated?]}\textcolor{blue}{[what would be the difference here, in both cases a new agent is running?]}. Finally, when the client count is zero, the scheduler goes to the next test and starts that two-phase process again.
+\item Then, the scheduler in its \textbf{second} phase waits for as many $DONE$ messages as the number of clients that have been instantiated. Finally, when the client count is zero, the scheduler goes to the next test and starts that two-phase process again.
 \end{packed_item1}
 
 
