@@ -254,7 +254,7 @@ In addition, for each $acc$ount in $CC \cup Domu \cup Mirror$ there are the foll
 	\item $creditLimit$ (a non-negative number)\footnote{Table \ref{tab:AccountMetaData1} includes also a $creditLimitDate$ location, indicating the date at which the credit limit was set. We skip such locations because no operation has been specified which uses them, so that there is no rule in the model which involves them.}
 	
 	\item $availableBalance$, a derived location required to be non-negative and defined by:
-	\[availableBalance=balance+creditLimit.\]
+	\[availableBalance = balance + creditLimit.\]
 \end{itemize}
 
 In addition, $CC$ and $Mirror$ (but not $Domu$) accounts have the following  location:
@@ -714,7 +714,7 @@ It seems that these rules are considered to be part of the Sardex system softwar
 
 Chapter \ref{ch:UpdatedBLS} considers the operations as instances of the general Credit/Debit operations. However, these B2C operations do not involve the transaction and account type checks every Credit/Debit operation has to perform. Therefore we simplify the formulation of the rules as rules tailored to perform the necessary dedicated checks and updates, but also to avoid the other general types checks, which are unnecessary here. 
 
-In the current Sardex system, EurB2C operations are triggered by a $retail$ or a $full$ member as Debit operations from the consumer's Bisoo account to the Income account of the $retail$ or $full$ member, respectively. To simplify the description of the desired functionality, in this model we have chosen to describe such operations directly, without the artificial detour via empty account type and account connectivity checks. Thus, an $\ASM{EurB2C}$ operation is triggered by a $consumer$ (whether in $Consumer$ or in $Consumer\_Verified$) who buys a product at a $retail \in Retail \cup Full$ and pays for it in Euro. The money is recorded in the $income(retail)$ account, a reward as SRD credit is issued to the $customer$ and the Euro fee is paid. The consumer from which the $EuroAmount$ is $Received$ remains anonymous. This means that, until it becomes a $Customer\_Verified$ member, namely by a registration action that we do not model here, it remains known to the Sardex system only by the number of the $card$ issued.
+In the current Sardex system, EurB2C operations are triggered by a $retail$ or a $full$ member as Debit operations from the consumer's Bisoo account to the Income account of the $retail$ or $full$ member, respectively. Since the pairing of the accounts is hard-wired, to simplify the description of the desired functionality in this model we have chosen to describe such operations directly, without the artificial detour via empty account type and account connectivity checks. Thus, an $\ASM{EurB2C}$ operation is triggered by a $consumer$ (whether in $Consumer$ or in $Consumer\_Verified$) who buys a product at a $retail \in Retail \cup Full$ and pays for it in Euro. The money is recorded in the $income(retail)$ account, a reward as SRD credit is issued to the $customer$ and the Euro fee is paid. The consumer from which the $EuroAmount$ is $Received$ remains anonymous. This means that, until it becomes a $Customer\_Verified$ member, namely by a registration action that we do not model here, it remains known to the Sardex system only by the number of the $card$ issued.
 
 \textcolor{red}{\bf ORIGINAL:}
 \begin{asm}
@@ -778,7 +778,7 @@ In the current Sardex system, EurB2C operations are triggered by a $retail$ or a
 			\ASM{ManageFeePayment}(EuroAmount, retail) \-
 		\ELSE\+
 			\ASM{IssueWarning}(\textcolor{red}{NotEnoughFundsInPrepaidOrCCAccounts}) \dec\-
-	\ASM{Consume}(EurB2CMsg(EuroAmount,\FROM customer, \FROM retail)) 
+	\ASM{Consume}(EurB2CMsg(EuroAmount,\FROM customer)) 
 		\mbox{~~~~~~~~~ // consume input} \-
 \WHERE \+
 ThereIsEnoughPrepaidFeeFor(amount, retail) \IFF 
@@ -786,11 +786,11 @@ ThereIsEnoughPrepaidFeeFor(amount, retail) \IFF
 \textcolor{red}{ThereAreEnoughCreditsFor(amount,retail) \IFF
 	availableBalance(cc_{retail}) \geq amount} \\
 \ASM{ManageEuroPayment}(amount, retail, cust) = \+
-	balance_{retail}(income_{retail}) := balance_{retail}(income_{retail}) + amount \\
-	balance_{cust}(bisoo_{cust}) := balance_{cust}(bisoo_{cust}) - amount \-
+	balance(income_{retail}) := balance(income_{retail}) + amount \\
+	balance(bisoo_{cust}) := balance(bisoo_{cust}) - amount \-
  \ASM{ManageRewardPayment}(amount, retail, cust) = \+
-	balance_{retail}(cc_{retail}) := balance_{retail}(cc_{retail}) - rewardRate_{retail}(amount) \\
-	balance_{cust}(cc_{cust}):=  balance_{cust}(cc_{cust}) + rewardRate_{retail}(amount) \-
+	balance(cc_{retail}) := balance(cc_{retail}) - rewardRate_{retail}(amount) \\
+	balance(cc_{cust}):=  balance(cc_{cust}) + rewardRate_{retail}(amount) \-
  \ASM{ManageFeePayment}(amount, retail) = \+
 	 \IF retail \in Retail \cup Full \THEN \+
 		balance(prepaid_{retail}):=balance(prepaid_{retail}) -  fee(amount) 
@@ -819,9 +819,8 @@ A $retail \in Retail \cup Full$ can also execute a $\ASM{SrdB2C}$ operation whic
       \ASM{Consume}(SrdB2CMsg(amount,\FROM consumer))\dec\dec\-
  \WHERE \+
 \ASM{PayWithReward}(amt,consumer,retail)  =\+    
-      balance_{consumer}(cc_{consumer}):= 
-                balance_{consumer}(cc_{consumer)}) -amt\\
-      balance_{retail}(cc_{retail}):= balance_{retail}(cc_{retail}) + amt
+      balance(cc_{consumer}):= balance(cc_{consumer)}) - amt\\
+      balance(cc_{retail}):= balance(cc_{retail}) + amt
 \end{asm}
 
 $\ASM{PayWithReward}$ is described in Section \ref{b2cOperations} as an instance of the standard Credit (via Service channel) or Debit (via POS channel) operation. 
@@ -919,7 +918,7 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
      \ASM{DebitLateAckReqAnswCompletion}\-
   \ASM{MngrOps} =\+    
      	\ASM{RechargePrepaid}\\
-     	\ASM{RecordFeePayment}\\
+     	\ASM{ManageFeePayment}\\
      	\ASM{LowPaymentAlert}
  \end{asm}
  
@@ -1190,7 +1189,7 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
 			\ASM{ManageFeePayment}(EuroAmount, retail) \-
 		\ELSE\+
 			\ASM{IssueWarning}(\textcolor{red}{NotEnoughFundsInPrepaidOrCCAccounts}) \dec\-
-\ASM{Consume}(EurB2CMsg(EuroAmount,\FROM customer, \FROM retail)) 
+\ASM{Consume}(EurB2CMsg(EuroAmount,\FROM customer)) 
 	\mbox{~~~~~~~~~ // consume input} 
 \end{asm}
 }
@@ -1204,9 +1203,8 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
  \ASM{Consume}(SrdB2CMsg(amount,\FROM consumer))\dec\dec\-
  \WHERE \+
  \ASM{PayWithReward}(amt,consumer,retail)  =\+    
- balance_{consumer}(cc_{consumer}):= 
- balance_{consumer}(cc_{consumer)}) -amt\\
- balance_{retail}(cc_{retail}):= balance_{retail}(cc_{retail}) + amt
+ balance(cc_{consumer}):= balance(cc_{consumer)}) - amt\\
+ balance(cc_{retail}):= balance(cc_{retail}) + amt
  \end{asm}
  
  \subsubsection{The B2C operation macros\\}
@@ -1251,11 +1249,11 @@ ThereIsEnoughPrepaidFeeFor(amount, retail) \IFF
 \textcolor{red}{ThereAreEnoughCreditsFor(amount,retail) \IFF
 	availableBalance(cc_{retail}) \geq amount} \\
 \ASM{ManageEuroPayment}(amount, retail, cust) = \+
-	balance_{retail}(income_{retail}) := balance_{retail}(income_{retail}) + amount \\
-	balance_{cust}(bisoo_{cust}) := balance_{cust}(bisoo_{cust}) - amount \-
+	balance(income_{retail}) := balance(income_{retail}) + amount \\
+	balance(bisoo_{cust}) := balance(bisoo_{cust}) - amount \-
  \ASM{ManageRewardPayment}(amount, retail, cust) = \+
-	balance_{retail}(cc_{retail}) := balance_{retail}(cc_{retail}) - rewardRate_{retail}(amount) \\
-	balance_{cust}(cc_{cust}):=  balance_{cust}(cc_{cust}) + rewardRate_{retail}(amount) \-
+	balance(cc_{retail}) := balance(cc_{retail}) - rewardRate_{retail}(amount) \\
+	balance(cc_{cust}):=  balance(cc_{cust}) + rewardRate_{retail}(amount) \-
  \ASM{ManageFeePayment}(amount, retail) = \+
 	 \IF retail \in Retail \cup Full \THEN \+
 		balance(prepaid_{retail}):=balance(prepaid_{retail}) -  fee(amount) 
