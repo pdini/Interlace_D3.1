@@ -464,14 +464,13 @@ The $\ASM{CompleteTransaction}$ component still remains rather abstract, as in D
 
 {\bf Historical remark.} At the time of writing the description of the model in D2.1, the understanding was that the (at the time otherwise not further specified) $custFlds$ parameter, which now would be renamed $metadata$, plays a role for the $\ASM{CreditPreviewReq}$ rule. We now know that for the behaviour of this rule only the group and account type properties are relevant so that the parameter can be skipped. Similarly for $\ASM{CreditPerformReq}$.
 
-\textcolor{blue}{
+
 {\bf Remark on Function Append.} The conceptual heart of the Credit or Debit operation is the Append function shown above. Following common practice, we do not hold user balances in the ledger, we simply record the amount of the transactions along with the other essential parameters shown by \emph{appending} this information to the ledger. If a user balance is required at any one point in time, it will need to be calculated in real time when the request is made. As a consequence, for a Credit operation performed by $userA$ as the payment of $amount$ to $userB$, the intuitively obvious double-entry book-keeping operation
 \begin{align*}
 balance(acct(userA)) = balance(acct(userA)) - amount \\
 balance(acct(userB)) = balance(acct(userB)) + amount
 \end{align*}
 does not appear at all, it is only implicit.
-}
 
 
 \section{Debit Operation} 
@@ -716,55 +715,8 @@ Chapter \ref{ch:UpdatedBLS} considers the operations as instances of the general
 
 In the current Sardex system, EurB2C operations are triggered by a $retail$ or a $full$ member as Debit operations from the consumer's Bisoo account to the Income account of the $retail$ or $full$ member, respectively. Since the pairing of the accounts is hard-wired, to simplify the description of the desired functionality in this model we have chosen to describe such operations directly, without the artificial detour via empty account type and account connectivity checks. Thus, an $\ASM{EurB2C}$ operation is triggered by a $consumer$ (whether in $Consumer$ or in $Consumer\_Verified$) who buys a product at a $retail \in Retail \cup Full$ and pays for it in Euro. The money is recorded in the $income(retail)$ account, a reward as SRD credit is issued to the $customer$ and the Euro fee is paid. The consumer from which the $EuroAmount$ is $Received$ remains anonymous. This means that, until it becomes a $Customer\_Verified$ member, namely by a registration action that we do not model here, it remains known to the Sardex system only by the number of the $card$ issued.
 
-\textcolor{red}{\bf ORIGINAL:}
-\begin{asm}
-\ASM{EurB2C}=\+
-\IF Received(EurB2CMsg(EuroAmount,\FROM customer), \FROM retail) \AND \+
-          ~~~~~~~~
-          customer \in  \{unknown\} \cup Consumer \cup Consumer\_Verified \THEN \\
-    \IF ThereIsEnoughPrepaidFeeFor(EuroAmount,retail) \THEN \+
-       \ASM{RegisterEuroPayment}(EuroAmount,retail)\\
-       \ASM{PayB2CEuroFee}(EuroAmount,\FOR retail) \\ 
-       \ASM{IssueReward}(retail,EuroAmount,customer)\-
-    \ELSE ~ \ASM{IssueWarning}(ThereIsNotEnoughEuroFeePrepayment)    \\
-    \ASM{Consume}(EurB2CMsg(EuroAmount,\FROM customer, \FOR retail)) 
-              \mbox{ // consume input} \dec\-
-\WHERE \+
-    ThereIsEnoughPrepaidFeeFor(amount,retail) \IFF \+    
-        balance_{retail}(prepaid_{retail}) \geq euroFee_{retail}(amount) \-
-    \ASM{RegisterEuroPayment}(amount,retail)=\+
-        balance_{retail}(income_{retail}):= balance_{retail}(income_{retail})+amount \-
-    \ASM{PayB2CEuroFee}(amount,\FOR retail)= \+      
-        \ASM{Send}(B2CEuroFeeMsg(euroFee_{retail}(amount),\FROM retail), \TO mngr) \-
-    \ASM{IssueReward}(retail,amount,customer)  =\+
-         balance_{retail}(cc_{retail}):=       
-         balance_{retail}(cc_{retail})-rewardRate_{retail}(amount) \\
-        \IF customer=unknown \THEN \+
-            \LET card=~\NEW{Consumer} \+
-               \ASM{InitializeBisoo}(card,amount)  \mbox{ // register Euro payment in new $Bisoo$ account}\\
-               \ASM{InitializeReward}(card,rewardRate_{retail}(amount))  \mbox{  // register SRD reward on card} \dec\-
-         \ELSE  \mbox{  // $customer$ `is' a $card$ or $customer$ is registered}\+
-              \ASM{RefreshBisoo}(customer,amount)   \\
-              \ASM{RefreshReward}(customer,rewardRate_{retail}(amount))\dec\-
-    \ASM{InitializeBisoo}(card,amount) = 
-              (balance_{card}(bisoo_{card}):=amount )    \\           	
-    \ASM{InitializeReward}(card,amount)=(balance_{card}(cc_{card}):=amount)\\
-    \ASM{RefreshBisoo}(cust,amt)=
-            (balance_{cust}(bisoo_{cust}):=balance_{cust}(bisoo_{cust})+amt) \\
-     \ASM{RefreshReward}(cust,amt)=
-        (balance_{cust}(cc_{cust}):=  balance_{cust}(cc_{cust})+amt)       
-\end{asm}
+Note: A customer is either a card (`$consumer$') or a registered B2C user (`$consumer$\_$verified$'). There is no need to initialise $bisoo_{cust}$ or $reward_{cust}$. They have already been initialised upstream, before the cards are distributed to the $Retail$ and $Full$ members.
 
-
- \textcolor{red}{Note 1: there is no need for an `$unknown$' customer. A customer is either a card (`$consumer$') or a registered B2C user (`$consumer$\_$verified$'). So I have deleted $unknown$ from the first test below.}
-
-\textcolor{red}{Note 2: There is no need to initialise $bisoo_{cust}$ or $reward_{cust}$. They have already been initialised upstream, before the cards are distributed to the $Retail$ and $Full$ members. So I have deleted the customer = $unknown$ case and the initialisation of these two accounts.}
-
-\textcolor{red}{Note 3: The test on the balance of the retail's CC account was missing. The definition of the function $availableBalance$ was also missing, I took it from D2.1. Finally, I made the $euroFee$ function explicit. I have coloured these additions in red}
-
-\textcolor{blue}{\bf NEW:}
-
-\textcolor{blue}{
 \begin{asm}
 \ASM{EurB2C} = \+
 	\IF Received(EurB2CMsg(EuroAmount,\FROM customer), \FROM retail) \AND \+
@@ -772,22 +724,22 @@ In the current Sardex system, EurB2C operations are triggered by a $retail$ or a
 			customer \in  Consumer \cup Consumer\_Verified \THEN \\
 		\IF ThereIsEnoughPrepaidFeeFor(EuroAmount,retail) \\
 				~~~~~~~~
-				\textcolor{red}{\AND ThereAreEnoughCreditsFor(EuroAmount, retail)} \THEN \+
+				\AND ThereAreEnoughCreditsFor(EuroAmount, retail) \THEN \+
 			\ASM{ManageEuroPayment}(EuroAmount, retail, customer)\\
 			\ASM{ManageRewardPayment}(EuroAmount, retail, customer)\\
 			\ASM{ManageFeePayment}(EuroAmount, retail) \-
 		\ELSE\+
-			\ASM{IssueWarning}(\textcolor{red}{NotEnoughFundsInPrepaidOrCCAccounts}) \dec\-
+			\ASM{IssueWarning}(NotEnoughFundsInPrepaidOrCCAccounts) \dec\-
 	\ASM{Consume}(EurB2CMsg(EuroAmount,\FROM customer)) 
 		\mbox{~~~~~~~~~ // consume input} \-
 \WHERE \+
 ThereIsEnoughPrepaidFeeFor(amount, retail) \IFF 
 	balance_{retail}(prepaid_{retail}) \geq euroFee_{retail}(amount) \\
-\textcolor{red}{ThereAreEnoughCreditsFor(amount,retail) \IFF
-	availableBalance(cc_{retail}) \geq amount} \\
+ThereAreEnoughCreditsFor(amount,retail) \IFF
+	availableBalance(cc_{retail}) \geq amount \\
 \ASM{ManageEuroPayment}(amount, retail, cust) = \+
 	balance(income_{retail}) := balance(income_{retail}) + amount \\
-	balance(bisoo_{cust}) := balance(bisoo_{cust}) - amount \-
+	balance(bisoo_{cust}) := balance(bisoo_{cust}) - amount\footnote{This is a purely statistical account, see below.} \-
  \ASM{ManageRewardPayment}(amount, retail, cust) = \+
 	balance(cc_{retail}) := balance(cc_{retail}) - rewardRate_{retail}(amount) \\
 	balance(cc_{cust}):=  balance(cc_{cust}) + rewardRate_{retail}(amount) \-
@@ -797,17 +749,14 @@ ThereIsEnoughPrepaidFeeFor(amount, retail) \IFF
 		\mbox{~~~~~ // subtract $fee$ from $prepaid_{retail}$} \\
 		balance(topup):=balance(topup) + fee(amount)
 		\mbox{~~~~~~~~~~~~~~~~~~~~~ // add $fee$ to $topup$}\dec\-
-\textcolor{red}{availableBalance(cc_{retail}) = balance_{retail} (cc_{retail})+ creditLimit(cc_{retail})}\\
-\textcolor{red}{euroFee_{retail}(amount) = 0.02 * amount}
+availableBalance(cc_{retail}) = balance_{retail} (cc_{retail})+ creditLimit(cc_{retail})\\
+euroFee_{retail}(amount) = 0.02 * amount
 \end{asm}
-}
 
-
-
-\smallskip
+%\smallskip
 NB. By registering, a $consumer$ becomes a member of $Consumer\_Verified$ whereby its `identity' changes from being a $card$ to a $customer$, with name, surname, etc. And correspondingly its $acc$ounts turn out to be known now as $acc_{customer}$ together with the associated account access function.
 
-{\bf Remark on Bisoo and Income.} For simplicity of exposition, we have included the  $bisoo_{consumer}$  action (to record, for statistical purposes, the Euro amount of the sale) into  the $\ASM{IssueReward}$ rule. In the use case description in Figure \ref{fig:B2C1} this action is introduced as \textcolor{blue}{a ``debit-like'' action initiated by a member of $Retail$ or $Full$ who can access $Bisoo$ accounts for payment purposes. The $Bisoo$ account does not have a ``spending limit'', it is only used for statistical purposes as a way to record what the $consumer$ spends in Euros through B2C transactions. Although adding the amount spent each time would achieve this purpose as well, we prefer to subtract each time -- resulting in an always-negative balance -- out of a desire for consistency with the double-entry book-keeping method at the heart of mutual credit, whereby the $Bisoo$ and the $Income$ accounts are paired: what is \emph{added to} the latter must be \emph{subtracted from} the former.} Note the direct update of $income_{retail}$ in $ \ASM{ManageEuroPayment}$, which in Chapter \ref{ch:UpdatedBLS} is introduced as a Debit operation involving $income_{retail}$ and $bisoo_{customer}$.
+{\bf Remark on Bisoo and Income.} For simplicity of exposition, we have included the  $bisoo_{consumer}$  action (to record, for statistical purposes, the Euro amount of the sale) into  the $\ASM{IssueReward}$ rule. In the use case description in Figure \ref{fig:B2C1} this action is introduced as a ``debit-like'' action initiated by a member of $Retail$ or $Full$ who can access $Bisoo$ accounts for payment purposes. The $Bisoo$ account does not have a ``spending limit'', it is only used for statistical purposes as a way to record what the $consumer$ spends in Euros through B2C transactions. Although adding the amount spent each time would achieve this purpose as well, we prefer to subtract each time -- resulting in an always-negative balance -- out of a desire for consistency with the double-entry book-keeping method at the heart of mutual credit, whereby the $Bisoo$ and the $Income$ accounts are paired: what is \emph{added to} the latter must be \emph{subtracted from} the former. Note the direct update of $income_{retail}$ in $ \ASM{ManageEuroPayment}$, which in Chapter \ref{ch:UpdatedBLS} is introduced as a Debit operation involving $income_{retail}$ and $bisoo_{customer}$.
 
 A $retail \in Retail \cup Full$ can also execute a $\ASM{SrdB2C}$ operation which can be triggered by a  member of $Consumer\_Verified$. This happens when the $retail$er accepts a purchase the member pays in SRD via its accumulated rewards. It is assumed that when registering (an operation we do not model here), a consumer is turned from an element $card \in Consumer$ into an element of $Consumer\_Verified$, so that formally the account $cc_{card}$ becomes $cc_{consumerVerified}$.
 
@@ -852,16 +801,6 @@ balance(prepaid_{retail}):=balance(prepaid_{retail})+amount \+
 \end{asm}
 
 When a $retail$er has to pay the fee for a $\ASM{EurB2C}$ operation it performs with a customer, $SysAdmin$ is triggered to $\ASM{ManageFeePayment}$ when it receives the corresponding $B2CEuroFeeMsg$ from the $retail$er. Following the Euro fee handling scheme via the $topup$ account described above, $SysAdmin$ must add the received fee to $topup$ and subtract it from the $retail$er's $Prepaid$ account.
-
- \textcolor{red}{This machine should be deleted, it is now in EurB2C under the name ``ManageFeePayment'':}
-\begin{asm}
-\ASM{RecordFeePayment}=\+   
-   \IF Received(B2CEuroFeeMsg(amount,\FROM retail)) \AND retail \in Retail \cup Full \THEN \+
-   balance(topup):=balance(topup)+fee \mbox{ // add $fee$ to $topup$}\\
-   balance(prepaid_{retail}):=balance(prepaid_{retail}) -  fee 
-            \mbox{ // subtract $fee$ from $prepaid_{retail}$}\\
-\ASM{Consume}(B2CEuroFeeMsg(amount,\FROM retail))
-\end{asm}
 
 \begin{asm}
 \ASM{LowPrepaymentAlert}=\+
@@ -1154,48 +1093,23 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
  
  \subsection{The B2C operations}
  
- \textcolor{red}{\bf ORIGINAL:}
- 
- \begin{asm}
- \ASM{EurB2C}=\+
- \IF Received(EurB2CMsg(EuroAmount,\FROM customer), \FROM retail) \AND \+
- ~~~~~~~~
- customer \in  \{unknown\} \cup Consumer \cup Consumer\_Verified \THEN \\
- \IF ThereIsEnoughPrepaidFeeFor(EuroAmount,retail) \THEN \+
- \ASM{RegisterEuroPayment}(EuroAmount,retail)\\
- \ASM{PayB2CEuroFee}(EuroAmount,\FOR retail) \\ 
- \ASM{IssueReward}(retail,EuroAmount,customer)\-
- \ELSE ~ \ASM{IssueWarning}(ThereIsNotEnoughEuroFeePrepayment)    \\
- \ASM{Consume}(EurB2CMsg(EuroAmount,\FROM customer, \FOR retail)) 
- \mbox{~~~~~~~~~ // consume input} 
-\end{asm}
-
-\textcolor{blue}{\bf NEW:}
-
- \textcolor{red}{Note 1: there is no need for an `$unknown$' customer. A customer is either a card (`$consumer$') or a registered B2C user (`$consumer$\_$verified$'). So I have deleted $unknown$ from the first test below.}
-
-\textcolor{red}{Note 3: The test on the balance of the retail's CC account was missing. The definition of the function $availableBalance$ was also missing, I took it from D2.1. Finally, I made the $euroFee$ function explicit. I have coloured these additions in red}
-
-\textcolor{blue}{
 \begin{asm}
 \ASM{EurB2C} = \+
 	\IF Received(EurB2CMsg(EuroAmount,\FROM customer), \FROM retail) \AND \+
 		~~~~~~~~
 		customer \in  Consumer \cup Consumer\_Verified \THEN \\
 		\IF ThereIsEnoughPrepaidFeeFor(EuroAmount,retail) \\
-			~~~~~~~~ \textcolor{red}{\AND ThereAreEnoughCreditsFor(EuroAmount, retail)} \THEN \+
+			~~~~~~~~ \AND ThereAreEnoughCreditsFor(EuroAmount, retail) \THEN \+
 			\ASM{ManageEuroPayment}(EuroAmount, retail, customer)\\
 			\ASM{ManageRewardPayment}(EuroAmount, retail, customer)\\
 			\ASM{ManageFeePayment}(EuroAmount, retail) \-
 		\ELSE\+
-			\ASM{IssueWarning}(\textcolor{red}{NotEnoughFundsInPrepaidOrCCAccounts}) \dec\-
+			\ASM{IssueWarning}(NotEnoughFundsInPrepaidOrCCAccounts) \dec\-
 \ASM{Consume}(EurB2CMsg(EuroAmount,\FROM customer)) 
 	\mbox{~~~~~~~~~ // consume input} 
 \end{asm}
-}
- 
- 
- \begin{asm}
+
+\begin{asm}
  \ASM{SrdB2C}=\+
  \IF Received(SrdB2CMsg(amount,\FROM consumer), \FROM retail) \AND \+
  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~consumer \in Consumer\_Verified \THEN \+
@@ -1209,45 +1123,11 @@ We assume that both the Credit/Debit/B2C and the $mngr$ operations are executed 
  
  \subsubsection{The B2C operation macros\\}
 
- \textcolor{red}{\bf ORIGINAL:}
-
- \begin{asm}
- ThereIsEnoughPrepaidFeeFor(amount,retail) \IFF \+    
- balance_{retail}(prepaid_{retail}) \geq euroFee_{retail}(amount) \-
- \ASM{RegisterEuroPayment}(amount,retail)=\+
- balance_{retail}(income_{retail}):= balance_{retail}(income_{retail})+amount \-
- \ASM{PayB2CEuroFee}(amount,\FOR retail)= \+      
- \ASM{Send}(B2CEuroFeeMsg(euroFee_{retail}(amount),\FROM retail), \TO mngr) \-
- \ASM{IssueReward}(retail,amount,customer)  =\+
- balance_{retail}(cc_{retail}):=       
- balance_{retail}(cc_{retail})-rewardRate_{retail}(amount) \\
- \IF customer=unknown \THEN \+
- \LET card=~\NEW{Consumer} \+
- \ASM{InitializeBisoo}(card,amount)  \mbox{ // register Euro payment in new $Bisoo$ account}\\
- \ASM{InitializeReward}(card,rewardRate_{retail}(amount))  \mbox{  // register SRD reward on card} \dec\-
- \ELSE  \mbox{  // $customer$ `is' a $card$ or $customer$ is registered}\+
- \ASM{RefreshBisoo}(customer,amount)   \\
- \ASM{RefreshReward}(customer,rewardRate_{retail}(amount))\dec\-
- \ASM{InitializeBisoo}(card,amount) = 
- (balance_{card}(bisoo_{card}):=amount )    \\           	
- \ASM{InitializeReward}(card,amount)=(balance_{card}(cc_{card}):=amount)\\
- \ASM{RefreshBisoo}(cust,amt)=
- (balance_{cust}(bisoo_{cust}):=balance_{cust}(bisoo_{cust})+amt) \\
- \ASM{RefreshReward}(cust,amt)=
- (balance_{cust}(cc_{cust}):=  balance_{cust}(cc_{cust})+amt)       
- \end{asm}
-
-\textcolor{blue}{\bf NEW:}
-
-\textcolor{red}{Note 2: There is no need to initialise $bisoo_{cust}$ or $reward_{cust}$. They have already been initialised upstream, before the cards are distributed to the $Retail$ and $Full$ members. So I have deleted the customer = $unknown$ case and the initialisation of these two accounts.}
-
-
-\textcolor{blue}{
 \begin{asm}
 ThereIsEnoughPrepaidFeeFor(amount, retail) \IFF 
 	balance_{retail}(prepaid_{retail}) \geq euroFee_{retail}(amount) \\
-\textcolor{red}{ThereAreEnoughCreditsFor(amount,retail) \IFF
-	availableBalance(cc_{retail}) \geq amount} \\
+ThereAreEnoughCreditsFor(amount,retail) \IFF
+	availableBalance(cc_{retail}) \geq amount \\
 \ASM{ManageEuroPayment}(amount, retail, cust) = \+
 	balance(income_{retail}) := balance(income_{retail}) + amount \\
 	balance(bisoo_{cust}) := balance(bisoo_{cust}) - amount \-
@@ -1260,11 +1140,9 @@ ThereIsEnoughPrepaidFeeFor(amount, retail) \IFF
 		\mbox{~~~~~ // subtract $fee$ from $prepaid_{retail}$} \\
 		balance(topup):=balance(topup) + fee(amount)
 		\mbox{~~~~~~~~~~~~~~~~~~~~~ // add $fee$ to $topup$}\dec\-
-\textcolor{red}{availableBalance(cc_{retail}) = balance_{retail} (cc_{retail})+ creditLimit(cc_{retail})}\\
-\textcolor{red}{euroFee_{retail}(amount) = 0.02 * amount}
+availableBalance(cc_{retail}) = balance_{retail} (cc_{retail})+ creditLimit(cc_{retail})\\
+euroFee_{retail}(amount) = 0.02 * amount
 \end{asm}
-}
-
 
 \subsection{The Manager/SysAdmin Operation Components}
 
@@ -1279,23 +1157,12 @@ balance(prepaid_{retail}):=balance(prepaid_{retail})+amount \+
  \ASM{Consume}((amount,FeePrepayment), \FROM retail) \mbox{~~~~~~~~~~~~~~~~~~ // consume input}
  \end{asm}
  
- \textcolor{red}{This machine should be deleted, it is now in EurB2C under the name ``ManageFeePayment'':}
- \begin{asm}
- \ASM{RecordFeePayment}=\+   
- \IF Received(B2CEuroFeeMsg(amount,\FROM retail)) \AND retail \in Retail \cup Full \THEN \+
- balance(topup):=balance(topup)+fee 
- \mbox{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ // add $fee$ to $topup$}\\
- balance(prepaid_{retail}):=balance(prepaid_{retail}) -  fee 
- \mbox{~~~~~~~~~~~ // subtract $fee$ from $prepaid_{retail}$}\\
- \ASM{Consume}(B2CEuroFeeMsg(amount,\FROM retail))
- \end{asm}
- 
- \begin{asm}
+\begin{asm}
  \ASM{LowPrepaymentAlert}=\+
  \FORALL  retail  \in Retail \cup Full \+
  \IF CloseToZero(balance(prepaid_{retail}))  \THEN \+
  \ASM{Send}(PrepaymentAlertMsg(lowPrepaidBalance),\TO retail)
- \end{asm}
+\end{asm}
 
 
 \section{Sub-Appendix 2: $\ASM{IfThenElseCascade}$ Pattern}
